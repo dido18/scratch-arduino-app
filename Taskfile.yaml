@@ -4,7 +4,6 @@ vars:
 
 tasks:
   scratch:init:
-    - rm -rf scratch-editor 
     - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
     - cd scratch-editor && npm install && npm run build
     - cd scratch-editor/packages/scratch-gui && npm install
