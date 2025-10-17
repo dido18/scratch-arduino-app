@@ -1,0 +1,19 @@
+version: "3"
+vars:
+  SCRATCH_EDITOR_VERSION: v12.0.1
+
+tasks:
+  scratch:init:
+    - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
+    - cd scratch-editor && npm install && npm run build
+    - cd scratch-editor/packages/scratch-gui && npm install
+    - cd scratch-editor/packages/scratch-vm && npm install
+
+  scratch:patch:
+    - cd scratch-editor/packages/scratch-gui && node ../../../scratch-arduino-extensions/scripts/patch-gui.js
+
+  scratch:start:
+    - cd scratch-editor/packages/scratch-gui  && npm start
+
+  scratch:clean:
+    - rm -rf scratch-editor
