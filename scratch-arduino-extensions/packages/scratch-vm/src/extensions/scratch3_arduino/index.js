@@ -1,13 +1,13 @@
-// const formatMessage = require('format-message');
-// const formatMessage = require('../../../../node_modules/format-message');
-
+// Option 1: Relative path to cousin folder
+// const formatMessage = require('../../../../../../scratch-editor/node_modules/format-message');
+const BlockType = require('../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/block-type');
 
 /**
  * Url of icon to be displayed at the left edge of each extension block.
  * @type {string}
  */
 // eslint-disable-next-line max-len
-const iconURI = '' 
+const iconURI = ''; 
 
 /**
  * Url of icon to be displayed in the toolbox menu for the extension category.
@@ -20,19 +20,26 @@ class Scratch3Arduino {
     constructor (runtime) {
         this.runtime = runtime;
    }
+};
 
-    getInfo () {
+Scratch3Arduino.prototype.getInfo = function () {
         return {
             id: 'arduino',
-            name: {
-                id: 'arduino.extensionName',
-                default: 'Arduino',
-                description: 'Add Arduino blocks to Scratch.'
-            },
+            name: "Arduino",
             menuIconURI: menuIconURI,
             blockIconURI: iconURI,
-            blocks: [ ],
+            blocks: [ 
+                {
+                    opcode: 'example-noop',
+                    blockType: BlockType.COMMAND,
+                    text: 'do nothing',
+                    func: 'noop'
+                },
+            ],
         };
-    }
 }
+
+Scratch3Arduino.prototype.noop = function () {
+};
+
 module.exports = Scratch3Arduino;

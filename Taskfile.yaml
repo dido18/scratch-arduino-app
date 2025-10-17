@@ -9,11 +9,11 @@ tasks:
     - cd scratch-editor/packages/scratch-gui && npm install
     - cd scratch-editor/packages/scratch-vm && npm install
 
-  scratch-patch:
+  scratch:patch:
     - cd scratch-editor/packages/scratch-gui && node ../../../scratch-arduino-extensions/scripts/patch-gui.js
 
-  scratch-start:
+  scratch:start:
     - cd scratch-editor/packages/scratch-gui  && npm start
 
-  scratch-clean:
+  scratch:clean:
     - rm -rf scratch-editor
