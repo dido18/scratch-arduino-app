@@ -30,12 +30,13 @@ Scratch3Arduino.prototype.getInfo = function () {
             blockIconURI: iconURI,
             blocks: [ 
                 {
-                    opcode: 'example-noop',
+                    opcode: 'noop',
                     blockType: BlockType.COMMAND,
                     text: 'do nothing',
                     func: 'noop'
                 },
             ],
+        
         };
 }
 
