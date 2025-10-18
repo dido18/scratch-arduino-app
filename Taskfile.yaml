@@ -5,15 +5,28 @@ vars:
 tasks:
   scratch:init:
     - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
-    - cd scratch-editor && npm install && npm run build
-    - cd scratch-editor/packages/scratch-gui && npm install
-    - cd scratch-editor/packages/scratch-vm && npm install
+
+  scratch:install:
+  dir: scratch-editor
+  cmds:
+    - npm install 
+    - npm run build --workspace @scratch/scratch-svg-renderer
+    - npm run build --workspace @scratch/scratch-vm
+    - npm run build:dev --workspace @scratch/scratch-gui
 
   scratch:patch:
     - cd scratch-editor/packages/scratch-gui && node ../../../scratch-arduino-extensions/scripts/patch-gui.js
 
   scratch:start:
-    - cd scratch-editor/packages/scratch-gui  && npm start
+  dir: scratch-editor
+    - npm start --workspace @scratch/scratch-gui
 
   scratch:clean:
     - rm -rf scratch-editor
+
+  board:upload:
+   -  adb push ./python/main.py  /home/arduino/ArduinoApps/scratch-arduino-app/python/main.py
+   -  adb push ./sketch/sketch.ino  /home/arduino/ArduinoApps/scratch-arduino-app/sketch/sketch.ino 
+   -  adb push ./sketch/sketch.yaml  /home/arduino/ArduinoApps/scratch-arduino-app/sketch/sketch.yaml 
+   -  adb push ./app.yaml /home/arduino/ArduinoApps/scratch-arduino-app/app.yaml  
+  #  -  adb shell arduino-app-cli app restart user:scratch-arduino-app 

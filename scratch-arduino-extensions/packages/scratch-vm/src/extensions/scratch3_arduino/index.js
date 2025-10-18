@@ -1,6 +1,7 @@
-// Option 1: Relative path to cousin folder
 // const formatMessage = require('../../../../../../scratch-editor/node_modules/format-message');
 const BlockType = require('../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/block-type');
+const ArgumentType = require('../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/argument-type');
+const io = require('./socket.io.min.js');
 
 /**
  * Url of icon to be displayed at the left edge of each extension block.
@@ -16,9 +17,16 @@ const iconURI = '';
 // eslint-disable-next-line max-len
 const menuIconURI =  ''
 
+const wsServerURL = 'http://192.168.1.39:7000';
+
 class Scratch3Arduino {
     constructor (runtime) {
         this.runtime = runtime;
+        this.io = io(wsServerURL, {
+            path: '/socket.io',
+            transports: ['polling','websocket'],
+            autoConnect: true
+        });
    }
 };
 
@@ -30,17 +38,24 @@ Scratch3Arduino.prototype.getInfo = function () {
             blockIconURI: iconURI,
             blocks: [ 
                 {
-                    opcode: 'noop',
+                    opcode: 'matrixDraw',
                     blockType: BlockType.COMMAND,
-                    text: 'do nothing',
-                    func: 'noop'
+                    text: 'draw [FRAME] on matrix',
+                    func: 'matrixDraw',
+                    arguments: {
+                        FRAME: {
+                           type: ArgumentType.MATRIX,
+                            defaultValue: '0101010101100010101000100'
+                        }
+                    }
                 },
             ],
-        
         };
 }
 
-Scratch3Arduino.prototype.noop = function () {
+Scratch3Arduino.prototype.matrixDraw = function (args) {
+    console.log(`Drawing frame on matrix: ${args}`);
+    this.io.emit("matrix_draw", {frame: args.FRAME});
 };
 
 module.exports = Scratch3Arduino;
