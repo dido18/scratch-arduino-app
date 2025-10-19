@@ -28,5 +28,13 @@ tasks:
    -  adb push ./python/main.py  /home/arduino/ArduinoApps/scratch-arduino-app/python/main.py
    -  adb push ./sketch/sketch.ino  /home/arduino/ArduinoApps/scratch-arduino-app/sketch/sketch.ino 
    -  adb push ./sketch/sketch.yaml  /home/arduino/ArduinoApps/scratch-arduino-app/sketch/sketch.yaml 
+   -  adb push  ./sketch/Arduino_Modulino /home/arduino/ArduinoApps/scratch-arduino-app/sketch/Arduino_Modulino  
    -  adb push ./app.yaml /home/arduino/ArduinoApps/scratch-arduino-app/app.yaml  
   #  -  adb shell arduino-app-cli app restart user:scratch-arduino-app 
+
+  modulino:patch:
+  # See https://github.com/arduino-libraries/Arduino_Modulino/pull/42
+  # Any Version<0.6.0 the build fails if Both modulino and ArduinoLedMatrix are used in the UnoQ
+    - mkdir -p sketch/Arduino_Modulino
+    - git clone --depth 1 git@github.com:arduino-libraries/Arduino_Modulino.git  sketch/Arduino_Modulino
+    - cd sketch/Arduino_Modulino && git checkout 480e9d183a3b3dede0c68170e469410a6d710bee
