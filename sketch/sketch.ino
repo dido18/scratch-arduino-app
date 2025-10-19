@@ -1,27 +1,36 @@
 #include <Arduino_RouterBridge.h>
 #include "Arduino_LED_Matrix.h"
+#include <Arduino_Modulino.h>
 
 Arduino_LED_Matrix matrix;
+ModulinoButtons buttons;
 
 void setup() {
   matrix.begin();
   Bridge.begin();
+  Modulino.begin(Wire1);
+  // show led indication if buttons cannot be initilized
+  buttons.begin(); 
+  buttons.setLeds(true, true, true);
   Bridge.provide("matrix_draw", matrix_draw);
 }
 
-void loop() {}
+void loop() {
+  if (buttons.update()) {
+      if (buttons.isPressed("A")) {
+        Bridge.notify("modulino_button_pressed", "A");
+        buttons.setLeds(true, false, false);
+      } else if (buttons.isPressed("B")) {
+        Bridge.notify("modulino_button_pressed", "B");
+        buttons.setLeds(false, true, false);
+      } else if (buttons.isPressed("C")) {
+        Bridge.notify("modulino_button_pressed", "C");
+        buttons.setLeds(false, false, true);
+      }
+  }
+}
 
-uint8_t shades[104] = {
-	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	
-	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,
-	2,	2,	2,	2,	2,	2,	2,	2,	2,	2,	2,	2,	2,
-	3,	3,	3,	3,	3,	3,	3,	3,	3,	3,	3,	3,	3,
-	4,	4,	4,	4,	4,	4,	4,	4,	4,	4,	4,	4,	4,
-	5,	5,	5,	5,	5,	5,	5,	5,	5,	5,	5,	5,	5,
-	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,	6,
-	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,	7,
-};
-
+uint8_t shades[104];
 
 void matrix_draw(String frame){
   if (frame.length() != 104) {

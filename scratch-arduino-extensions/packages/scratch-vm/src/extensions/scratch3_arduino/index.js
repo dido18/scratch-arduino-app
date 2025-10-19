@@ -27,6 +27,34 @@ class Scratch3Arduino {
             transports: ['polling','websocket'],
             autoConnect: true
         });
+
+        // TODO: move to ModulinoPeripheral
+        this._button_a_pressed = false;
+        this._button_b_pressed = false;
+        this._button_c_pressed = false;
+
+        this.io.on('modulino_buttons_pressed', (data) => {
+            console.log(`Modulino button pressed event received: ${data.btn}`);
+            if (data.btn.toUpperCase() == 'A'){
+                this._button_a_pressed = true;
+                this._button_b_pressed = false;
+                this._button_c_pressed = false;
+                return;
+            }
+            if (data.btn.toUpperCase() == 'B'){
+                this._button_a_pressed = false;
+                this._button_b_pressed = true;
+                this._button_c_pressed = false;
+                return;
+            }
+            if (data.btn.toUpperCase() == 'C'){
+                this._button_a_pressed = false;
+                this._button_b_pressed = false;
+                this._button_c_pressed = true;
+                return;
+            }
+            return;
+        });
    }
 };
 
@@ -49,13 +77,40 @@ Scratch3Arduino.prototype.getInfo = function () {
                         }
                     }
                 },
+                 {
+                    opcode: 'whenModulinoButtonsPressed',
+                    blockType: BlockType.HAT,
+                    text:  'when modulino button [BTN] pressed',
+                    func: 'whenModulinoButtonsPressed',
+                    arguments: {
+                        BTN: {
+                            type: ArgumentType.STRING,
+                            menu: 'modulinoButtons',
+                            defaultValue: "A"
+                        }
+                    }
+                },
             ],
+            menus: {
+                modulinoButtons: ["A", "B", "C"]
+            }
         };
 }
 
 Scratch3Arduino.prototype.matrixDraw = function (args) {
     console.log(`Drawing frame on matrix: ${args}`);
     this.io.emit("matrix_draw", {frame: args.FRAME});
+};
+
+Scratch3Arduino.prototype.whenModulinoButtonsPressed = function (args) {
+     if (args.BTN === 'A') {
+        return this._button_a_pressed
+     } else if (args.BTN === 'B') {
+        return this._button_b_pressed
+    } else if (args.BTN === 'C') {
+        return this._button_c_pressed;
+    }
+    return false;
 };
 
 module.exports = Scratch3Arduino;
