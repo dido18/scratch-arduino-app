@@ -3,6 +3,12 @@ from arduino.app_bricks.web_ui import WebUI
 import time
 
 ui = WebUI()
+ui.on_connect(
+    lambda sid: (
+        print(f"Client connected: {sid} "),
+    )
+)
+
 
 def on_matrix_draw(_, data):
     print(f"Received frame to draw on matrix: {data}")
@@ -22,9 +28,9 @@ def on_matrix_draw(_, data):
 
 ui.on_message("matrix_draw", on_matrix_draw)
 
-ui.on_connect(
-    lambda sid: (
-        print(f"Client connected: {sid} "),
-    )
-)
+def on_modulino_button_pressed(btn):
+    ui.send_message('modulino_buttons_pressed', {"btn": btn})
+
+Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
+
 App.run()
