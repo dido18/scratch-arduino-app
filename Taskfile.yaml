@@ -19,6 +19,7 @@ tasks:
 
   scratch:start:
   dir: scratch-editor
+  cmds:
     - npm start --workspace @scratch/scratch-gui
 
   scratch:clean:
