@@ -7,21 +7,18 @@ tasks:
   app:upload:
     desc: "Upload app files to the Arduino Board"
     cmds:
-      -  adb push ./python/main.py  {{ .ARDUINO_APP_BASE_PATH }}/python/main.py
-      -  adb push ./sketch/sketch.ino  {{ .ARDUINO_APP_BASE_PATH }}/sketch/sketch.ino 
-      -  adb push ./sketch/sketch.yaml  {{ .ARDUINO_APP_BASE_PATH }}/sketch/sketch.yaml 
+      -  adb push ./app.yaml  {{ .ARDUINO_APP_BASE_PATH }}/app.yaml
       -  task modulino:patch
-      -  adb push  ./sketch/Arduino_Modulino {{ .ARDUINO_APP_BASE_PATH }}/sketch/Arduino_Modulino  
-      -  adb push ./app.yaml {{ .ARDUINO_APP_BASE_PATH }}/app.yaml 
-      -  adb push ./assets/index.html {{ .ARDUINO_APP_BASE_PATH }}/assets/index.html  
-      -  adb push ./assets/gui.js {{ .ARDUINO_APP_BASE_PATH }}/assets/gui.js  
+      -  adb push ./sketch  {{ .ARDUINO_APP_BASE_PATH }}/
+      -  adb push ./python/  {{ .ARDUINO_APP_BASE_PATH }}/
+      -  adb push ./assets/ {{ .ARDUINO_APP_BASE_PATH }}/
 
   modulino:patch:
     desc: "Patch Arduino Modulino and put it in the sketch folder"
     cmds:
     # See https://github.com/arduino-libraries/Arduino_Modulino/pull/42
     # Any Version<0.6.0 the build fails if Both modulino and ArduinoLedMatrix are used in the UnoQ
-      - mkdir -p sketch/Arduino_Modulino
+      - rm -rf sketch/Arduino_Modulino && mkdir -p sketch/Arduino_Modulino
       - git clone --depth 1 git@github.com:arduino-libraries/Arduino_Modulino.git  sketch/Arduino_Modulino
       - cd sketch/Arduino_Modulino && git checkout 480e9d183a3b3dede0c68170e469410a6d710bee
 
@@ -56,3 +53,5 @@ tasks:
       - npm run build:dev --workspace @scratch/scratch-gui
       - cp build/index.html ../../../assets/index.html
       - cp build/gui.js ../../../assets/gui.js
+      ## copy (some) of the static files
+      - mkdir -p ../../../assets/static/blocks-media && cp -r build/static/blocks-media ../../../assets/static/
