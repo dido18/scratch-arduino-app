@@ -7,12 +7,12 @@ tasks:
     - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
 
   scratch:install:
-  dir: scratch-editor
-  cmds:
-    - npm install 
-    - npm run build --workspace @scratch/scratch-svg-renderer
-    - npm run build --workspace @scratch/scratch-vm
-    - npm run build:dev --workspace @scratch/scratch-gui
+    dir: scratch-editor
+    cmds:
+      - npm install 
+      - npm run build --workspace @scratch/scratch-svg-renderer
+      - npm run build --workspace @scratch/scratch-vm
+      - npm run build:dev --workspace @scratch/scratch-gui
 
   scratch:patch:
     - cd scratch-editor/packages/scratch-gui && node ../../../scratch-arduino-extensions/scripts/patch-gui.js
@@ -25,8 +25,11 @@ tasks:
     - rm -rf scratch-editor
 
   scratch:build: # buiild scratch-gui index.html and gui.js
-  dir: scratch-editor/packages/scratch-gui
-    - npm run build:dev
+    dir: scratch-editor/packages/scratch-gui
+    cmds:
+      # - npm run build:dev
+      - cp build/index.html ../../../assets/index.html
+      - cp build/gui.js ../../../assets/gui.js
 
   app:upload:
    -  adb push ./python/main.py  /home/arduino/ArduinoApps/scratch-arduino-app/python/main.py
@@ -34,8 +37,8 @@ tasks:
    -  adb push ./sketch/sketch.yaml  /home/arduino/ArduinoApps/scratch-arduino-app/sketch/sketch.yaml 
    -  adb push  ./sketch/Arduino_Modulino /home/arduino/ArduinoApps/scratch-arduino-app/sketch/Arduino_Modulino  
    -  adb push ./app.yaml /home/arduino/ArduinoApps/scratch-arduino-app/app.yaml 
-   -  adb push ./scratch-editor/packages/scratch-gui/build/index.html /home/arduino/ArduinoApps/scratch-arduino-app/assets/index.html  
-   -  adb push ./scratch-editor/packages/scratch-gui/build/gui.js /home/arduino/ArduinoApps/scratch-arduino-app/assets/gui.js  
+   -  adb push ./assets/index.html /home/arduino/ArduinoApps/scratch-arduino-app/assets/index.html  
+   -  adb push ./assets/gui.js /home/arduino/ArduinoApps/scratch-arduino-app/assets/gui.js  
 
   modulino:patch:
   # See https://github.com/arduino-libraries/Arduino_Modulino/pull/42
