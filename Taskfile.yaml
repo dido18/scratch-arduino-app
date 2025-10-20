@@ -7,31 +7,35 @@ tasks:
     - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
 
   scratch:install:
-    dir: scratch-editor
-    cmds:
-      - npm install 
-      - npm run build --workspace @scratch/scratch-svg-renderer
-      - npm run build --workspace @scratch/scratch-vm
-      - npm run build:dev --workspace @scratch/scratch-gui
+  dir: scratch-editor
+  cmds:
+    - npm install 
+    - npm run build --workspace @scratch/scratch-svg-renderer
+    - npm run build --workspace @scratch/scratch-vm
+    - npm run build:dev --workspace @scratch/scratch-gui
 
   scratch:patch:
     - cd scratch-editor/packages/scratch-gui && node ../../../scratch-arduino-extensions/scripts/patch-gui.js
 
   scratch:start:
-    dir: scratch-editor
-    cmds:
-      - npm start --workspace @scratch/scratch-gui
+  dir: scratch-editor
+    - npm start --workspace @scratch/scratch-gui
 
   scratch:clean:
     - rm -rf scratch-editor
 
-  board:upload:
+  scratch:build: # buiild scratch-gui index.html and gui.js
+  dir: scratch-editor/packages/scratch-gui
+    - npm run build:dev
+
+  app:upload:
    -  adb push ./python/main.py  /home/arduino/ArduinoApps/scratch-arduino-app/python/main.py
    -  adb push ./sketch/sketch.ino  /home/arduino/ArduinoApps/scratch-arduino-app/sketch/sketch.ino 
    -  adb push ./sketch/sketch.yaml  /home/arduino/ArduinoApps/scratch-arduino-app/sketch/sketch.yaml 
    -  adb push  ./sketch/Arduino_Modulino /home/arduino/ArduinoApps/scratch-arduino-app/sketch/Arduino_Modulino  
-   -  adb push ./app.yaml /home/arduino/ArduinoApps/scratch-arduino-app/app.yaml  
-  #  -  adb shell arduino-app-cli app restart user:scratch-arduino-app 
+   -  adb push ./app.yaml /home/arduino/ArduinoApps/scratch-arduino-app/app.yaml 
+   -  adb push ./scratch-editor/packages/scratch-gui/build/index.html /home/arduino/ArduinoApps/scratch-arduino-app/assets/index.html  
+   -  adb push ./scratch-editor/packages/scratch-gui/build/gui.js /home/arduino/ArduinoApps/scratch-arduino-app/assets/gui.js  
 
   modulino:patch:
   # See https://github.com/arduino-libraries/Arduino_Modulino/pull/42
