@@ -12,8 +12,9 @@ task app:upload
 
 4. Open the `<IP_OR_BOARD_NAME>:7000`
 
-
 ### Local dev
--  `task scratch:init`
-
+- `task scratch:init`
+- `task scratch:patch`
+- `task scratch:start`
+- change the `const wsServerURL = `<YOUR_IP>:7000`;` in the `index.js` 
 - Open local scratch on http://localhost:8601/
