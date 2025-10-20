@@ -1,21 +1,44 @@
 version: "3"
 vars:
   SCRATCH_EDITOR_VERSION: v12.0.1
+  ARDUINO_APP_BASE_PATH: /home/arduino/ArduinoApps/scratch-arduino-app
 
 tasks:
-  scratch:init:
-    - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
+  app:upload:
+    desc: "Upload app files to the Arduino Board"
+    cmds:
+      -  adb push ./python/main.py  {{ .ARDUINO_APP_BASE_PATH }}/python/main.py
+      -  adb push ./sketch/sketch.ino  {{ .ARDUINO_APP_BASE_PATH }}/sketch/sketch.ino 
+      -  adb push ./sketch/sketch.yaml  {{ .ARDUINO_APP_BASE_PATH }}/sketch/sketch.yaml 
+      -  task modulino:patch
+      -  adb push  ./sketch/Arduino_Modulino {{ .ARDUINO_APP_BASE_PATH }}/sketch/Arduino_Modulino  
+      -  adb push ./app.yaml {{ .ARDUINO_APP_BASE_PATH }}/app.yaml 
+      -  adb push ./assets/index.html {{ .ARDUINO_APP_BASE_PATH }}/assets/index.html  
+      -  adb push ./assets/gui.js {{ .ARDUINO_APP_BASE_PATH }}/assets/gui.js  
 
+  modulino:patch:
+    desc: "Patch Arduino Modulino and put it in the sketch folder"
+    cmds:
+    # See https://github.com/arduino-libraries/Arduino_Modulino/pull/42
+    # Any Version<0.6.0 the build fails if Both modulino and ArduinoLedMatrix are used in the UnoQ
+      - mkdir -p sketch/Arduino_Modulino
+      - git clone --depth 1 git@github.com:arduino-libraries/Arduino_Modulino.git  sketch/Arduino_Modulino
+      - cd sketch/Arduino_Modulino && git checkout 480e9d183a3b3dede0c68170e469410a6d710bee
+
+  scratch:init:
+    cmds:
+      - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
+      - task scratch:install
+    
   scratch:install:
     dir: scratch-editor
     cmds:
       - npm install 
-      - npm run build --workspace @scratch/scratch-svg-renderer
-      - npm run build --workspace @scratch/scratch-vm
-      - npm run build:dev --workspace @scratch/scratch-gui
+      - npm build 
 
   scratch:patch:
-    - cd scratch-editor/packages/scratch-gui && node ../../../scratch-arduino-extensions/scripts/patch-gui.js
+    cmds:
+      - cd scratch-editor/packages/scratch-gui && node ../../../scratch-arduino-extensions/scripts/patch-gui.js
 
   scratch:start:
     dir: scratch-editor
@@ -23,19 +46,13 @@ tasks:
       - npm start --workspace @scratch/scratch-gui
 
   scratch:clean:
-    - rm -rf scratch-editor
+    cmds:
+      - rm -rf scratch-editor
 
-  board:upload:
-   -  adb push ./python/main.py  /home/arduino/ArduinoApps/scratch-arduino-app/python/main.py
-   -  adb push ./sketch/sketch.ino  /home/arduino/ArduinoApps/scratch-arduino-app/sketch/sketch.ino 
-   -  adb push ./sketch/sketch.yaml  /home/arduino/ArduinoApps/scratch-arduino-app/sketch/sketch.yaml 
-   -  adb push  ./sketch/Arduino_Modulino /home/arduino/ArduinoApps/scratch-arduino-app/sketch/Arduino_Modulino  
-   -  adb push ./app.yaml /home/arduino/ArduinoApps/scratch-arduino-app/app.yaml  
-  #  -  adb shell arduino-app-cli app restart user:scratch-arduino-app 
-
-  modulino:patch:
-  # See https://github.com/arduino-libraries/Arduino_Modulino/pull/42
-  # Any Version<0.6.0 the build fails if Both modulino and ArduinoLedMatrix are used in the UnoQ
-    - mkdir -p sketch/Arduino_Modulino
-    - git clone --depth 1 git@github.com:arduino-libraries/Arduino_Modulino.git  sketch/Arduino_Modulino
-    - cd sketch/Arduino_Modulino && git checkout 480e9d183a3b3dede0c68170e469410a6d710bee
+  scratch:assets: 
+    desc: "Build Scratch GUI files and copy to the assets folder"
+    dir: scratch-editor/packages/scratch-gui
+    cmds:
+      - npm run build:dev --workspace @scratch/scratch-gui
+      - cp build/index.html ../../../assets/index.html
+      - cp build/gui.js ../../../assets/gui.js
