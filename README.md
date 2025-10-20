@@ -2,7 +2,7 @@
 
 Getting started:
 1. Connect the Arduino Uno Q board
-2. Upload the `scratch-arduino-app` into the board with the commad
+2. Upload the `scratch-arduino-app` into the board:
 ``` sh
 task app:upload
 ```
@@ -11,3 +11,9 @@ task app:upload
   - via command line `arduino-app-cli app start user:scratch-arduino-app`
 
 4. Open the `<IP_OR_BOARD_NAME>:7000`
+
+
+### Local dev
+-  `task scratch:init`
+
+- Open local scratch on http://localhost:8601/

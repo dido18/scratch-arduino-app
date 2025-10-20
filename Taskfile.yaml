@@ -15,22 +15,16 @@ tasks:
       -  adb push ./assets/index.html {{ .ARDUINO_APP_BASE_PATH }}/assets/index.html  
       -  adb push ./assets/gui.js {{ .ARDUINO_APP_BASE_PATH }}/assets/gui.js  
 
-  app:start:
-    desc: "Start the Scratch Arduino App on the board"
-    cmds:
-      - adb shell arduino-app-cli app start user:scratch-arduino-app
-      
   scratch:init:
     cmds:
       - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
-
+      - task scratch:install
+    
   scratch:install:
     dir: scratch-editor
     cmds:
       - npm install 
-      - npm run build --workspace @scratch/scratch-svg-renderer
-      - npm run build --workspace @scratch/scratch-vm
-      - npm run build:dev --workspace @scratch/scratch-gui
+      - npm build 
 
   scratch:patch:
     cmds:
@@ -45,16 +39,15 @@ tasks:
     cmds:
       - rm -rf scratch-editor
 
-  scratch:build: # buiild scratch-gui index.html and gui.js
-    desc: "Build Scratch GUI files and copy into the assets folder"
+  scratch:assets: 
+    desc: "Build Scratch GUI files and copy to the assets folder"
     dir: scratch-editor/packages/scratch-gui
     cmds:
-      # - npm run build:dev
+      - npm run build:dev --workspace @scratch/scratch-gui
       - cp build/index.html ../../../assets/index.html
       - cp build/gui.js ../../../assets/gui.js
 
  
-
   modulino:patch:
     cmds:
     # See https://github.com/arduino-libraries/Arduino_Modulino/pull/42

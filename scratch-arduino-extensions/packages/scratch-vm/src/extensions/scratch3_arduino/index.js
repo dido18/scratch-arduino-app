@@ -17,7 +17,6 @@ const iconURI = '';
 // eslint-disable-next-line max-len
 const menuIconURI =  ''
 
-// Use the same origin as the HTML page, but with port 7000
 const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
 
 class Scratch3Arduino {
