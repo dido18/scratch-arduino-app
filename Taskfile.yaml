@@ -4,6 +4,22 @@ vars:
   ARDUINO_APP_BASE_PATH: /home/arduino/ArduinoApps/scratch-arduino-app
 
 tasks:
+  app:upload:
+    desc: "Upload app files to the Arduino Board"
+    cmds:
+      -  adb push ./python/main.py  {{ .ARDUINO_APP_BASE_PATH }}/python/main.py
+      -  adb push ./sketch/sketch.ino  {{ .ARDUINO_APP_BASE_PATH }}/sketch/sketch.ino 
+      -  adb push ./sketch/sketch.yaml  {{ .ARDUINO_APP_BASE_PATH }}/sketch/sketch.yaml 
+      -  adb push  ./sketch/Arduino_Modulino {{ .ARDUINO_APP_BASE_PATH }}/sketch/Arduino_Modulino  
+      -  adb push ./app.yaml {{ .ARDUINO_APP_BASE_PATH }}/app.yaml 
+      -  adb push ./assets/index.html {{ .ARDUINO_APP_BASE_PATH }}/assets/index.html  
+      -  adb push ./assets/gui.js {{ .ARDUINO_APP_BASE_PATH }}/assets/gui.js  
+
+  app:start:
+    desc: "Start the Scratch Arduino App on the board"
+    cmds:
+      - adb shell arduino-app-cli app start user:scratch-arduino-app
+      
   scratch:init:
     cmds:
       - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
@@ -37,17 +53,7 @@ tasks:
       - cp build/index.html ../../../assets/index.html
       - cp build/gui.js ../../../assets/gui.js
 
-  app:upload:
-    desc: "Upload app files to the Arduino Board"
-    cmds:
-      -  adb push ./python/main.py  {{ .ARDUINO_APP_BASE_PATH }}/python/main.py
-      -  adb push ./sketch/sketch.ino  {{ .ARDUINO_APP_BASE_PATH }}/sketch/sketch.ino 
-      -  adb push ./sketch/sketch.yaml  {{ .ARDUINO_APP_BASE_PATH }}/sketch/sketch.yaml 
-      -  adb push  ./sketch/Arduino_Modulino {{ .ARDUINO_APP_BASE_PATH }}/sketch/Arduino_Modulino  
-      -  adb push ./app.yaml {{ .ARDUINO_APP_BASE_PATH }}/app.yaml 
-      -  adb push ./assets/index.html {{ .ARDUINO_APP_BASE_PATH }}/assets/index.html  
-      -  adb push ./assets/gui.js {{ .ARDUINO_APP_BASE_PATH }}/assets/gui.js  
-
+ 
 
   modulino:patch:
     cmds:
