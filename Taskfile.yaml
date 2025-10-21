@@ -8,7 +8,7 @@ tasks:
     desc: "Upload app files to the Arduino Board"
     cmds:
       -  adb push ./app.yaml  {{ .ARDUINO_APP_BASE_PATH }}/app.yaml
-      -  task modulino:patch
+      -  task: modulino:patch
       -  adb push ./sketch  {{ .ARDUINO_APP_BASE_PATH }}/
       -  adb push ./python/  {{ .ARDUINO_APP_BASE_PATH }}/
       -  adb push ./assets/ {{ .ARDUINO_APP_BASE_PATH }}/
@@ -25,7 +25,7 @@ tasks:
   scratch:init:
     cmds:
       - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
-      - task scratch:install
+      - task: scratch:install
     
   scratch:install:
     dir: scratch-editor
