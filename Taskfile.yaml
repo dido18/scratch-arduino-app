@@ -30,8 +30,8 @@ tasks:
   scratch:install:
     dir: scratch-editor
     cmds:
-      - npm install 
-      - npm build 
+      - npm install
+      - npm run build
 
   scratch:patch:
     cmds:
