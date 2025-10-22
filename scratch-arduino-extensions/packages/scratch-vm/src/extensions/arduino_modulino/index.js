@@ -1,7 +1,7 @@
-// const formatMessage = require('../../../../../../scratch-editor/node_modules/format-message');
 const BlockType = require('../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/block-type');
 const ArgumentType = require('../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/argument-type');
-const io = require('./socket.io.min.js');
+const io = require('../socket.io.min.js');
+
 
 /**
  * Url of icon to be displayed at the left edge of each extension block.
@@ -19,7 +19,7 @@ const menuIconURI = ''
 
 const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
 
-class Scratch3Arduino {
+class ArduinoModulino {
   constructor(runtime) {
     this.runtime = runtime;
     this.io = io(wsServerURL, {
@@ -37,25 +37,13 @@ class Scratch3Arduino {
   }
 };
 
-Scratch3Arduino.prototype.getInfo = function () {
+ArduinoModulino.prototype.getInfo = function () {
   return {
-    id: 'arduino',
-    name: "Arduino",
+    id: 'arduinomodulino',
+    name: "Arduino Modulino",
     menuIconURI: menuIconURI,
     blockIconURI: iconURI,
     blocks: [
-      {
-        opcode: 'matrixDraw',
-        blockType: BlockType.COMMAND,
-        text: 'draw [FRAME] on matrix',
-        func: 'matrixDraw',
-        arguments: {
-          FRAME: {
-            type: ArgumentType.MATRIX,
-            defaultValue: '0101010101100010101000100'
-          }
-        }
-      },
       {
         opcode: 'whenModulinoButtonsPressed',
         blockType: BlockType.HAT,
@@ -76,12 +64,7 @@ Scratch3Arduino.prototype.getInfo = function () {
   };
 }
 
-Scratch3Arduino.prototype.matrixDraw = function (args) {
-  console.log(`Drawing frame on matrix: ${args}`);
-  this.io.emit("matrix_draw", { frame: args.FRAME });
-};
-
-Scratch3Arduino.prototype.whenModulinoButtonsPressed = function (args) {
+ArduinoModulino.prototype.whenModulinoButtonsPressed = function (args) {
   if (args.BTN === this._button_pressed) {
     this._button_pressed = '';
     return true;
@@ -89,4 +72,4 @@ Scratch3Arduino.prototype.whenModulinoButtonsPressed = function (args) {
   return false;
 };
 
-module.exports = Scratch3Arduino;
+module.exports = ArduinoModulino;

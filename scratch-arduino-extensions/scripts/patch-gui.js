@@ -2,14 +2,15 @@ const path = require("path");
 const fs = require("fs");
 
 const extensions = [
-  { name: "Scratch3Arduino", directory: "scratch3_arduino" },
+  { name: "ArduinoBasics", directory: "arduino_basics" },
+  { name: "ArduinoModulino", directory: "arduino_modulino" }
 ];
 
  // base dir is the 'scratch-arduino-extensions' folder
 const BaseDir = path.resolve(__dirname, "../"); 
 
 extensions.forEach(extension => {
-  console.log(`${extension.name} (${extension.directory})`);
+  console.log(`\n${extension.name} (${extension.directory})`);
 
   process.stdout.write("\t - add symbolic link: ");
   const scratchVmExtensionsDir = path.resolve(BaseDir,"../scratch-editor/packages/scratch-vm/src/extensions",extension.directory);
@@ -39,8 +40,8 @@ extensions.forEach(extension => {
   if (!vmCode.includes(extension.name)) {
     fs.copyFileSync(scratchVmVirtualMachineFile, `${scratchVmVirtualMachineFile}.orig`);
     vmCode = vmCode.replace(
-      /CORE_EXTENSIONS = \[[\s\S]*?\];/,
-      `$&\n\nCORE_EXTENSIONS.push('${extension.name}');`,
+      /(CORE_EXTENSIONS = \[[\s\S]*?)\];/,
+      `$1'${extension.name}',\n];`,
     );
     fs.writeFileSync(scratchVmVirtualMachineFile, vmCode);
     process.stdout.write("done\n");
