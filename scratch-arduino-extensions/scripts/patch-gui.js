@@ -1,67 +1,53 @@
 const path = require("path");
 const fs = require("fs");
 
-const BaseDir = path.resolve(__dirname, "../"); // base dir is the 'scratch-arduino-extensions'
+const extensions = [
+  { name: "Scratch3Arduino", directory: "scratch3_arduino" },
+];
 
-const ScratchVmExtensionsManagerFile = path.resolve(
-  BaseDir,
-  "../scratch-editor/packages/scratch-vm/src/extension-support/extension-manager.js"
-);
+ // base dir is the 'scratch-arduino-extensions' folder
+const BaseDir = path.resolve(__dirname, "../"); 
 
-const ScratchVmVirtualMachineFile = path.resolve(
-  BaseDir,
-  "../scratch-editor/packages/scratch-vm/src/virtual-machine.js",
-);
+extensions.forEach(extension => {
+  console.log(`${extension.name} (${extension.directory})`);
 
-const ExtIds = ["Scratch3Arduino"];
-const ExtDirName = "scratch3_arduino";
+  process.stdout.write("\t - add symbolic link: ");
+  const scratchVmExtensionsDir = path.resolve(BaseDir,"../scratch-editor/packages/scratch-vm/src/extensions",extension.directory);
+  if (!fs.existsSync(scratchVmExtensionsDir)) {
+    const patchedExtensionDir = path.resolve(BaseDir,"./packages/scratch-vm/src/extensions/",extension.directory);
+    fs.symlinkSync(patchedExtensionDir, scratchVmExtensionsDir, "dir");
+    process.stdout.write("done");
+  } else  process.stdout.write("skip");
+  
 
-const PatchedExtensionDir = path.resolve(
-  BaseDir,
-  "./packages/scratch-vm/src/extensions/",
-  ExtDirName,
-);
-const ScratchVmExtensionsDir = path.resolve(
-  BaseDir,
-  "../scratch-editor/packages/scratch-vm/src/extensions",
-   ExtDirName,
-);
-
-if (!fs.existsSync(ScratchVmExtensionsDir)) {
-  fs.symlinkSync(PatchedExtensionDir, ScratchVmExtensionsDir, "dir");
-  console.log("Set symbolic link to", ScratchVmExtensionsDir);
-} else {
-  console.log("Symbolic link already set to", ScratchVmExtensionsDir);
-}
-
-let managerCode = fs.readFileSync(ScratchVmExtensionsManagerFile, "utf-8");
-for (const ExtId of ExtIds) {
-  if (managerCode.includes(ExtId)) {
-    console.log(`Already registered in manager: ${ExtId}`);
-  } else {
-    fs.copyFileSync(ScratchVmExtensionsManagerFile, `${ScratchVmExtensionsManagerFile}.orig`);
+  process.stdout.write("\n\t - register builtin: ");
+  const scratchVmExtensionsManagerFile = path.resolve(BaseDir, "../scratch-editor/packages/scratch-vm/src/extension-support/extension-manager.js");
+  let managerCode = fs.readFileSync(scratchVmExtensionsManagerFile, "utf-8");
+  if (!managerCode.includes(extension.name)) {
+    fs.copyFileSync(scratchVmExtensionsManagerFile, `${scratchVmExtensionsManagerFile}.orig`);
     managerCode = managerCode.replace(
       /builtinExtensions = {[\s\S]*?};/,
-      `$&\n\nbuiltinExtensions.${ExtId} = () => require('../extensions/${ExtDirName}');`,
+      `$&\n\nbuiltinExtensions.${extension.name} = () => require('../extensions/${extension.directory}');`,
     );
-    fs.writeFileSync(ScratchVmExtensionsManagerFile, managerCode);
-    console.log(`Registered in manager: ${ExtId}`);
-  }
-}
+    fs.writeFileSync(scratchVmExtensionsManagerFile, managerCode);
+    process.stdout.write("done");
+  } else process.stdout.write("skip");
 
-
-// Add the extension as a core extension.
-let vmCode = fs.readFileSync(ScratchVmVirtualMachineFile, "utf-8");
-for (const ExtId of ExtIds) {
-  if (vmCode.includes(ExtId)) {
-    console.log(`Already added as a core extension: ${ExtId}`);
-  } else {
-    fs.copyFileSync(ScratchVmVirtualMachineFile, `${ScratchVmVirtualMachineFile}.orig`);
+  process.stdout.write("\n\t - register core: ");
+  const scratchVmVirtualMachineFile = path.resolve(BaseDir, "../scratch-editor/packages/scratch-vm/src/virtual-machine.js");
+  let vmCode = fs.readFileSync(scratchVmVirtualMachineFile, "utf-8");
+  if (!vmCode.includes(extension.name)) {
+    fs.copyFileSync(scratchVmVirtualMachineFile, `${scratchVmVirtualMachineFile}.orig`);
     vmCode = vmCode.replace(
       /CORE_EXTENSIONS = \[[\s\S]*?\];/,
-      `$&\n\nCORE_EXTENSIONS.push('${ExtId}');`,
+      `$&\n\nCORE_EXTENSIONS.push('${extension.name}');`,
     );
-    fs.writeFileSync(ScratchVmVirtualMachineFile, vmCode);
-    console.log(`Add as a core extension: ${ExtId}`);
-  }
-}
+    fs.writeFileSync(scratchVmVirtualMachineFile, vmCode);
+    process.stdout.write("done\n");
+  } else process.stdout.write("skip");
+});
+
+
+
+
+
