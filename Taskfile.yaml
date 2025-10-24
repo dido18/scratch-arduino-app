@@ -1,7 +1,6 @@
 version: "3"
 vars:
   SCRATCH_EDITOR_VERSION: v12.0.1
-  ARDUINO_APP_BASE_PATH: /home/arduino/ArduinoApps/scratch-arduino-app
 
 tasks:
   scratch:init:
@@ -10,6 +9,7 @@ tasks:
       - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
       - npm install
       - npm run build
+      - task scratch:patch
 
   scratch:patch:
     cmds:

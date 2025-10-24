@@ -14,7 +14,6 @@ task app:upload
 
 ### Local dev
 - `task scratch:init`
-- `task scratch:patch`
-- `task scratch:start`
+- `task scratch:local:start`
 - change the `const wsServerURL = `<YOUR_IP>:7000`;` in the `index.js` 
 - Open local scratch on http://localhost:8601/
