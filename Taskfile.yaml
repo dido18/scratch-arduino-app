@@ -51,7 +51,33 @@ tasks:
     dir: scratch-editor/packages/scratch-gui
     cmds:
       - npm run build:dev --workspace @scratch/scratch-gui
-      - cp build/index.html ../../../assets/index.html
-      - cp build/gui.js ../../../assets/gui.js
-      ## copy (some) of the static files
-      - mkdir -p ../../../assets/static/blocks-media && cp -r build/static/blocks-media ../../../assets/static/
+   
+
+  app:copy:
+    desc: "Copy app files (python, assets, app.yaml) to a destination directory"
+    cmds:
+      - mkdir -p build/scratch-arduino-app
+      - cp ./app.yaml build/scratch-arduino-app/app.yaml
+      - cp  -r ./sketch build/scratch-arduino-app/sketch
+      - cp -r ./python/ build/scratch-arduino-app/python
+
+      - mkdir -p build/scratch-arduino-app/assets
+      - cp scratch-editor/packages/scratch-gui/build/index.html build/scratch-arduino-app/assets/index.html
+      - cp scratch-editor/packages/scratch-gui/build/gui.js build/scratch-arduino-app/assets/gui.js
+      - mkdir -p build/scratch-arduino-app/assets/static
+      - cp -r scratch-editor/packages/scratch-gui/build/static/blocks-media  build/scratch-arduino-app/assets/static/blocks-media
+
+  app:zip:
+    desc: "Create a zip file with the contents of the build/scratch-arduino-app folder"
+    cmds:
+      - |
+        if [ ! -d "build/scratch-arduino-app" ]; then
+          echo "Build folder does not exist. Run 'task app:copy' first."
+          exit 1
+        fi
+      - |
+        ZIP_NAME="${ZIP_NAME:-scratch-arduino-app-$(date +%Y%m%d-%H%M%S).zip}"
+        echo "Creating zip file: $ZIP_NAME"
+        cd build && zip -r ../$ZIP_NAME scratch-arduino-app && cd ..
+        echo "Zip file created: $ZIP_NAME"
+     
