@@ -4,32 +4,10 @@ vars:
   ARDUINO_APP_BASE_PATH: /home/arduino/ArduinoApps/scratch-arduino-app
 
 tasks:
-  app:upload:
-    desc: "Upload app files to the Arduino Board"
-    cmds:
-      -  adb push ./app.yaml  {{ .ARDUINO_APP_BASE_PATH }}/app.yaml
-      -  task: modulino:patch
-      -  adb push ./sketch  {{ .ARDUINO_APP_BASE_PATH }}/
-      -  adb push ./python/  {{ .ARDUINO_APP_BASE_PATH }}/
-      -  adb push ./assets/ {{ .ARDUINO_APP_BASE_PATH }}/
-
-  modulino:patch:
-    desc: "Patch Arduino Modulino and put it in the sketch folder"
-    cmds:
-    # See https://github.com/arduino-libraries/Arduino_Modulino/pull/42
-    # Any Version<0.6.0 the build fails if Both modulino and ArduinoLedMatrix are used in the UnoQ
-      - rm -rf sketch/Arduino_Modulino && mkdir -p sketch/Arduino_Modulino
-      - git clone --depth 1 git@github.com:arduino-libraries/Arduino_Modulino.git  sketch/Arduino_Modulino
-      - cd sketch/Arduino_Modulino && git checkout 480e9d183a3b3dede0c68170e469410a6d710bee
-
   scratch:init:
     cmds:
+      - rm -rf scratch-editor
       - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
-      - task: scratch:install
-    
-  scratch:install:
-    dir: scratch-editor
-    cmds:
       - npm install
       - npm run build
 
@@ -37,47 +15,54 @@ tasks:
     cmds:
       - cd scratch-editor/packages/scratch-gui && node ../../../scratch-arduino-extensions/scripts/patch-gui.js
 
-  scratch:start:
+  scratch:local:start:
     dir: scratch-editor
     cmds:
       - npm start --workspace @scratch/scratch-gui
 
-  scratch:clean:
-    cmds:
-      - rm -rf scratch-editor
-
-  scratch:assets: 
-    desc: "Build Scratch GUI files and copy to the assets folder"
-    dir: scratch-editor/packages/scratch-gui
-    cmds:
-      - npm run build:dev --workspace @scratch/scratch-gui
-   
-
-  app:copy:
-    desc: "Copy app files (python, assets, app.yaml) to a destination directory"
+  app:build:
+    desc: "Copy app files (python, assets, app.yaml) to a build directory"
     cmds:
       - mkdir -p build/scratch-arduino-app
       - cp ./app.yaml build/scratch-arduino-app/app.yaml
-      - cp  -r ./sketch build/scratch-arduino-app/sketch
+      - cp -r ./sketch/ build/scratch-arduino-app/sketch
       - cp -r ./python/ build/scratch-arduino-app/python
-
+      - task scratch:build
       - mkdir -p build/scratch-arduino-app/assets
       - cp scratch-editor/packages/scratch-gui/build/index.html build/scratch-arduino-app/assets/index.html
       - cp scratch-editor/packages/scratch-gui/build/gui.js build/scratch-arduino-app/assets/gui.js
       - mkdir -p build/scratch-arduino-app/assets/static
       - cp -r scratch-editor/packages/scratch-gui/build/static/blocks-media  build/scratch-arduino-app/assets/static/blocks-media
+  
+  scratch:build: 
+    desc: "Build Scratch GUI files"
+    dir: scratch-editor/packages/scratch-gui
+    cmds:
+      - npm run build:dev --workspace @scratch/scratch-gui
 
+  board:app:upload:
+    desc: "Upload zip file to Arduino board, unzip and deploy to /home/arduino/ArduinoApps"
+    cmds:
+      - task app:zip
+      - |
+        ZIP_FILE=$(ls -t build/scratch-arduino-app-*.zip 2>/dev/null | head -n1)
+        if [ -z "$ZIP_FILE" ]; then
+          echo "No zip file found. Run 'task app:zip' first."
+          exit 1
+        fi
+        adb push "$ZIP_FILE" /tmp/
+        ZIP_BASENAME=$(basename "$ZIP_FILE")
+        adb shell "cd /tmp && unzip -o $ZIP_BASENAME && mkdir -p /home/arduino/ArduinoApps && rm -rf /home/arduino/ArduinoApps/scratch-arduino-app && mv scratch-arduino-app /home/arduino/ArduinoApps/ && rm $ZIP_BASENAME"
+        echo "App deployed to /home/arduino/ArduinoApps/scratch-arduino-app"
+     
   app:zip:
     desc: "Create a zip file with the contents of the build/scratch-arduino-app folder"
     cmds:
       - |
         if [ ! -d "build/scratch-arduino-app" ]; then
-          echo "Build folder does not exist. Run 'task app:copy' first."
+          echo "Build folder does not exist. Run 'task app:build' first."
           exit 1
         fi
-      - |
         ZIP_NAME="${ZIP_NAME:-scratch-arduino-app-$(date +%Y%m%d-%H%M%S).zip}"
-        echo "Creating zip file: $ZIP_NAME"
-        cd build && zip -r ../$ZIP_NAME scratch-arduino-app && cd ..
+        cd build && zip -r $ZIP_NAME scratch-arduino-app && cd ..
         echo "Zip file created: $ZIP_NAME"
-     
