@@ -48,7 +48,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: scratch-arduino-app-${{TAG_VERSION}}
+          name: scratch-arduino-app-${{env.TAG_VERSION}}
           path: |
             build/*.zip
           if-no-files-found: error
