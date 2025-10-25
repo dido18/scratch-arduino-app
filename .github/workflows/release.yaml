@@ -25,27 +25,21 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Install Task
+        uses: arduino/setup-task@v2
+
       - name: Scratch init 
         run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task \
-              --silent \
-              scratch:init
+          task scratch:init
 
       - name: Create build 
         run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task \
-              --silent \
-             app:build
+          task app:build
 
       - name: Create zip 
         run: |
-          go tool \
-            github.com/go-task/task/v3/cmd/task \
-              --silent \
-             app:zip
-      
+          task app:zip
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
         with:
