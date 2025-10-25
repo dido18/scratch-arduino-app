@@ -7,8 +7,8 @@ tasks:
     cmds:
       - rm -rf scratch-editor
       - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
-      - npm install
-      - npm run build
+      - cd scratch-editor && npm install
+      - cd scratch-editor && npm run build
       - task scratch:patch
 
   scratch:patch:
