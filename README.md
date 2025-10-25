@@ -1,6 +1,12 @@
 # Scratch for Arduino Uno Q 
 
 Getting started:
+
+```
+curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/install.sh | bash
+```
+
+
 1. Connect the Arduino Uno Q board
 2. Upload the `scratch-arduino-app` into the board:
 ``` sh
@@ -14,7 +20,6 @@ task app:upload
 
 ### Local dev
 - `task scratch:init`
-- `task scratch:patch`
-- `task scratch:start`
+- `task scratch:local:start`
 - change the `const wsServerURL = `<YOUR_IP>:7000`;` in the `index.js` 
 - Open local scratch on http://localhost:8601/
