@@ -13,9 +13,7 @@ fi
 
 # Download
 echo "Downloading..."
-cd /tmp
-curl -sL "https://github.com/dido18/scratch-arduino-app/releases/download/$TAG/scratch-arduino-app.zip" -o app.zip 2>/dev/null || \
-curl -sL "https://github.com/dido18/scratch-arduino-app/archive/refs/tags/$TAG.zip" -o app.zip
+curl -sL "https://github.com/dido18/scratch-arduino-app/releases/download/$TAG/scratch-arduino-app.zip" -o app.zip
 
 if [ ! -f app.zip ]; then
     echo "Error: Download failed"
