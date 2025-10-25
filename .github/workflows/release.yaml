@@ -47,6 +47,5 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: scratch-arduino-app-${{ github.ref_name }}
-          path: |
-            build/*.zip
+          path: build/scratch-arduino-app
           if-no-files-found: error
