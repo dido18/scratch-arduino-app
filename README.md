@@ -1,6 +1,12 @@
 # Scratch for Arduino Uno Q 
 
 Getting started:
+
+```
+curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/install.sh | bash
+```
+
+
 1. Connect the Arduino Uno Q board
 2. Upload the `scratch-arduino-app` into the board:
 ``` sh
