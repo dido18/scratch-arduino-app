@@ -41,14 +41,14 @@ jobs:
         run: |
           task app:build
 
-      - name: Create zip 
-        run: |
-          task app:zip
+      # - name: Create zip 
+      #   run: |
+      #     task app:zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: scratch-arduino-app-${TAG_VERSION}
+          name: scratch-arduino-app-${{TAG_VERSION}}
           path: |
             build/*.zip
           if-no-files-found: error
