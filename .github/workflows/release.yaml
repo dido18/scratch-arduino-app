@@ -39,9 +39,18 @@ jobs:
         run: |
           task app:build
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+      - name: Create zip 
+        run: |
+          task app:zip
+
+      - uses: ncipollo/release-action@v1
         with:
-          name: scratch-arduino-app-${{ github.ref_name }}
-          path: build/scratch-arduino-app
-          if-no-files-found: error
+          artifacts: "build/scratch-arduino-app*.zip"
+          allowUpdates: true
+
+      # - name: Upload artifacts
+      #   uses: actions/upload-artifact@v5
+      #   with:
+      #     name: scratch-arduino-app-${{ github.ref_name }}
+      #     path: build/scratch-arduino-app-*.zip
+      #     if-no-files-found: error
