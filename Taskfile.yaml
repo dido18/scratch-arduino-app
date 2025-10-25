@@ -56,13 +56,16 @@ tasks:
         echo "App deployed to /home/arduino/ArduinoApps/scratch-arduino-app"
      
   app:zip:
-    desc: "Create a zip file with the contents of the build/scratch-arduino-app folder"
+    desc: "Create a zip file with version (defaults to git commit hash)"
+    vars:
+      APP_VERSION:
+        sh: echo "${APP_VERSION:-$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')}"
     cmds:
       - |
         if [ ! -d "build/scratch-arduino-app" ]; then
           echo "Build folder does not exist. Run 'task app:build' first."
           exit 1
         fi
-        ZIP_NAME="${ZIP_NAME:-scratch-arduino-app-$(date +%Y%m%d-%H%M%S).zip}"
-        cd build && zip -r $ZIP_NAME scratch-arduino-app && cd ..
-        echo "Zip file created: $ZIP_NAME"
+      - echo "Creating zip with version {{.APP_VERSION}}"
+      - cd build && zip -r scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
+  

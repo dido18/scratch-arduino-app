@@ -40,18 +40,12 @@ jobs:
           task app:build
 
       - name: Create zip 
-        run: |
-          task app:zip
+        run: task app:zip
+        env:
+          APP_VERSION: ${{ github.ref_name }}
 
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "build/scratch-arduino-app*.zip"
           allowUpdates: true
           token: ${{ github.token }}
-  
-      # - name: Upload artifacts
-      #   uses: actions/upload-artifact@v5
-      #   with:
-      #     name: scratch-arduino-app-${{ github.ref_name }}
-      #     path: build/scratch-arduino-app-*.zip
-      #     if-no-files-found: error
