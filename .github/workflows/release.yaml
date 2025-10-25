@@ -15,10 +15,8 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Set env vars
-        run: |
-          echo "TAG_VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
-          echo "creating tag ${TAG_VERSION}"
+      - name: Show tag info
+        run: echo "Building release for tag ${{ github.ref_name }}"
       
       - name: Install Go
         uses: actions/setup-go@v5
@@ -48,7 +46,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: scratch-arduino-app-${{env.TAG_VERSION}}
+          name: scratch-arduino-app-${{ github.ref_name }}
           path: |
             build/*.zip
           if-no-files-found: error
