@@ -48,8 +48,7 @@ jobs:
         with:
           artifacts: "build/scratch-arduino-app*.zip"
           allowUpdates: true
-        vars:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
   
       # - name: Upload artifacts
       #   uses: actions/upload-artifact@v5
