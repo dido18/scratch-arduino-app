@@ -39,10 +39,6 @@ jobs:
         run: |
           task app:build
 
-      # - name: Create zip 
-      #   run: |
-      #     task app:zip
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
         with:
