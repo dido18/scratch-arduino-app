@@ -25,14 +25,14 @@ fi
 # Install
 echo "Installing..."
 unzip -q app.zip
-mkdir -p /home/arduino/ArduinoApps
-rm -rf /home/arduino/ArduinoApps/scratch-arduino-app
+mkdir -p $HOME/ArduinoApps
+rm -rf $HOME/ArduinoApps/scratch-arduino-app
 
 # Handle both release asset and source archive formats
 if [ -d "scratch-arduino-app" ]; then
-    mv scratch-arduino-app /home/arduino/ArduinoApps/
+    mv scratch-arduino-app $HOME/ArduinoApps/
 elif [ -d "scratch-arduino-app-$TAG" ]; then
-    mv "scratch-arduino-app-$TAG" /home/arduino/ArduinoApps/scratch-arduino-app
+    mv "scratch-arduino-app-$TAG" $HOME/ArduinoApps/scratch-arduino-app
 else
     echo "Error: Could not find extracted directory"
     ls -la
@@ -42,4 +42,4 @@ fi
 # Cleanup
 rm -f app.zip
 
-echo "Installation completed at /home/arduino/ArduinoApps/scratch-arduino-app"
+echo "Installation completed at $HOME/ArduinoApps/scratch-arduino-app"
