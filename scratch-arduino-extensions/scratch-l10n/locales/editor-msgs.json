@@ -1,0 +1,9 @@
+{
+    "it": {
+        "arduino.basics": "Arduino Base",
+        "arduino.drawMatrix": "mostra led [FRAME]",
+        
+        "arduino.modulino": "Arduino Modulino",
+        "arduino.whenModulinoButtonsPressed": "quando premi il bottone [BTN]"
+    }
+}

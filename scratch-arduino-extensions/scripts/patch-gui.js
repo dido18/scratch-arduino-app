@@ -46,7 +46,26 @@ extensions.forEach(extension => {
     fs.writeFileSync(scratchVmVirtualMachineFile, vmCode);
     process.stdout.write("done\n");
   } else process.stdout.write("skip");
+
 });
+
+process.stdout.write("\nAdding translation: ");
+const scratchl10nEditorMsgsFile = path.resolve(BaseDir,"../scratch-editor/node_modules/scratch-l10n/locales/editor-msgs.js");
+let fileContent = fs.readFileSync(scratchl10nEditorMsgsFile, "utf8");
+let match = fileContent.match(/export default (\{.*\});/s);
+if (!match) {
+  throw new Error("Could not find object in file");
+}
+let obj = eval("(" + match[1] + ")");
+
+const patchedMessages = path.resolve(BaseDir,"./scratch-l10n/locales/editor-msgs.json");
+let messages = JSON.parse(fs.readFileSync(patchedMessages, "utf8"));
+for (let lang in messages) {
+  process.stdout.write(`\n\t - ${lang}`);
+  obj[lang] = { ...obj[lang], ...messages[lang] };
+}
+let updatedContent = "export default " + JSON.stringify(obj, null, 2) + ";";
+fs.writeFileSync(scratchl10nEditorMsgsFile, updatedContent);
 
 
 

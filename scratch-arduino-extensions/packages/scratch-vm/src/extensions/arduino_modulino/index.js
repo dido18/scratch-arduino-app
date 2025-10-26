@@ -1,5 +1,7 @@
 const BlockType = require('../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/block-type');
 const ArgumentType = require('../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/argument-type');
+const formatMessage = require('../../../../../../scratch-editor/node_modules/format-message');
+
 const io = require('../socket.io.min.js');
 
 
@@ -40,14 +42,23 @@ class ArduinoModulino {
 ArduinoModulino.prototype.getInfo = function () {
   return {
     id: 'arduinomodulino',
-    name: "Arduino Modulino",
+    name:  "Arduino Modulino",
+    // formatMessage({
+    //   id: 'arduino.modulino',
+    //   defaultMessage: 'Arduino Modulino',
+    //   description: 'The name of the "Arduino Modulino" extension'
+    // }),
     menuIconURI: menuIconURI,
     blockIconURI: iconURI,
     blocks: [
       {
         opcode: 'whenModulinoButtonsPressed',
         blockType: BlockType.HAT,
-        text: 'when modulino button [BTN] pressed',
+        text: formatMessage({
+            id: 'arduino.whenModulinoButtonsPressed',
+            defaultMessage: 'when modulino button [BTN] pressed',
+            description: 'When the specified modulino button is pressed'
+        }),
         func: 'whenModulinoButtonsPressed',
         arguments: {
           BTN: {
