@@ -11,6 +11,7 @@ echo "Downloading: $ZIP_NAME"
 curl -sL "$ZIP_URL" -o app.zip
 
 unzip -q app.zip
+rm -rf $HOME/ArduinoApps/scratch-arduino-app
 mv -f scratch-arduino-app $HOME/ArduinoApps/
 rm -f app.zip
 
