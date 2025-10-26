@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      
+      - name: Show tag info
+        run: echo "Building release for tag ${{ github.ref_name }}"
+      
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.25
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '18'
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+
+      - name: Scratch init 
+        run: |
+          task scratch:init
+
+      - name: Create build 
+        run: |
+          task app:build
+
+      - name: Create zip 
+        run: task app:zip
+        env:
+          APP_VERSION: ${{ github.ref_name }}
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/scratch-arduino-app*.zip"
+          allowUpdates: true
+          token: ${{ github.token }}
