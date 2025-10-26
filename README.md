@@ -1,24 +1,16 @@
 # Scratch for Arduino Uno Q 
 
-Getting started:
+## Installation
 
+- Connect to the board using `adb` following https://docs.arduino.cc/software/app-lab/tutorials/cli/ and open the `adb shell`
+- From inside the board, Install the latest `scratch-arduino-app` into the board running the command:
 ```
 curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/install.sh | bash
 ```
+- Open the `ArduinoAppLab` and start the app
+- Visit the `<IP_OR_BOARD_NAME>:7000` to open the Scratch App.
 
-
-1. Connect the Arduino Uno Q board
-2. Upload the `scratch-arduino-app` into the board:
-``` sh
-task app:upload
-```
-3. Start the App
-  - via the ArduinoAppLab
-  - via command line `arduino-app-cli app start user:scratch-arduino-app`
-
-4. Open the `<IP_OR_BOARD_NAME>:7000`
-
-### Local dev
+### Local development
 - `task scratch:init`
 - `task scratch:local:start`
 - change the `const wsServerURL = `<YOUR_IP>:7000`;` in the `index.js` 
