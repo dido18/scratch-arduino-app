@@ -15,6 +15,8 @@ fi
 ZIP_NAME=$(basename "$ZIP_URL")
 echo "Downloading: $ZIP_NAME"
 
+# Download to /tmp directory
+cd /tmp
 curl -sL "$ZIP_URL" -o app.zip
 
 unzip -q app.zip
