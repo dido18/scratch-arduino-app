@@ -35,12 +35,11 @@ class ArduinoBasics {
 ArduinoBasics.prototype.getInfo = function () {
   return {
     id: 'arduinobasics',
-    name:  "Arduino Basics",
-    // formatMessage({
-    //   id: 'arduino.basics',
-    //   defaultMessage: 'Arduino Basics',
-    //   description: 'The name of the "Arduino Basics" extension'
-    // }),
+    name: formatMessage({
+      id: 'arduino.basics',
+      defaultMessage: 'Arduino Basics',
+      description: 'The name of the "Arduino Basics" extension'
+    }),
     menuIconURI: menuIconURI,
     blockIconURI: iconURI,
     blocks: [

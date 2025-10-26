@@ -57,6 +57,7 @@ if (!match) {
   throw new Error("Could not find object in file");
 }
 let obj = eval("(" + match[1] + ")");
+fs.copyFileSync(scratchl10nEditorMsgsFile, `${scratchl10nEditorMsgsFile}.orig`);
 
 const patchedMessages = path.resolve(BaseDir,"./scratch-l10n/locales/editor-msgs.json");
 let messages = JSON.parse(fs.readFileSync(patchedMessages, "utf8"));

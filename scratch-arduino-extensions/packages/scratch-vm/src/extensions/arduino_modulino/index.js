@@ -42,12 +42,11 @@ class ArduinoModulino {
 ArduinoModulino.prototype.getInfo = function () {
   return {
     id: 'arduinomodulino',
-    name:  "Arduino Modulino",
-    // formatMessage({
-    //   id: 'arduino.modulino',
-    //   defaultMessage: 'Arduino Modulino',
-    //   description: 'The name of the "Arduino Modulino" extension'
-    // }),
+    name: formatMessage({
+      id: 'arduino.modulino',
+      defaultMessage: 'Arduino Modulino',
+      description: 'The name of the "Arduino Modulino" extension'
+    }),
     menuIconURI: menuIconURI,
     blockIconURI: iconURI,
     blocks: [
@@ -55,7 +54,7 @@ ArduinoModulino.prototype.getInfo = function () {
         opcode: 'whenModulinoButtonsPressed',
         blockType: BlockType.HAT,
         text: formatMessage({
-            id: 'arduino.whenModulinoButtonsPressed',
+            id: 'arduino.modulino.whenPressed',
             defaultMessage: 'when modulino button [BTN] pressed',
             description: 'When the specified modulino button is pressed'
         }),
