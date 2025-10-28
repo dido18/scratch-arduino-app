@@ -62,7 +62,7 @@ void matrix_draw(String frame){
   matrix.draw(shades);
 }
 
-void set_led_rgb(String pin, uint8_t r, uint8_t g, uint8_t b) {
+void set_led_rgb(String pin, bool r, bool g, bool b) {
   if (pin == "LED3") {
     digitalWrite(LED_BUILTIN, r ? LOW : HIGH );
     digitalWrite(LED_BUILTIN + 1, g ? LOW : HIGH );
