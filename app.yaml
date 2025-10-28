@@ -1,7 +1,7 @@
 name: scratch-arduino-app
 description: Control the Uno-Q board using Scratch blocks
 ports:
-   - 7000
+  - 7000
 bricks:
-   - arduino:web_ui
+  - arduino:web_ui
 icon: 🐱
