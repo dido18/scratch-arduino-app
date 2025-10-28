@@ -9,7 +9,7 @@ tasks:
     cmds:
       - ${PWD}/.bin/dprint fmt
 
-  fmt-check:
+  fmt:check:
     desc: Check format
     cmds:
       - ${PWD}/.bin/dprint check
