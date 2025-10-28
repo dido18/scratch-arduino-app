@@ -11,6 +11,20 @@ void setup() {
   Modulino.begin(Wire1);
   // show led indication if buttons cannot be initilized
   buttons.begin();
+  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_BUILTIN + 1, OUTPUT);
+  pinMode(LED_BUILTIN + 2, OUTPUT);
+  pinMode(LED_BUILTIN + 3, OUTPUT);
+  pinMode(LED_BUILTIN + 4, OUTPUT);
+  pinMode(LED_BUILTIN + 5, OUTPUT);
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  digitalWrite(LED_BUILTIN + 1, HIGH);
+  digitalWrite(LED_BUILTIN + 2, HIGH);
+  digitalWrite(LED_BUILTIN + 3, HIGH);
+  digitalWrite(LED_BUILTIN + 4, HIGH);
+  digitalWrite(LED_BUILTIN + 5, HIGH);
+
   buttons.setLeds(true, true, true);
   Bridge.provide("matrix_draw", matrix_draw);
   Bridge.provide("set_led_rgb", set_led_rgb);
@@ -50,12 +64,12 @@ void matrix_draw(String frame){
 
 void set_led_rgb(String pin, uint8_t r, uint8_t g, uint8_t b) {
   if (pin == "LED3") {
-    analogWrite(LED_BUILTIN, r);
-    analogWrite(LED_BUILTIN + 1, g);
-    analogWrite(LED_BUILTIN + 2, b);
+    digitalWrite(LED_BUILTIN, r ? LOW : HIGH );
+    digitalWrite(LED_BUILTIN + 1, g ? LOW : HIGH );
+    digitalWrite(LED_BUILTIN + 2, b ? LOW: HIGH );
   } else if (pin == "LED4") {
-    analogWrite(LED_BUILTIN + 3, r);
-    analogWrite(LED_BUILTIN + 4, g);
-    analogWrite(LED_BUILTIN + 5, b);
+    digitalWrite(LED_BUILTIN + 3, r ? LOW : HIGH );
+    digitalWrite(LED_BUILTIN + 4, g ? LOW : HIGH );
+    digitalWrite(LED_BUILTIN + 5, b ? LOW : HIGH );
   }
 }
