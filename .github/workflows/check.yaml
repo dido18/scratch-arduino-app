@@ -18,6 +18,10 @@ jobs:
       - name: Install Task
         uses: arduino/setup-task@v2
 
+      - name: Install dprint
+        run: |
+          task install
+
       - name: Fmt check
         run: |
           task fmt:check

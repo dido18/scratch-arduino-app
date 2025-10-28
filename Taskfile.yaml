@@ -4,6 +4,11 @@ vars:
   DPRINT_VERSION: 0.48.0
 
 tasks:
+  install:
+    cmds:
+      - curl -fsSL https://dprint.dev/install.sh | sh -s {{ .DPRINT_VERSION }}
+      - mkdir -p .bin && cp $HOME/.dprint/bin/dprint .bin/dprint # workaround for local install
+
   fmt:
     desc: Run format
     cmds:
@@ -21,10 +26,6 @@ tasks:
       - cd scratch-editor && npm install
       - cd scratch-editor && npm run build
       - task scratch:patch
-  install:dprint:
-    cmds:
-      - curl -fsSL https://dprint.dev/install.sh | sh -s {{ .DPRINT_VERSION }}
-      - mkdir -p .bin && cp $HOME/.dprint/bin/dprint .bin/dprint # workaround for local install
 
   scratch:patch:
     cmds:
