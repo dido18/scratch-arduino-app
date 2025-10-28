@@ -26,7 +26,16 @@ def on_matrix_draw(_, data):
     print(f"Transformed frame to draw on 8x13 matrix: {frame_8x13}")
     Bridge.call("matrix_draw", frame_8x13)
 
+def on_set_led_rgb(_, data):
+    led = data.get("led")
+    r = data.get("r")
+    g = data.get("g")
+    b = data.get("b")
+    print(f"Setting LED {led} to color: {r} {g} {b} ")
+    Bridge.call("set_led_rgb", led, r, g, b)
+
 ui.on_message("matrix_draw", on_matrix_draw)
+ui.on_message("set_led_rgb", on_set_led_rgb)
 
 def on_modulino_button_pressed(btn):
     ui.send_message('modulino_buttons_pressed', {"btn": btn})

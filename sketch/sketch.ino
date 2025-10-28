@@ -10,9 +10,10 @@ void setup() {
   Bridge.begin();
   Modulino.begin(Wire1);
   // show led indication if buttons cannot be initilized
-  buttons.begin(); 
+  buttons.begin();
   buttons.setLeds(true, true, true);
   Bridge.provide("matrix_draw", matrix_draw);
+  Bridge.provide("set_led_rgb", set_led_rgb);
 }
 
 void loop() {
@@ -47,4 +48,14 @@ void matrix_draw(String frame){
   matrix.draw(shades);
 }
 
-
+void set_led_rgb(String pin, uint8_t r, uint8_t g, uint8_t b) {
+  if (pin == "LED3") {
+    analogWrite(LED_BUILTIN, r);
+    analogWrite(LED_BUILTIN + 1, g);
+    analogWrite(LED_BUILTIN + 2, b);
+  } else if (pin == "LED4") {
+    analogWrite(LED_BUILTIN + 3, r);
+    analogWrite(LED_BUILTIN + 4, g);
+    analogWrite(LED_BUILTIN + 5, b);
+  }
+}
