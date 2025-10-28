@@ -1,8 +1,14 @@
 version: "3"
 vars:
   SCRATCH_EDITOR_VERSION: v12.0.1
+  DPRINT_VERSION: 0.48.0
 
 tasks:
+  fmt:
+    desc: Run format
+    cmds:
+      - ${PWD}/.bin/dprint fmt
+
   scratch:init:
     cmds:
       - rm -rf scratch-editor
@@ -10,6 +16,10 @@ tasks:
       - cd scratch-editor && npm install
       - cd scratch-editor && npm run build
       - task scratch:patch
+  install:dprint:
+    cmds:
+      - curl -fsSL https://dprint.dev/install.sh | sh -s {{ .DPRINT_VERSION }}
+      - mkdir -p .bin && cp $HOME/.dprint/bin/dprint .bin/dprint # workaround for local install
 
   scratch:patch:
     cmds:
@@ -33,8 +43,8 @@ tasks:
       - cp scratch-editor/packages/scratch-gui/build/gui.js build/scratch-arduino-app/assets/gui.js
       - mkdir -p build/scratch-arduino-app/assets/static
       - cp -r scratch-editor/packages/scratch-gui/build/static/blocks-media  build/scratch-arduino-app/assets/static/blocks-media
-  
-  scratch:build: 
+
+  scratch:build:
     desc: "Build Scratch GUI files"
     dir: scratch-editor/packages/scratch-gui
     cmds:
@@ -45,16 +55,16 @@ tasks:
     cmds:
       - task app:zip
       - |
-        ZIP_FILE=$(ls -t build/scratch-arduino-app-*.zip 2>/dev/null | head -n1)
-        if [ -z "$ZIP_FILE" ]; then
-          echo "No zip file found. Run 'task app:zip' first."
-          exit 1
-        fi
-        adb push "$ZIP_FILE" /tmp/
-        ZIP_BASENAME=$(basename "$ZIP_FILE")
-        adb shell "cd /tmp && unzip -o $ZIP_BASENAME && mkdir -p /home/arduino/ArduinoApps && rm -rf /home/arduino/ArduinoApps/scratch-arduino-app && mv scratch-arduino-app /home/arduino/ArduinoApps/ && rm $ZIP_BASENAME"
-        echo "App deployed to /home/arduino/ArduinoApps/scratch-arduino-app"
-     
+          ZIP_FILE=$(ls -t build/scratch-arduino-app-*.zip 2>/dev/null | head -n1)
+          if [ -z "$ZIP_FILE" ]; then
+            echo "No zip file found. Run 'task app:zip' first."
+            exit 1
+          fi
+          adb push "$ZIP_FILE" /tmp/
+          ZIP_BASENAME=$(basename "$ZIP_FILE")
+          adb shell "cd /tmp && unzip -o $ZIP_BASENAME && mkdir -p /home/arduino/ArduinoApps && rm -rf /home/arduino/ArduinoApps/scratch-arduino-app && mv scratch-arduino-app /home/arduino/ArduinoApps/ && rm $ZIP_BASENAME"
+          echo "App deployed to /home/arduino/ArduinoApps/scratch-arduino-app"
+
   app:zip:
     desc: "Create a zip file with version (defaults to git commit hash)"
     vars:
@@ -62,10 +72,9 @@ tasks:
         sh: echo "${APP_VERSION:-$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')}"
     cmds:
       - |
-        if [ ! -d "build/scratch-arduino-app" ]; then
-          echo "Build folder does not exist. Run 'task app:build' first."
-          exit 1
-        fi
+          if [ ! -d "build/scratch-arduino-app" ]; then
+            echo "Build folder does not exist. Run 'task app:build' first."
+            exit 1
+          fi
       - echo "Creating zip with version {{.APP_VERSION}}"
       - cd build && zip -r scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
-  

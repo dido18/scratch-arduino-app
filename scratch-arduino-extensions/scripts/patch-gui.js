@@ -3,26 +3,32 @@ const fs = require("fs");
 
 const extensions = [
   { name: "ArduinoBasics", directory: "arduino_basics" },
-  { name: "ArduinoModulino", directory: "arduino_modulino" }
+  { name: "ArduinoModulino", directory: "arduino_modulino" },
 ];
 
- // base dir is the 'scratch-arduino-extensions' folder
-const BaseDir = path.resolve(__dirname, "../"); 
+// base dir is the 'scratch-arduino-extensions' folder
+const BaseDir = path.resolve(__dirname, "../");
 
 extensions.forEach(extension => {
   console.log(`\n${extension.name} (${extension.directory})`);
 
   process.stdout.write("\t - add symbolic link: ");
-  const scratchVmExtensionsDir = path.resolve(BaseDir,"../scratch-editor/packages/scratch-vm/src/extensions",extension.directory);
+  const scratchVmExtensionsDir = path.resolve(
+    BaseDir,
+    "../scratch-editor/packages/scratch-vm/src/extensions",
+    extension.directory,
+  );
   if (!fs.existsSync(scratchVmExtensionsDir)) {
-    const patchedExtensionDir = path.resolve(BaseDir,"./packages/scratch-vm/src/extensions/",extension.directory);
+    const patchedExtensionDir = path.resolve(BaseDir, "./packages/scratch-vm/src/extensions/", extension.directory);
     fs.symlinkSync(patchedExtensionDir, scratchVmExtensionsDir, "dir");
     process.stdout.write("done");
-  } else  process.stdout.write("skip");
-  
+  } else process.stdout.write("skip");
 
   process.stdout.write("\n\t - register builtin: ");
-  const scratchVmExtensionsManagerFile = path.resolve(BaseDir, "../scratch-editor/packages/scratch-vm/src/extension-support/extension-manager.js");
+  const scratchVmExtensionsManagerFile = path.resolve(
+    BaseDir,
+    "../scratch-editor/packages/scratch-vm/src/extension-support/extension-manager.js",
+  );
   let managerCode = fs.readFileSync(scratchVmExtensionsManagerFile, "utf-8");
   if (!managerCode.includes(extension.name)) {
     fs.copyFileSync(scratchVmExtensionsManagerFile, `${scratchVmExtensionsManagerFile}.orig`);
@@ -35,7 +41,10 @@ extensions.forEach(extension => {
   } else process.stdout.write("skip");
 
   process.stdout.write("\n\t - register core: ");
-  const scratchVmVirtualMachineFile = path.resolve(BaseDir, "../scratch-editor/packages/scratch-vm/src/virtual-machine.js");
+  const scratchVmVirtualMachineFile = path.resolve(
+    BaseDir,
+    "../scratch-editor/packages/scratch-vm/src/virtual-machine.js",
+  );
   let vmCode = fs.readFileSync(scratchVmVirtualMachineFile, "utf-8");
   if (!vmCode.includes(extension.name)) {
     fs.copyFileSync(scratchVmVirtualMachineFile, `${scratchVmVirtualMachineFile}.orig`);
@@ -47,8 +56,3 @@ extensions.forEach(extension => {
     process.stdout.write("done\n");
   } else process.stdout.write("skip");
 });
-
-
-
-
-
