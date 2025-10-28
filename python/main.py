@@ -26,7 +26,26 @@ def on_matrix_draw(_, data):
     print(f"Transformed frame to draw on 8x13 matrix: {frame_8x13}")
     Bridge.call("matrix_draw", frame_8x13)
 
+def rgb_to_digital(value, threshold=128) -> bool:
+    """Convert RGB value (0-255) to digital HIGH(1) or LOW(0)"""
+    return value >= threshold
+
+def on_set_led_rgb(_, data):
+    led = data.get("led")
+    r = data.get("r")
+    g = data.get("g")
+    b = data.get("b")
+
+    # Convert RGB values (0-255) to digital HIGH/LOW
+    r_digital = rgb_to_digital(r)
+    g_digital = rgb_to_digital(g)
+    b_digital = rgb_to_digital(b)
+
+    print(f"Setting LED {led} to color: RGB({r},{g},{b}) -> Digital({r_digital},{g_digital},{b_digital})")
+    Bridge.call("set_led_rgb", led, r_digital, g_digital, b_digital)
+
 ui.on_message("matrix_draw", on_matrix_draw)
+ui.on_message("set_led_rgb", on_set_led_rgb)
 
 def on_modulino_button_pressed(btn):
     ui.send_message('modulino_buttons_pressed', {"btn": btn})
