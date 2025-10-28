@@ -70,7 +70,7 @@ ArduinoBasics.prototype.getInfo = function () {
         arguments: {
           HEX: {
             type: ArgumentType.COLOR,
-            defaultValue: '#ff0000'
+            defaultValue: '#0000ff'
           }
         }
       }

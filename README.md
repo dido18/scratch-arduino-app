@@ -12,8 +12,7 @@ curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/inst
 
 ### Local development
 - `task scratch:init`
-- `task scratch:patch`
 - `task scratch:local:start`
-- change the `const wsServerURL = `<YOUR_IP>:7000`;` in the `index.js`
-- Open local scratch on http://localhost:8601/
 - `ŧask board:upload`
+- change the `const wsServerURL = `ws://<YOUR_IP>:7000`;` in the `index.js`
+- Open local scratch on http://localhost:8601/
