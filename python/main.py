@@ -48,7 +48,6 @@ ui.on_message("matrix_draw", on_matrix_draw)
 ui.on_message("set_led_rgb", on_set_led_rgb)
 
 def on_modulino_button_pressed(btn):
-    print("Modulino button pressed:", btn)
     ui.send_message('modulino_buttons_pressed', {"btn": btn})
 
 Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
