@@ -48,4 +48,5 @@ jobs:
         with:
           artifacts: "build/scratch-arduino-app*.zip"
           allowUpdates: true
+          prerelease: ${{ contains(github.ref_name, 'rc') }}
           token: ${{ github.token }}

@@ -1,6 +1,7 @@
 // const formatMessage = require('../../../../../../scratch-editor/node_modules/format-message');
 const BlockType = require('../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/block-type');
 const ArgumentType = require('../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/argument-type');
+const formatMessage = require('../../../../../../scratch-editor/node_modules/format-message');
 const io = require('../socket.io.min.js');
 
 /**
@@ -34,14 +35,22 @@ class ArduinoBasics {
 ArduinoBasics.prototype.getInfo = function () {
   return {
     id: 'arduinobasics',
-    name: "Arduino Basics",
+    name: formatMessage({
+      id: 'arduino.basics',
+      defaultMessage: 'Arduino Basics',
+      description: 'The name of the "Arduino Basics" extension'
+    }),
     menuIconURI: menuIconURI,
     blockIconURI: iconURI,
     blocks: [
       {
         opcode: 'matrixDraw',
         blockType: BlockType.COMMAND,
-        text: 'draw [FRAME] on matrix',
+        text: formatMessage({
+              id: 'arduino.drawMatrix',
+              defaultMessage: 'show [FRAME] on matrix',
+              description: 'Draw the given frame on the LED matrix'
+          }),
         func: 'matrixDraw',
         arguments: {
           FRAME: {
