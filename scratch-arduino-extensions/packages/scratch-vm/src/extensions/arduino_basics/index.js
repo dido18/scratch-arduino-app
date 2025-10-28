@@ -17,10 +17,7 @@ const iconURI = '';
 // eslint-disable-next-line max-len
 const menuIconURI = ''
 
-// 'http://http://10.72.240.39:7000'
-
-// const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
-const wsServerURL = `ws://192.168.1.39:7000`;
+const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
 
 class ArduinoBasics {
   constructor(runtime) {
