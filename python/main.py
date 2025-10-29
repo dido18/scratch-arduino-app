@@ -87,6 +87,7 @@ def on_detect_objects(client_id, data):
         response = {
             "success": True,
             "result_image": b64_result,
+            "detection": results.get("detection", []),
             "detection_count": len(results.get("detection", [])) if results else 0,
             "processing_time": f"{diff:.2f} ms",
         }
