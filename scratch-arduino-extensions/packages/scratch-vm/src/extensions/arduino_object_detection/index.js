@@ -4,7 +4,7 @@ const ArgumentType = require(
   "../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/argument-type",
 );
 const io = require("../socket.io.min.js");
-const Video = require('../../../../../../scratch-editor/packages/scratch-vm/src/io/video');
+const Video = require("../../../../../../scratch-editor/packages/scratch-vm/src/io/video");
 
 /**
  * Url of icon to be displayed at the left edge of each extension block.
@@ -31,6 +31,10 @@ class arduinoObjectDetection {
       transports: ["polling", "websocket"],
       autoConnect: true,
     });
+
+    this.io.on("detection_result", (data) => {
+      console.log(">>>> Received detection result:", data);
+    });
   }
 }
 
@@ -46,45 +50,44 @@ arduinoObjectDetection.prototype.getInfo = function() {
         blockType: BlockType.COMMAND,
         text: "enable video",
         func: "enableVideo",
-        arguments: {}
+        arguments: {},
       },
-       {
+      {
         opcode: "disableVideo",
         blockType: BlockType.COMMAND,
         text: "disable video",
         func: "disableVideo",
-        arguments: {}
+        arguments: {},
       },
     ],
   };
 };
 
 arduinoObjectDetection.prototype.enableVideo = function(args) {
-   this.runtime.ioDevices.video.enableVideo();
+  this.runtime.ioDevices.video.enableVideo();
 
-    if (this.runtime.ioDevices) {
-        // Get frame as canvas for base64 conversion
-        const canvas = this.runtime.ioDevices.video.getFrame({
-            format: Video.FORMAT_CANVAS,
-            dimensions: [320, 240]
-        });
+  if (this.runtime.ioDevices) {
+    // Get frame as canvas for base64 conversion
+    const canvas = this.runtime.ioDevices.video.getFrame({
+      format: Video.FORMAT_CANVAS,
+      dimensions: [320, 240],
+    });
 
-        if (canvas) {
-            const dataUrl = canvas.toDataURL('image/png'); // PNG format
-            const base64Frame = dataUrl.split(',')[1];
-            this.io.emit('detect_objects', { image: base64Frame });
-            console.log(`Processed frame in base64`, base64Frame.substring(0, 100) + '...');
-        } else {
-            console.log("Failed to capture frame.");
-        }
+    if (canvas) {
+      const dataUrl = canvas.toDataURL("image/png"); // PNG format
+      const base64Frame = dataUrl.split(",")[1];
+      this.io.emit("detect_objects", { image: base64Frame });
+      console.log(`Processed frame in base64`, base64Frame.substring(0, 100) + "...");
     } else {
-        console.log("No ioDevices available.");
+      console.log("Failed to capture frame.");
     }
-
+  } else {
+    console.log("No ioDevices available.");
+  }
 };
 
 arduinoObjectDetection.prototype.disableVideo = function(args) {
-   this.runtime.ioDevices.video.disableVideo();
+  this.runtime.ioDevices.video.disableVideo();
 };
 
 module.exports = arduinoObjectDetection;
