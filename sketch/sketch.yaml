@@ -8,10 +8,7 @@ profiles:
       - DebugLog (0.8.4)
       - ArxContainer (0.7.0)
       - ArxTypeTraits (0.3.1)
-      # Use commit 480e9d183a3b3dede0c68170e469410a6d710bee
-      # See https://github.com/arduino-libraries/Arduino_Modulino/pull/42
-      # Any Version<=0.6.0 the build fails if both modulino and ArduinoLedMatrix are used in the UnoQ
-      - dir: Arduino_Modulino
+      - Arduino_Modulino (0.6.1)
       - Arduino_HS300x (1.0.0)
       - STM32duino VL53L4CD (1.0.5)
       - STM32duino VL53L4ED (1.0.1)
