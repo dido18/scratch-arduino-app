@@ -70,9 +70,8 @@ arduinoObjectDetection.prototype.enableVideo = function(args) {
         });
 
         if (canvas) {
-            // Convert canvas to base64 PNG (lossless) or JPEG (smaller file)
-            const base64Frame = canvas.toDataURL('image/png'); // PNG format
-            // Alternative: canvas.toDataURL('image/jpeg', 0.8); // JPEG format with 80% quality
+            const dataUrl = canvas.toDataURL('image/png'); // PNG format
+            const base64Frame = dataUrl.split(',')[1];
             this.io.emit('detect_objects', { image: base64Frame });
             console.log(`Processed frame in base64`, base64Frame.substring(0, 100) + '...');
         } else {
