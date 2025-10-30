@@ -26,9 +26,10 @@ const wsServerURL = `ws://192.168.1.39:7000`;
 class arduinoObjectDetection {
   constructor(runtime) {
     this.runtime = runtime;
+
     this.detectedObjects = [];
-    this.drawnBoxes = [];
     this.penColor = [255, 0, 0]; // Default red color
+    this.boundingBoxesVisible = false; // Track visibility state
 
     this.runtime.on('PROJECT_LOADED', () => {
         // Renderer should be available now
@@ -53,8 +54,6 @@ class arduinoObjectDetection {
     });
 
     this.io.on("detection_result", (data) => {
-      console.log(">>>> Received detection result:", data);
-
       data.detection.forEach((detection) => {
         // Convert bounding box from canvas coordinates [0-480, 0-360] to centered coordinates [-240 to +240, -180 to +180]
         const [x1, y1, x2, y2] = detection.bounding_box_xyxy;
@@ -67,28 +66,14 @@ class arduinoObjectDetection {
 
         const centeredBoundingBox = [centeredX1, centeredY1, centeredX2, centeredY2];
 
+         const rectangle = new Rectangle();
+         rectangle.initFromBounds(centeredX1, centeredX2, centeredY1, centeredY2);
+
         console.log(
           `Detected ${detection.class_name} with confidence ${detection.confidence}`
         );
         console.log(`  Original coords: [${detection.bounding_box_xyxy.join(", ")}]`);
         console.log(`  Centered coords: [${centeredBoundingBox.join(", ")}]`);
-
-       // Create Rectangle object from bounding box coordinates
-        const rectangle = this.createRectangleFromBounds(centeredX1, centeredY1, centeredX2, centeredY2);
-
-        // Set pen attributes (convert RGB 0-255 to 0-1 range)
-        const penAttributes = {
-            color4f: [
-            this.penColor[0] / 255,
-            this.penColor[1] / 255,
-            this.penColor[2] / 255,
-            1.0
-            ],
-            diameter: 3
-        };
-
-        // Draw the rectangle using our helper method
-        this.drawRectangleWithPen(rectangle, penAttributes);
 
         // Store the converted coordinates back to the detection object
         detection.bounding_box_centered = centeredBoundingBox;
@@ -96,6 +81,11 @@ class arduinoObjectDetection {
 
       // Store detected objects for drawing
       this.detectedObjects = data.detection;
+
+      // If bounding boxes should be visible, show them
+      if (this.boundingBoxesVisible) {
+        this.showDetectedObjects();
+      }
     });
   }
 }
@@ -115,6 +105,13 @@ arduinoObjectDetection.prototype.getInfo = function() {
         func: "enableVideo",
         arguments: {},
       },
+       {
+        opcode: "detectObjects",
+        blockType: BlockType.COMMAND,
+        text: "detect",
+        func: "detectObjects",
+        arguments: {},
+      },
       {
         opcode: "disableVideo",
         blockType: BlockType.COMMAND,
@@ -123,79 +120,50 @@ arduinoObjectDetection.prototype.getInfo = function() {
         arguments: {},
       },
       {
-        opcode: "drawBoundingBox",
+        opcode: "toggleBoundingBoxes",
         blockType: BlockType.COMMAND,
-        text: "draw box at x1 [X1] y1 [Y1] x2 [X2] y2 [Y2]",
-        func: "drawBoundingBox",
+        text: "set bounding boxes [SHOW]",
+        func: "toggleBoundingBoxes",
         arguments: {
-          X1: {
-            type: ArgumentType.NUMBER,
-            defaultValue: -100
-          },
-          Y1: {
-            type: ArgumentType.NUMBER,
-            defaultValue: -100
-          },
-          X2: {
-            type: ArgumentType.NUMBER,
-            defaultValue: 100
-          },
-          Y2: {
-            type: ArgumentType.NUMBER,
-            defaultValue: 100
-          }
-        }
-      },
-      {
-        opcode: "clearBoundingBoxes",
-        blockType: BlockType.COMMAND,
-        text: "clear all boxes",
-        func: "clearBoundingBoxes",
-        arguments: {}
-      },
-      {
-        opcode: "drawDetectedObjects",
-        blockType: BlockType.COMMAND,
-        text: "draw boxes for detected objects",
-        func: "drawDetectedObjects",
-        arguments: {}
-      },
-      {
-        opcode: "setPenColor",
-        blockType: BlockType.COMMAND,
-        text: "set box color to [COLOR]",
-        func: "setPenColor",
-        arguments: {
-          COLOR: {
-            type: ArgumentType.COLOR,
-            defaultValue: "#ff0000"
+          SHOW: {
+            type: ArgumentType.STRING,
+            menu: "showHideMenu",
+            defaultValue: "show"
           }
         }
       },
     ],
     menus: {
       // Define any menus for the extension here
-      modelsLabels: ["person", "cellphone"]
+      modelsLabels: ["person", "cellphone"],
+      showHideMenu: [
+        {
+          text: "show",
+          value: "show"
+        },
+        {
+          text: "hide",
+          value: "hide"
+        }
+      ]
     }
   };
 };
 
 arduinoObjectDetection.prototype.enableVideo = function(args) {
   this.runtime.ioDevices.video.enableVideo();
+};
 
+arduinoObjectDetection.prototype.detectObjects = function(args) {
   if (this.runtime.ioDevices) {
-    // Get frame as canvas for base64 conversion
     const canvas = this.runtime.ioDevices.video.getFrame({
       format: Video.FORMAT_CANVAS,
       dimensions: [480, 360], // the same as the stage resolution
     });
-
     if (canvas) {
-
-      const dataUrl = canvas.toDataURL("image/png"); // PNG format
+      const dataUrl = canvas.toDataURL("image/png");
       const base64Frame = dataUrl.split(",")[1];
       this.io.emit("detect_objects", { image: base64Frame });
-      console.log(`Processed frame in base64`, base64Frame.substring(0, 100) + "...");
     } else {
       console.log("Failed to capture frame.");
     }
@@ -208,35 +176,23 @@ arduinoObjectDetection.prototype.disableVideo = function(args) {
   this.runtime.ioDevices.video.disableVideo();
 };
 
-arduinoObjectDetection.prototype.drawBoundingBox = function(args, util) {
-  const x1 = parseFloat(args.X1);
-  const y1 = parseFloat(args.Y1);
-  const x2 = parseFloat(args.X2);
-  const y2 = parseFloat(args.Y2);
+arduinoObjectDetection.prototype.toggleBoundingBoxes = function(args) {
+  const showValue = args.SHOW;
+  const shouldShow = showValue === "show";
 
-  // Create Rectangle object from bounding box coordinates
-  const rectangle = this.createRectangleFromBounds(x1, y1, x2, y2);
+  console.log(`Toggle bounding boxes: ${showValue}`);
 
-  // Set pen attributes (convert RGB 0-255 to 0-1 range)
-  const penAttributes = {
-    color4f: [
-      this.penColor[0] / 255,
-      this.penColor[1] / 255,
-      this.penColor[2] / 255,
-      1.0
-    ],
-    diameter: 3
-  };
-
-  // Draw the rectangle using our helper method
-  this.drawRectangleWithPen(rectangle, penAttributes);
-
-  console.log(`Drew bounding box from (${x1}, ${y1}) to (${x2}, ${y2}) using Rectangle class`);
+  if (shouldShow) {
+    // Show bounding boxes - draw all detected objects
+    this.boundingBoxesVisible = true;
+    this.showDetectedObjects();
+  } else {
+    // Hide bounding boxes - clear all drawings
+    this.boundingBoxesVisible = false;
+    this.clearAllBoundingBoxes();
+  }
 };
 
-arduinoObjectDetection.prototype.clearBoundingBoxes = function(args) {
-  // Clear all pen drawings from the stage
-};
 
 arduinoObjectDetection.prototype.drawDetectedObjects = function(args) {
   // Clear existing boxes first
@@ -257,15 +213,62 @@ arduinoObjectDetection.prototype.drawDetectedObjects = function(args) {
   });
 };
 
-arduinoObjectDetection.prototype.setPenColor = function(args) {
-  // Convert hex color to RGB array
-  const hexColor = args.COLOR;
-  const r = parseInt(hexColor.slice(1, 3), 16);
-  const g = parseInt(hexColor.slice(3, 5), 16);
-  const b = parseInt(hexColor.slice(5, 7), 16);
+/**
+ * Show bounding boxes for all detected objects
+ */
+arduinoObjectDetection.prototype.showDetectedObjects = function() {
+  if (!this.detectedObjects || this.detectedObjects.length === 0) {
+    console.log("No detected objects to show");
+    return;
+  }
 
-  this.penColor = [r, g, b];
-  console.log(`Set bounding box color to RGB(${r}, ${g}, ${b})`);
+  // Clear existing boxes first
+  this.clearAllBoundingBoxes();
+
+  // Draw boxes for all detected objects
+  this.detectedObjects.forEach(detection => {
+    if (detection.bounding_box_centered) {
+      const [x1, y1, x2, y2] = detection.bounding_box_centered;
+
+      // Create Rectangle object from bounding box coordinates
+      const rectangle = this.createRectangleFromBounds(x1, y1, x2, y2);
+
+      // Set pen attributes (convert RGB 0-255 to 0-1 range)
+      const penAttributes = {
+        color4f: [
+          this.penColor[0] / 255,
+          this.penColor[1] / 255,
+          this.penColor[2] / 255,
+          1.0
+        ],
+        diameter: 3
+      };
+
+      // Draw the rectangle using our helper method
+      this.drawRectangleWithPen(rectangle, penAttributes);
+
+      console.log(`Showed box for ${detection.class_name} (confidence: ${detection.confidence})`);
+    }
+  });
+};
+
+/**
+ * Clear all bounding boxes from the display
+ */
+arduinoObjectDetection.prototype.clearAllBoundingBoxes = function() {
+  if (!this.runtime.renderer || !this.penSkinId) {
+    console.log("Renderer or pen skin not available for clearing");
+    return;
+  }
+
+  // Get the pen skin object and clear it
+  const penSkin = this.runtime.renderer._allSkins[this.penSkinId];
+  if (penSkin && penSkin.clear) {
+    penSkin.clear();
+    console.log("Cleared all bounding boxes from pen skin");
+  } else {
+    console.log("Could not clear pen skin");
+  }
 };
 
 /**
