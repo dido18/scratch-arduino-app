@@ -34,6 +34,15 @@ class arduinoObjectDetection {
 
     this.io.on("detection_result", (data) => {
       console.log(">>>> Received detection result:", data);
+    //   bounding_box_xyxy: [73.84615384615385, 79.23076923076924, 297.69230769230774, 240]
+    //   class_name: "person"
+    //   confidence: "91.12"
+
+      data.detection.forEach((detection) => {
+        console.log(
+          `Detected ${detection.class_name} with confidence ${detection.confidence} at [${detection.bounding_box_xyxy.join(", ")}]`,
+        );
+      });
     });
   }
 }
@@ -60,6 +69,91 @@ arduinoObjectDetection.prototype.getInfo = function() {
         arguments: {},
       },
     ],
+    menus: {
+      // Define any menus for the extension here
+      modelsLabels: [
+        "airplane",
+        "apple",
+        "backpack", 
+        "banana",
+        "baseball bat",
+        "baseball glove",
+        "bear",
+        "bed",
+        "bench",
+        "bicycle",
+        "bird",
+        "boat",
+        "book",
+        "bottle",
+        "bowl",
+        "broccoli",
+        "bus",
+        "cake",
+        "car",
+        "carrot",
+        "cat",
+        "cell phone",
+        "chair",
+        "clock",
+        "couch",
+        "cow",
+        "cup",
+        "dining table",
+        "dog",
+        "donut",
+        "elephant",
+        "fire hydrant",
+        "fork",
+        "frisbee",
+        "giraffe",
+        "hair drier",
+        "handbag",
+        "hot dog",
+        "horse",
+        "keyboard",
+        "kite",
+        "knife",
+        "laptop",
+        "microwave",
+        "motorcycle",
+        "mouse",
+        "orange",
+        "oven",
+        "parking meter",
+        "person",
+        "pizza",
+        "potted plant",
+        "refrigerator",
+        "remote",
+        "sandwich",
+        "scissors",
+        "sheep",
+        "sink",
+        "skateboard",
+        "skis",
+        "snowboard",
+        "spoon",
+        "sports ball",
+        "stop sign",
+        "suitcase",
+        "surfboard",
+        "teddy bear",
+        "tennis racket",
+        "tie",
+        "toaster",
+        "toilet",
+        "toothbrush",
+        "traffic light",
+        "train",
+        "truck",
+        "tv",
+        "umbrella",
+        "vase",
+        "wine glass",
+        "zebra"
+      ]
+    }
   };
 };
 
@@ -70,7 +164,7 @@ arduinoObjectDetection.prototype.enableVideo = function(args) {
     // Get frame as canvas for base64 conversion
     const canvas = this.runtime.ioDevices.video.getFrame({
       format: Video.FORMAT_CANVAS,
-      dimensions: [320, 240],
+      dimensions: [480, 360], // the same as the stage resolution
     });
 
     if (canvas) {
