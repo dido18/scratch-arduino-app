@@ -24,6 +24,15 @@ const menuIconURI = "";
 
 const wsServerURL = `ws://192.168.1.39:7000`;
 
+/**
+ * RGB color constants for confidence visualization
+ */
+const RGB_COLORS = {
+  RED: { r: 1.0, g: 0.0, b: 0.0 },
+  ORANGE: { r: 1.0, g: 0.5, b: 0.0 },
+  GREEN: { r: 0.0, g: 1.0, b: 0.0 },
+};
+
 class ArduinoObjectDetection {
   constructor(runtime) {
     this.runtime = runtime;
@@ -193,23 +202,13 @@ ArduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
  * @returns {Object} RGB color object {r, g, b} in 0-1 range
  */
 ArduinoObjectDetection.prototype._getColorByConfidence = function(confidence) {
-  // Define confidence thresholds and corresponding colors
   if (confidence >= 90) {
-    // High confidence: Bright Green
-    return { r: 0.0, g: 1.0, b: 0.0 };
-  } else if (confidence >= 60) {
-    // Medium-high confidence: Yellow-Green
-    return { r: 0.5, g: 1.0, b: 0.0 };
-  } else if (confidence >= 40) {
-    // Medium confidence: Yellow
-    return { r: 1.0, g: 1.0, b: 0.0 };
-  } else if (confidence >= 20) {
-    // Low-medium confidence: Orange
-    return { r: 1.0, g: 0.5, b: 0.0 };
-  } else {
-    // Low confidence: Red
-    return { r: 1.0, g: 0.0, b: 0.0 };
+    return RGB_COLORS.GREEN;
   }
+  if (confidence >= 75 && confidence < 90) {
+    return RGB_COLORS.ORANGE;
+  }
+  return RGB_COLORS.RED;
 };
 
 /**
