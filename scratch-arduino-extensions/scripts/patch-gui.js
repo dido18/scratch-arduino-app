@@ -4,6 +4,7 @@ const fs = require("fs");
 const extensions = [
   { name: "ArduinoBasics", directory: "arduino_basics" },
   { name: "ArduinoModulino", directory: "arduino_modulino" },
+  { name: "ArduinoObjectDetection", directory: "arduino_object_detection" },
 ];
 
 // base dir is the 'scratch-arduino-extensions' folder
