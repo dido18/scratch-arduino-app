@@ -110,12 +110,6 @@ class arduinoObjectDetection {
     /** @type {Array<Detection>} */
     this.detectedObjects = [];
 
-    /** @type {Array<number>} */
-    this.penColor = [255, 0, 0]; // Default red color
-
-    /** @type {boolean} */
-    this.boundingBoxesVisible = true;
-
     this.runtime.on("PROJECT_LOADED", () => {
       if (!this.runtime.renderer) {
         console.log("Renderer is NOT available in runtime.");
@@ -159,9 +153,7 @@ class arduinoObjectDetection {
         );
       });
 
-      if (this.boundingBoxesVisible) {
-        this.showDetectedObjects();
-      }
+      this.showBoundingBoxes();
     });
   }
 }
@@ -173,6 +165,20 @@ arduinoObjectDetection.prototype.getInfo = function() {
     menuIconURI: menuIconURI,
     blockIconURI: iconURI,
     blocks: [
+         {
+        opcode: "enableVideo",
+        blockType: BlockType.COMMAND,
+        text: "enable video",
+        func: "enableVideo",
+        arguments: {},
+      },
+      {
+        opcode: "disableVideo",
+        blockType: BlockType.COMMAND,
+        text: "disable video",
+        func: "disableVideo",
+        arguments: {},
+      },
       {
         opcode: "whenObjectDetected",
         blockType: BlockType.HAT,
@@ -186,25 +192,11 @@ arduinoObjectDetection.prototype.getInfo = function() {
           },
         },
       },
-      {
-        opcode: "enableVideo",
-        blockType: BlockType.COMMAND,
-        text: "enable video",
-        func: "enableVideo",
-        arguments: {},
-      },
-      {
+    {
         opcode: "detectObjects",
         blockType: BlockType.COMMAND,
         text: "detect",
         func: "detectObjects",
-        arguments: {},
-      },
-      {
-        opcode: "disableVideo",
-        blockType: BlockType.COMMAND,
-        text: "disable video",
-        func: "disableVideo",
         arguments: {},
       },
       {
@@ -256,7 +248,7 @@ arduinoObjectDetection.prototype.detectObjects = function(args) {
     console.log("No ioDevices available.");
     return;
   }
-  this.clearAllBoundingBoxes();
+  this.clearBoundingBoxes();
   const canvas = this.runtime.ioDevices.video.getFrame({
     format: Video.FORMAT_CANVAS,
     dimensions: [480, 360], // the same as the stage resolution
@@ -275,14 +267,36 @@ arduinoObjectDetection.prototype.disableVideo = function(args) {
 };
 
 arduinoObjectDetection.prototype.showBoundingBoxes = function(args) {
-  this.boundingBoxesVisible = true;
-  this.showDetectedObjects();
+  if (!this.detectedObjects || this.detectedObjects.length === 0) {
+    console.log("No detected objects to show");
+    return;
+  }
+
+  this.clearBoundingBoxes();
+
+  this.detectedObjects.forEach(detectionObject => {
+    const { r, g, b } = this.getColorByConfidence(detectionObject.confidence);
+    const penAttributes = {
+      color4f: [r, g, b, 1.0],
+      diameter: 3,
+    };
+    this._drawRectangleWithPen(detectionObject.rectangle, penAttributes);
+  });
 };
 
 arduinoObjectDetection.prototype.clearBoundingBoxes = function(args) {
-  this.boundingBoxesVisible = false;
-  this.clearAllBoundingBoxes();
+  if (!this.runtime.renderer || !this._penSkinId) {
+    console.log("Renderer or pen skin not available for clearing");
+    return;
+  }
+  const penSkin = this.runtime.renderer._allSkins[this._penSkinId];
+  if (penSkin && penSkin.clear) {
+    penSkin.clear();
+  } else {
+    console.log("Could not clear pen skin");
+  }
 };
+
 
 /**
  * Get pen color based on confidence level
@@ -309,47 +323,14 @@ arduinoObjectDetection.prototype.getColorByConfidence = function(confidence) {
   }
 };
 
-arduinoObjectDetection.prototype.showDetectedObjects = function() {
-  if (!this.detectedObjects || this.detectedObjects.length === 0) {
-    console.log("No detected objects to show");
-    return;
-  }
 
-  this.clearAllBoundingBoxes();
-
-  this.detectedObjects.forEach(detectionObject => {
-    const { r, g, b } = this.getColorByConfidence(detectionObject.confidence);
-    const penAttributes = {
-      color4f: [r, g, b, 1.0],
-      diameter: 3,
-    };
-    this.drawRectangleWithPen(detectionObject.rectangle, penAttributes);
-    console.log(`Detected ${detectionObject.label} (confidence: ${detectionObject.confidence.toFixed(2)})`);
-  });
-};
-
-/**
- * Clear all bounding boxes from the display
- */
-arduinoObjectDetection.prototype.clearAllBoundingBoxes = function() {
-  if (!this.runtime.renderer || !this._penSkinId) {
-    console.log("Renderer or pen skin not available for clearing");
-    return;
-  }
-  const penSkin = this.runtime.renderer._allSkins[this._penSkinId];
-  if (penSkin && penSkin.clear) {
-    penSkin.clear();
-  } else {
-    console.log("Could not clear pen skin");
-  }
-};
 
 /**
  * Draw a rectangle using the Rectangle class and pen system
  * @param {Rectangle} rectangle - Rectangle object defining the bounds
  * @param {Object} penAttributes - Pen drawing attributes (color, thickness)
  */
-arduinoObjectDetection.prototype.drawRectangleWithPen = function(rectangle, penAttributes) {
+arduinoObjectDetection.prototype._drawRectangleWithPen = function(rectangle, penAttributes) {
   if (!this.runtime.renderer || !this._penSkinId) {
     console.log("Renderer or pen skin not available");
     return;
