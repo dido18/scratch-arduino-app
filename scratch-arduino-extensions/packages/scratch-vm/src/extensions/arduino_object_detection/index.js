@@ -6,179 +6,7 @@ const io = require("../socket.io.min.js");
 const Video = require("../../../../../../scratch-editor/packages/scratch-vm/src/io/video");
 const Rectangle = require("../../../../../../scratch-editor/packages/scratch-render/src/Rectangle.js");
 const StageLayering = require("../../../../../../scratch-editor/packages/scratch-vm/src/engine/stage-layering.js");
-
-/**
- * Model labels constants for object detection
- */
-const MODEL_LABELS = {
-  AIRPLANE: "airplane",
-  APPLE: "apple",
-  BACKPACK: "backpack",
-  BANANA: "banana",
-  BASEBALL_BAT: "baseball bat",
-  BASEBALL_GLOVE: "baseball glove",
-  BEAR: "bear",
-  BED: "bed",
-  BENCH: "bench",
-  BICYCLE: "bicycle",
-  BIRD: "bird",
-  BOAT: "boat",
-  BOOK: "book",
-  BOTTLE: "bottle",
-  BOWL: "bowl",
-  BROCCOLI: "broccoli",
-  BUS: "bus",
-  CAKE: "cake",
-  CAR: "car",
-  CARROT: "carrot",
-  CAT: "cat",
-  CELL_PHONE: "cell phone",
-  CHAIR: "chair",
-  CLOCK: "clock",
-  COUCH: "couch",
-  COW: "cow",
-  CUP: "cup",
-  DINING_TABLE: "dining table",
-  DOG: "dog",
-  DONUT: "donut",
-  ELEPHANT: "elephant",
-  FIRE_HYDRANT: "fire hydrant",
-  FORK: "fork",
-  FRISBEE: "frisbee",
-  GIRAFFE: "giraffe",
-  HAIR_DRIER: "hair drier",
-  HANDBAG: "handbag",
-  HOT_DOG: "hot dog",
-  HORSE: "horse",
-  KEYBOARD: "keyboard",
-  KITE: "kite",
-  KNIFE: "knife",
-  LAPTOP: "laptop",
-  MICROWAVE: "microwave",
-  MOTORCYCLE: "motorcycle",
-  MOUSE: "mouse",
-  ORANGE: "orange",
-  OVEN: "oven",
-  PARKING_METER: "parking meter",
-  PERSON: "person",
-  PIZZA: "pizza",
-  POTTED_PLANT: "potted plant",
-  REFRIGERATOR: "refrigerator",
-  REMOTE: "remote",
-  SANDWICH: "sandwich",
-  SCISSORS: "scissors",
-  SHEEP: "sheep",
-  SINK: "sink",
-  SKATEBOARD: "skateboard",
-  SKIS: "skis",
-  SNOWBOARD: "snowboard",
-  SPOON: "spoon",
-  SPORTS_BALL: "sports ball",
-  STOP_SIGN: "stop sign",
-  SUITCASE: "suitcase",
-  SURFBOARD: "surfboard",
-  TEDDY_BEAR: "teddy bear",
-  TENNIS_RACKET: "tennis racket",
-  TIE: "tie",
-  TOASTER: "toaster",
-  TOILET: "toilet",
-  TOOTHBRUSH: "toothbrush",
-  TRAFFIC_LIGHT: "traffic light",
-  TRAIN: "train",
-  TRUCK: "truck",
-  TV: "tv",
-  UMBRELLA: "umbrella",
-  VASE: "vase",
-  WINE_GLASS: "wine glass",
-  ZEBRA: "zebra"
-};
-
-/**
- * Array of all available model labels for the menu
- * Dynamically generated from MODEL_LABELS object values
- */
-const ALL_MODEL_LABELS = Object.values(MODEL_LABELS).sort();
-
-/**
- * Detection Object class that represents a detected object with its properties
- */
-class Detection {
-  /**
-   * Create a Detection object
-   * @param {string} label - The object class name (e.g., "person", "car")
-   * @param {Rectangle} rectangle - The bounding box as a Rectangle object
-   * @param {number} confidence - The confidence score (0.0 to 1.0)
-   */
-  constructor(label, rectangle, confidence) {
-    /** @type {string} */
-    this.label = label;
-
-    /** @type {Rectangle} */
-    this.rectangle = rectangle;
-
-    /** @type {number} */
-    this.confidence = confidence;
-  }
-
-  /**
-   * Get the bounding box coordinates
-   * @returns {Object} Object with left, right, top, bottom properties
-   */
-  getBounds() {
-    return {
-      left: this.rectangle.left,
-      right: this.rectangle.right,
-      top: this.rectangle.top,
-      bottom: this.rectangle.bottom,
-    };
-  }
-
-  /**
-   * Get the width of the bounding box
-   * @returns {number} Width in pixels
-   */
-  getWidth() {
-    return this.rectangle.right - this.rectangle.left;
-  }
-
-  /**
-   * Get the height of the bounding box
-   * @returns {number} Height in pixels
-   */
-  getHeight() {
-    return this.rectangle.top - this.rectangle.bottom;
-  }
-
-  /**
-   * Get the center point of the bounding box
-   * @returns {Object} Object with x, y properties
-   */
-  getCenter() {
-    return {
-      x: (this.rectangle.left + this.rectangle.right) / 2,
-      y: (this.rectangle.bottom + this.rectangle.top) / 2,
-    };
-  }
-
-  /**
-   * Get the area of the bounding box
-   * @returns {number} Area in square pixels
-   */
-  getArea() {
-    return this.getWidth() * this.getHeight();
-  }
-
-  /**
-   * Get a string representation of the detection
-   * @returns {string} Formatted string with detection info
-   */
-  toString() {
-    return `Detection: ${this.label} (${(this.confidence * 100).toFixed(1)}%) at [${this.rectangle.left.toFixed(1)}, ${
-      this.rectangle.top.toFixed(1)
-    }, ${this.rectangle.right.toFixed(1)}, ${this.rectangle.bottom.toFixed(1)}]`;
-  }
-}
-
+const { Detection, MODEL_LABELS } = require("./object_detection");
 /**
  * Url of icon to be displayed at the left edge of each extension block.
  * @type {string}
@@ -202,6 +30,8 @@ class arduinoObjectDetection {
     /** @type {Array<Detection>} */
     this.detectedObjects = [];
 
+    this._penSkinId = null;
+
     this.runtime.on("PROJECT_LOADED", () => {
       if (!this.runtime.renderer) {
         console.log("Renderer is NOT available in runtime.");
@@ -213,6 +43,7 @@ class arduinoObjectDetection {
         this.runtime.renderer.updateDrawableSkinId(this.penDrawableId, this._penSkinId);
       }
     });
+
     this.io = io(wsServerURL, {
       path: "/socket.io",
       transports: ["polling", "websocket"],
@@ -223,21 +54,14 @@ class arduinoObjectDetection {
       this.detectedObjects = [];
 
       data.detection.forEach((detection) => {
-        // Convert bounding box from canvas coordinates [0-480, 0-360] to centered coordinates [-240 to +240, -180 to +180]
         const [x1, y1, x2, y2] = detection.bounding_box_xyxy;
 
-        // Convert to centered coordinate system
-        const centeredX1 = x1 - 240; // 0-480 -> -240 to +240
-        const centeredY1 = -(y1 - 180); // 0-360 -> -180 to +180
-        const centeredX2 = x2 - 240;
-        const centeredY2 = -(y2 - 180);
-
-        const rectangle = this.createRectangleFromBounds(centeredX1, centeredY1, centeredX2, centeredY2);
         const detectionObject = new Detection(
           detection.class_name,
-          rectangle,
+          this._createRectangleFromBoundingBox(x1, y1, x2, y2),
           parseFloat(detection.confidence),
         );
+
         this.detectedObjects.push(detectionObject);
 
         console.log(
@@ -257,7 +81,7 @@ arduinoObjectDetection.prototype.getInfo = function() {
     menuIconURI: menuIconURI,
     blockIconURI: iconURI,
     blocks: [
-         {
+      {
         opcode: "enableVideo",
         blockType: BlockType.COMMAND,
         text: "enable video",
@@ -272,19 +96,6 @@ arduinoObjectDetection.prototype.getInfo = function() {
         arguments: {},
       },
       {
-        opcode: "whenObjectDetected",
-        blockType: BlockType.HAT,
-        text: "when [OBJECT] detected",
-        func: "whenObjectDetected",
-        arguments: {
-          OBJECT: {
-            type: ArgumentType.STRING,
-            menu: "modelsLabels",
-            defaultValue: MODEL_LABELS.PERSON,
-          },
-        },
-      },
-    {
         opcode: "detectObjects",
         blockType: BlockType.COMMAND,
         text: "detect",
@@ -294,7 +105,7 @@ arduinoObjectDetection.prototype.getInfo = function() {
       {
         opcode: "showBoundingBoxes",
         blockType: BlockType.COMMAND,
-        text: "show detected objects",
+        text: "show bounding boxes",
         func: "showBoundingBoxes",
         arguments: {
           STATE: {
@@ -304,10 +115,10 @@ arduinoObjectDetection.prototype.getInfo = function() {
         },
       },
       {
-        opcode: "clearBoundingBoxes",
+        opcode: "hideBoundingBoxes",
         blockType: BlockType.COMMAND,
-        text: "clear detected objects",
-        func: "clearBoundingBoxes",
+        text: "hide bounding boxes",
+        func: "hideBoundingBoxes",
         arguments: {
           STATE: {
             type: ArgumentType.BOOLEAN,
@@ -317,22 +128,17 @@ arduinoObjectDetection.prototype.getInfo = function() {
       },
     ],
     menus: {
-      modelsLabels: ALL_MODEL_LABELS,
+      modelsLabels: Object.values(MODEL_LABELS).sort(),
     },
   };
 };
 
-arduinoObjectDetection.prototype.whenObjectDetected = function(args) {
-  if (!this.detectedObjects || this.detectedObjects.length === 0) {
-    return false;
-  }
-  const labelToDetect = args.OBJECT;
-  const matchingDetections = this.getDetectionsByLabel(labelToDetect);
-  return matchingDetections.length > 0;
-};
-
 arduinoObjectDetection.prototype.enableVideo = function(args) {
   this.runtime.ioDevices.video.enableVideo();
+};
+
+arduinoObjectDetection.prototype.disableVideo = function(args) {
+  this.runtime.ioDevices.video.disableVideo();
 };
 
 arduinoObjectDetection.prototype.detectObjects = function(args) {
@@ -340,7 +146,7 @@ arduinoObjectDetection.prototype.detectObjects = function(args) {
     console.log("No ioDevices available.");
     return;
   }
-  this.clearBoundingBoxes();
+  this.hideBoundingBoxes();
   const canvas = this.runtime.ioDevices.video.getFrame({
     format: Video.FORMAT_CANVAS,
     dimensions: [480, 360], // the same as the stage resolution
@@ -354,20 +160,11 @@ arduinoObjectDetection.prototype.detectObjects = function(args) {
   this.io.emit("detect_objects", { image: base64Frame });
 };
 
-arduinoObjectDetection.prototype.disableVideo = function(args) {
-  this.runtime.ioDevices.video.disableVideo();
-};
-
 arduinoObjectDetection.prototype.showBoundingBoxes = function(args) {
-  if (!this.detectedObjects || this.detectedObjects.length === 0) {
-    console.log("No detected objects to show");
-    return;
-  }
-
-  this.clearBoundingBoxes();
+  this.hideBoundingBoxes();
 
   this.detectedObjects.forEach(detectionObject => {
-    const { r, g, b } = this.getColorByConfidence(detectionObject.confidence);
+    const { r, g, b } = this._getColorByConfidence(detectionObject.confidence);
     const penAttributes = {
       color4f: [r, g, b, 1.0],
       diameter: 3,
@@ -376,7 +173,7 @@ arduinoObjectDetection.prototype.showBoundingBoxes = function(args) {
   });
 };
 
-arduinoObjectDetection.prototype.clearBoundingBoxes = function(args) {
+arduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
   if (!this.runtime.renderer || !this._penSkinId) {
     console.log("Renderer or pen skin not available for clearing");
     return;
@@ -389,13 +186,12 @@ arduinoObjectDetection.prototype.clearBoundingBoxes = function(args) {
   }
 };
 
-
 /**
  * Get pen color based on confidence level
  * @param {number} confidence - Confidence score (0 to 100)
  * @returns {Object} RGB color object {r, g, b} in 0-1 range
  */
-arduinoObjectDetection.prototype.getColorByConfidence = function(confidence) {
+arduinoObjectDetection.prototype._getColorByConfidence = function(confidence) {
   // Define confidence thresholds and corresponding colors
   if (confidence >= 90) {
     // High confidence: Bright Green
@@ -415,8 +211,6 @@ arduinoObjectDetection.prototype.getColorByConfidence = function(confidence) {
   }
 };
 
-
-
 /**
  * Draw a rectangle using the Rectangle class and pen system
  * @param {Rectangle} rectangle - Rectangle object defining the bounds
@@ -428,7 +222,7 @@ arduinoObjectDetection.prototype._drawRectangleWithPen = function(rectangle, pen
     return;
   }
 
-  // Get the pen skin object
+  // TODO: Get the pen skin object in a better way
   const penSkin = this.runtime.renderer._allSkins[this._penSkinId];
   if (!penSkin) {
     console.log("Pen skin not found");
@@ -446,33 +240,20 @@ arduinoObjectDetection.prototype._drawRectangleWithPen = function(rectangle, pen
   penSkin.drawLine(penAttributes, left, bottom, left, top);
 };
 
-/**
- * Create a Rectangle from bounding box coordinates
- * @param {number} x1 - Left coordinate
- * @param {number} y1 - Top coordinate
- * @param {number} x2 - Right coordinate
- * @param {number} y2 - Bottom coordinate
- * @returns {Rectangle} Rectangle object
- */
-arduinoObjectDetection.prototype.createRectangleFromBounds = function(x1, y1, x2, y2) {
-  const rectangle = new Rectangle();
-  // Rectangle.initFromBounds expects (left, right, bottom, top)
+arduinoObjectDetection.prototype._createRectangleFromBoundingBox = function(x1, y1, x2, y2) {
+  x1 = x1 - 240; // 0-480 -> -240 to +240
+  y1 = -(y1 - 180); // 0-360 -> -180 to +180
+  x2 = x2 - 240;
+  y2 = -(y2 - 180);
+
   const left = Math.min(x1, x2);
   const right = Math.max(x1, x2);
   const bottom = Math.min(y1, y2);
   const top = Math.max(y1, y2);
 
+  const rectangle = new Rectangle();
   rectangle.initFromBounds(left, right, bottom, top);
   return rectangle;
-};
-
-/**
- * Get detections by label
- * @param {string} label - Object label to filter by
- * @returns {Array<Detection>} Array of Detection objects matching the label
- */
-arduinoObjectDetection.prototype.getDetectionsByLabel = function(label) {
-  return this.detectedObjects.filter(detection => detection.label === label);
 };
 
 module.exports = arduinoObjectDetection;
