@@ -7,6 +7,7 @@ const Video = require("../../../../../../scratch-editor/packages/scratch-vm/src/
 const Rectangle = require("../../../../../../scratch-editor/packages/scratch-render/src/Rectangle.js");
 const StageLayering = require("../../../../../../scratch-editor/packages/scratch-vm/src/engine/stage-layering.js");
 const { Detection, MODEL_LABELS } = require("./object_detection");
+
 /**
  * Url of icon to be displayed at the left edge of each extension block.
  * @type {string}
@@ -23,7 +24,7 @@ const menuIconURI = "";
 
 const wsServerURL = `ws://192.168.1.39:7000`;
 
-class arduinoObjectDetection {
+class ArduinoObjectDetection {
   constructor(runtime) {
     this.runtime = runtime;
 
@@ -74,9 +75,9 @@ class arduinoObjectDetection {
   }
 }
 
-arduinoObjectDetection.prototype.getInfo = function() {
+ArduinoObjectDetection.prototype.getInfo = function() {
   return {
-    id: "arduinoObjectDetection",
+    id: "ArduinoObjectDetection",
     name: "Arduino Object Detection",
     menuIconURI: menuIconURI,
     blockIconURI: iconURI,
@@ -133,15 +134,15 @@ arduinoObjectDetection.prototype.getInfo = function() {
   };
 };
 
-arduinoObjectDetection.prototype.enableVideo = function(args) {
+ArduinoObjectDetection.prototype.enableVideo = function(args) {
   this.runtime.ioDevices.video.enableVideo();
 };
 
-arduinoObjectDetection.prototype.disableVideo = function(args) {
+ArduinoObjectDetection.prototype.disableVideo = function(args) {
   this.runtime.ioDevices.video.disableVideo();
 };
 
-arduinoObjectDetection.prototype.detectObjects = function(args) {
+ArduinoObjectDetection.prototype.detectObjects = function(args) {
   if (!this.runtime.ioDevices) {
     console.log("No ioDevices available.");
     return;
@@ -160,7 +161,7 @@ arduinoObjectDetection.prototype.detectObjects = function(args) {
   this.io.emit("detect_objects", { image: base64Frame });
 };
 
-arduinoObjectDetection.prototype.showBoundingBoxes = function(args) {
+ArduinoObjectDetection.prototype.showBoundingBoxes = function(args) {
   this.hideBoundingBoxes();
 
   this.detectedObjects.forEach(detectionObject => {
@@ -173,7 +174,7 @@ arduinoObjectDetection.prototype.showBoundingBoxes = function(args) {
   });
 };
 
-arduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
+ArduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
   if (!this.runtime.renderer || !this._penSkinId) {
     console.log("Renderer or pen skin not available for clearing");
     return;
@@ -191,7 +192,7 @@ arduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
  * @param {number} confidence - Confidence score (0 to 100)
  * @returns {Object} RGB color object {r, g, b} in 0-1 range
  */
-arduinoObjectDetection.prototype._getColorByConfidence = function(confidence) {
+ArduinoObjectDetection.prototype._getColorByConfidence = function(confidence) {
   // Define confidence thresholds and corresponding colors
   if (confidence >= 90) {
     // High confidence: Bright Green
@@ -216,7 +217,7 @@ arduinoObjectDetection.prototype._getColorByConfidence = function(confidence) {
  * @param {Rectangle} rectangle - Rectangle object defining the bounds
  * @param {Object} penAttributes - Pen drawing attributes (color, thickness)
  */
-arduinoObjectDetection.prototype._drawRectangleWithPen = function(rectangle, penAttributes) {
+ArduinoObjectDetection.prototype._drawRectangleWithPen = function(rectangle, penAttributes) {
   if (!this.runtime.renderer || !this._penSkinId) {
     console.log("Renderer or pen skin not available");
     return;
@@ -240,7 +241,7 @@ arduinoObjectDetection.prototype._drawRectangleWithPen = function(rectangle, pen
   penSkin.drawLine(penAttributes, left, bottom, left, top);
 };
 
-arduinoObjectDetection.prototype._createRectangleFromBoundingBox = function(x1, y1, x2, y2) {
+ArduinoObjectDetection.prototype._createRectangleFromBoundingBox = function(x1, y1, x2, y2) {
   x1 = x1 - 240; // 0-480 -> -240 to +240
   y1 = -(y1 - 180); // 0-360 -> -180 to +180
   x2 = x2 - 240;
@@ -256,4 +257,4 @@ arduinoObjectDetection.prototype._createRectangleFromBoundingBox = function(x1, 
   return rectangle;
 };
 
-module.exports = arduinoObjectDetection;
+module.exports = ArduinoObjectDetection;
