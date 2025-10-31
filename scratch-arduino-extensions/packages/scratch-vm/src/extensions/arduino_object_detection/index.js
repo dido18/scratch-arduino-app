@@ -8,6 +8,98 @@ const Rectangle = require("../../../../../../scratch-editor/packages/scratch-ren
 const StageLayering = require("../../../../../../scratch-editor/packages/scratch-vm/src/engine/stage-layering.js");
 
 /**
+ * Model labels constants for object detection
+ */
+const MODEL_LABELS = {
+  AIRPLANE: "airplane",
+  APPLE: "apple",
+  BACKPACK: "backpack",
+  BANANA: "banana",
+  BASEBALL_BAT: "baseball bat",
+  BASEBALL_GLOVE: "baseball glove",
+  BEAR: "bear",
+  BED: "bed",
+  BENCH: "bench",
+  BICYCLE: "bicycle",
+  BIRD: "bird",
+  BOAT: "boat",
+  BOOK: "book",
+  BOTTLE: "bottle",
+  BOWL: "bowl",
+  BROCCOLI: "broccoli",
+  BUS: "bus",
+  CAKE: "cake",
+  CAR: "car",
+  CARROT: "carrot",
+  CAT: "cat",
+  CELL_PHONE: "cell phone",
+  CHAIR: "chair",
+  CLOCK: "clock",
+  COUCH: "couch",
+  COW: "cow",
+  CUP: "cup",
+  DINING_TABLE: "dining table",
+  DOG: "dog",
+  DONUT: "donut",
+  ELEPHANT: "elephant",
+  FIRE_HYDRANT: "fire hydrant",
+  FORK: "fork",
+  FRISBEE: "frisbee",
+  GIRAFFE: "giraffe",
+  HAIR_DRIER: "hair drier",
+  HANDBAG: "handbag",
+  HOT_DOG: "hot dog",
+  HORSE: "horse",
+  KEYBOARD: "keyboard",
+  KITE: "kite",
+  KNIFE: "knife",
+  LAPTOP: "laptop",
+  MICROWAVE: "microwave",
+  MOTORCYCLE: "motorcycle",
+  MOUSE: "mouse",
+  ORANGE: "orange",
+  OVEN: "oven",
+  PARKING_METER: "parking meter",
+  PERSON: "person",
+  PIZZA: "pizza",
+  POTTED_PLANT: "potted plant",
+  REFRIGERATOR: "refrigerator",
+  REMOTE: "remote",
+  SANDWICH: "sandwich",
+  SCISSORS: "scissors",
+  SHEEP: "sheep",
+  SINK: "sink",
+  SKATEBOARD: "skateboard",
+  SKIS: "skis",
+  SNOWBOARD: "snowboard",
+  SPOON: "spoon",
+  SPORTS_BALL: "sports ball",
+  STOP_SIGN: "stop sign",
+  SUITCASE: "suitcase",
+  SURFBOARD: "surfboard",
+  TEDDY_BEAR: "teddy bear",
+  TENNIS_RACKET: "tennis racket",
+  TIE: "tie",
+  TOASTER: "toaster",
+  TOILET: "toilet",
+  TOOTHBRUSH: "toothbrush",
+  TRAFFIC_LIGHT: "traffic light",
+  TRAIN: "train",
+  TRUCK: "truck",
+  TV: "tv",
+  UMBRELLA: "umbrella",
+  VASE: "vase",
+  WINE_GLASS: "wine glass",
+  ZEBRA: "zebra"
+};
+
+/**
+ * Array of all available model labels for the menu
+ * Dynamically generated from MODEL_LABELS object values
+ */
+const ALL_MODEL_LABELS = Object.values(MODEL_LABELS).sort();
+
+/**
  * Detection Object class that represents a detected object with its properties
  */
 class Detection {
@@ -188,7 +280,7 @@ arduinoObjectDetection.prototype.getInfo = function() {
           OBJECT: {
             type: ArgumentType.STRING,
             menu: "modelsLabels",
-            defaultValue: "person",
+            defaultValue: MODEL_LABELS.PERSON,
           },
         },
       },
@@ -225,7 +317,7 @@ arduinoObjectDetection.prototype.getInfo = function() {
       },
     ],
     menus: {
-      modelsLabels: ["person", "cellphone"],
+      modelsLabels: ALL_MODEL_LABELS,
     },
   };
 };
