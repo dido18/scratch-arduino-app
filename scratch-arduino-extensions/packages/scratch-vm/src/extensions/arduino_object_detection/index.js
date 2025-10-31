@@ -222,7 +222,7 @@ arduinoObjectDetection.prototype.getInfo = function() {
       {
         opcode: "clearBoundingBoxes",
         blockType: BlockType.COMMAND,
-        text: "clear",
+        text: "clear detected objects",
         func: "clearBoundingBoxes",
         arguments: {
           STATE: {
@@ -287,25 +287,25 @@ arduinoObjectDetection.prototype.clearBoundingBoxes = function(args) {
 /**
  * Get pen color based on confidence level
  * @param {number} confidence - Confidence score (0 to 100)
- * @returns {Array<number>} RGB color array [r, g, b] in 0-100 range
+ * @returns {Object} RGB color object {r, g, b} in 0-1 range
  */
 arduinoObjectDetection.prototype.getColorByConfidence = function(confidence) {
   // Define confidence thresholds and corresponding colors
   if (confidence >= 90) {
     // High confidence: Bright Green
-    return [0.0, 1.0, 0.0];
+    return { r: 0.0, g: 1.0, b: 0.0 };
   } else if (confidence >= 60) {
     // Medium-high confidence: Yellow-Green
-    return [0.5, 1.0, 0.0];
+    return { r: 0.5, g: 1.0, b: 0.0 };
   } else if (confidence >= 40) {
     // Medium confidence: Yellow
-    return [1.0, 1.0, 0.0];
+    return { r: 1.0, g: 1.0, b: 0.0 };
   } else if (confidence >= 20) {
     // Low-medium confidence: Orange
-    return [1.0, 0.5, 0.0];
+    return { r: 1.0, g: 0.5, b: 0.0 };
   } else {
     // Low confidence: Red
-    return [1.0, 0.0, 0.0];
+    return { r: 1.0, g: 0.0, b: 0.0 };
   }
 };
 
@@ -318,14 +318,9 @@ arduinoObjectDetection.prototype.showDetectedObjects = function() {
   this.clearAllBoundingBoxes();
 
   this.detectedObjects.forEach(detectionObject => {
-    const confidenceColor = this.getColorByConfidence(detectionObject.confidence);
+    const { r, g, b } = this.getColorByConfidence(detectionObject.confidence);
     const penAttributes = {
-      color4f: [
-        confidenceColor[0], // Red component (0-1)
-        confidenceColor[1], // Green component (0-1)
-        confidenceColor[2], // Blue component (0-1)
-        1.0, // Alpha (fully opaque)
-      ],
+      color4f: [r, g, b, 1.0],
       diameter: 3,
     };
     this.drawRectangleWithPen(detectionObject.rectangle, penAttributes);
