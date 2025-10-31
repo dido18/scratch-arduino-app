@@ -43,12 +43,12 @@ tasks:
       - cp ./app.yaml build/scratch-arduino-app/app.yaml
       - cp -r ./sketch/ build/scratch-arduino-app/sketch
       - cp -r ./python/ build/scratch-arduino-app/python
-      # - task scratch:build
-      # - mkdir -p build/scratch-arduino-app/assets
-      # - cp scratch-editor/packages/scratch-gui/build/index.html build/scratch-arduino-app/assets/index.html
-      # - cp scratch-editor/packages/scratch-gui/build/gui.js build/scratch-arduino-app/assets/gui.js
-      # - mkdir -p build/scratch-arduino-app/assets/static
-      # - cp -r scratch-editor/packages/scratch-gui/build/static/blocks-media  build/scratch-arduino-app/assets/static/blocks-media
+      - task scratch:build
+      - mkdir -p build/scratch-arduino-app/assets
+      - cp scratch-editor/packages/scratch-gui/build/index.html build/scratch-arduino-app/assets/index.html
+      - cp scratch-editor/packages/scratch-gui/build/gui.js build/scratch-arduino-app/assets/gui.js
+      - mkdir -p build/scratch-arduino-app/assets/static
+      - cp -r scratch-editor/packages/scratch-gui/build/static/blocks-media  build/scratch-arduino-app/assets/static/blocks-media
 
   scratch:build:
     desc: "Build Scratch GUI files"
