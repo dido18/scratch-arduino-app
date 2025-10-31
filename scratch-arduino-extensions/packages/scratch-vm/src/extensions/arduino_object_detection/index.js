@@ -96,6 +96,13 @@ ArduinoObjectDetection.prototype.getInfo = function() {
     blockIconURI: iconURI,
     blocks: [
       {
+        opcode: "whenPersonDetected",
+        blockType: BlockType.HAT,
+        text: "when person detected",
+        func: "whenPersonDetected",
+        arguments: {},
+      },
+      {
         opcode: "enableVideo",
         blockType: BlockType.COMMAND,
         text: "enable video",
@@ -142,6 +149,10 @@ ArduinoObjectDetection.prototype.getInfo = function() {
       modelsLabels: Object.values(MODEL_LABELS).sort(),
     },
   };
+};
+
+ArduinoObjectDetection.prototype.whenPersonDetected = function(args) {
+    return this.personIsDetected();
 };
 
 ArduinoObjectDetection.prototype.enableVideo = function(args) {
