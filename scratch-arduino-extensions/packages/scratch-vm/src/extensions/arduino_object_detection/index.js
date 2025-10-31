@@ -42,6 +42,8 @@ class ArduinoObjectDetection {
 
     this._penSkinId = null;
 
+    this._isfaceDetected = false;
+
     this.runtime.on("PROJECT_LOADED", () => {
       if (!this.runtime.renderer) {
         console.log("Renderer is NOT available in runtime.");
@@ -75,7 +77,7 @@ class ArduinoObjectDetection {
         this.detectedObjects.push(detectionObject);
 
         console.log(
-          `Detected ${detectionObject.label} with confidence ${detectionObject.confidence.toFixed(2)}`,
+          `Detected ${detectionObject.label} with confidence ${detectionObject.confidence.toFixed(2)} took ${data.processing_time}`,
         );
       });
 
@@ -117,24 +119,21 @@ ArduinoObjectDetection.prototype.getInfo = function() {
         blockType: BlockType.COMMAND,
         text: "show bounding boxes",
         func: "showBoundingBoxes",
-        arguments: {
-          STATE: {
-            type: ArgumentType.BOOLEAN,
-            defaultValue: true,
-          },
-        },
+        arguments: { },
       },
       {
         opcode: "hideBoundingBoxes",
         blockType: BlockType.COMMAND,
         text: "hide bounding boxes",
         func: "hideBoundingBoxes",
-        arguments: {
-          STATE: {
-            type: ArgumentType.BOOLEAN,
-            defaultValue: true,
-          },
-        },
+        arguments: { },
+      },
+       {
+        opcode: "personIsDetected",
+        blockType: BlockType.BOOLEAN,
+        text: "is person detected?",
+        func: "personIsDetected",
+        arguments: { },
       },
     ],
     menus: {
@@ -194,6 +193,19 @@ ArduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
   } else {
     console.log("Could not clear pen skin");
   }
+};
+
+
+ArduinoObjectDetection.prototype.personIsDetected = function(args) {
+    if (!this.detectedObjects || this.detectedObjects.length === 0) {
+        return false;
+    }
+    const isPersonDetected = this.detectedObjects.some(detection => detection.label === MODEL_LABELS.PERSON);
+    if (isPersonDetected) {
+        this._isfaceDetected = false;
+        return true;
+    }
+    return false;
 };
 
 /**
