@@ -22,7 +22,7 @@ const iconURI = "";
 // eslint-disable-next-line max-len
 const menuIconURI = "";
 
-const wsServerURL = `ws://192.168.1.39:7000`;
+const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
 
 /**
  * RGB color constants for confidence visualization
@@ -77,7 +77,9 @@ class ArduinoObjectDetection {
         this.detectedObjects.push(detectionObject);
 
         console.log(
-          `Detected ${detectionObject.label} with confidence ${detectionObject.confidence.toFixed(2)} took ${data.processing_time}`,
+          `Detected ${detectionObject.label} with confidence ${
+            detectionObject.confidence.toFixed(2)
+          } took ${data.processing_time}`,
         );
       });
 
@@ -119,21 +121,21 @@ ArduinoObjectDetection.prototype.getInfo = function() {
         blockType: BlockType.COMMAND,
         text: "show bounding boxes",
         func: "showBoundingBoxes",
-        arguments: { },
+        arguments: {},
       },
       {
         opcode: "hideBoundingBoxes",
         blockType: BlockType.COMMAND,
         text: "hide bounding boxes",
         func: "hideBoundingBoxes",
-        arguments: { },
+        arguments: {},
       },
-       {
+      {
         opcode: "personIsDetected",
         blockType: BlockType.BOOLEAN,
         text: "is person detected?",
         func: "personIsDetected",
-        arguments: { },
+        arguments: {},
       },
     ],
     menus: {
@@ -195,17 +197,16 @@ ArduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
   }
 };
 
-
 ArduinoObjectDetection.prototype.personIsDetected = function(args) {
-    if (!this.detectedObjects || this.detectedObjects.length === 0) {
-        return false;
-    }
-    const isPersonDetected = this.detectedObjects.some(detection => detection.label === MODEL_LABELS.PERSON);
-    if (isPersonDetected) {
-        this._isfaceDetected = false;
-        return true;
-    }
+  if (!this.detectedObjects || this.detectedObjects.length === 0) {
     return false;
+  }
+  const isPersonDetected = this.detectedObjects.some(detection => detection.label === MODEL_LABELS.PERSON);
+  if (isPersonDetected) {
+    this._isfaceDetected = false;
+    return true;
+  }
+  return false;
 };
 
 /**
