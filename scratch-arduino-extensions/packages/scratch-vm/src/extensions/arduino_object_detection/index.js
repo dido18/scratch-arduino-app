@@ -152,7 +152,7 @@ ArduinoObjectDetection.prototype.getInfo = function() {
 };
 
 ArduinoObjectDetection.prototype.whenPersonDetected = function(args) {
-    return this.personIsDetected();
+  return this.personIsDetected();
 };
 
 ArduinoObjectDetection.prototype.enableVideo = function(args) {
