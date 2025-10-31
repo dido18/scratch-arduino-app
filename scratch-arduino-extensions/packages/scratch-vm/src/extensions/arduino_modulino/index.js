@@ -18,7 +18,7 @@ const iconURI = "";
 // eslint-disable-next-line max-len
 const menuIconURI = "";
 
-const wsServerURL =`${window.location.protocol}//${window.location.hostname}:7000`;
+const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
 
 class ArduinoModulino {
   constructor(runtime) {
