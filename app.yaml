@@ -1,5 +1,5 @@
-name: scratch-arduino-app
-description: Control the Uno-Q board using Scratch blocks
+name: Scratch for Arduino UNO Q
+description: Control the UNO Q board using Scratch blocks
 ports:
   - 7000
 bricks:
