@@ -19,8 +19,9 @@ const iconURI = "";
 // eslint-disable-next-line max-len
 const menuIconURI = "";
 
-const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
+// const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
 
+const wsServerURL = `ws://192.168.1.39:7000`;
 class ArduinoBasics {
   constructor(runtime) {
     this.runtime = runtime;
@@ -53,6 +54,13 @@ ArduinoBasics.prototype.getInfo = function() {
         },
       },
       {
+        opcode: "matrixClear",
+        blockType: BlockType.COMMAND,
+        text: "clear matrix",
+        func: "matrixClear",
+        arguments: {},
+      },
+      {
         opcode: "setLed3",
         blockType: BlockType.COMMAND,
         text: "set LED 3 to [HEX]",
@@ -83,6 +91,11 @@ ArduinoBasics.prototype.getInfo = function() {
 ArduinoBasics.prototype.matrixDraw = function(args) {
   console.log(`Drawing frame on matrix: ${args}`);
   this.io.emit("matrix_draw", { frame: args.FRAME });
+};
+
+ArduinoBasics.prototype.matrixClear = function() {
+  console.log("Clearing matrix");
+  this.io.emit("matrix_draw", { frame: "0000000000000000000000000" });
 };
 
 ArduinoBasics.prototype.setLed3 = function(args) {
