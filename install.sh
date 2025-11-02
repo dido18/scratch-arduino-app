@@ -25,3 +25,6 @@ mv -f scratch-arduino-app $HOME/ArduinoApps/
 rm -f app.zip
 
 echo "Installation completed: $ZIP_NAME installed at $HOME/ArduinoApps/scratch-arduino-app"
+
+arduino-app-cli app restart user:scratch-arduino-app
+echo "Application restarted"
