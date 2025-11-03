@@ -3,6 +3,7 @@
 
 ## Description
 > Arduino UNO Q + Scratch = ❤️
+
 This is an Arduino App that runs Scratch on the board, enabling block-based interaction with the board.
 
 Scratch for Arduino UNO Q runs Scratch directly on the board to control Arduino (e.g., LEDs, buttons, and Arduino Modulino) with optional AI model integration.
