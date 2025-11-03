@@ -19,15 +19,18 @@ echo "Downloading: $ZIP_NAME"
 cd /tmp
 curl -sL "$ZIP_URL" -o app.zip
 
-# before deleting the folder, stop it 
-arduino-app-cli app stop user:scratch-arduino-app
+# Check if app exists and stop it before updating
+if [ -d "$HOME/ArduinoApps/scratch-arduino-app" ]; then
+    echo "Stopping existing application..."
+    arduino-app-cli app stop user:scratch-arduino-app || echo "Warning: Failed to stop app (may not be running)"
+    rm -rf $HOME/ArduinoApps/scratch-arduino-app
+fi
 
 unzip -q app.zip
-rm -rf $HOME/ArduinoApps/scratch-arduino-app
 mv -f scratch-arduino-app $HOME/ArduinoApps/
 rm -f app.zip
 
-echo "Installation completed: $ZIP_NAME installed at $HOME/ArduinoApps/scratch-arduino-app"
+echo "Installed $ZIP_NAME  at $HOME/ArduinoApps/scratch-arduino-app"
 
 arduino-app-cli app start user:scratch-arduino-app
 arduino-app-cli properties set default user:scratch-arduino-app
