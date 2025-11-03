@@ -1,5 +1,7 @@
 # Scratch for Arduino Uno Q
 
+![Scratch for Arduion UNO Q](./doc/scratch-unoq.png)
+
 ## Installation
 
 - Connect to the board using `adb` following https://docs.arduino.cc/software/app-lab/tutorials/cli/ and open the `adb shell`
