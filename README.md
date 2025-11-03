@@ -10,6 +10,7 @@ Accessible from any device via a browser, it makes coding, electronics, and AI h
 ![Scratch for Arduion UNO Q](./doc/scratch-unoq.png)
 
 ## Installation
+
 - Connect the Arduino Uno Q board via USB
 - Open an `adb shell` into the board using [adb](https://docs.arduino.cc/software/app-lab/tutorials/cli/)
 - Copy and paste the following command into the terminal to install the latest `scratch-arduino-app` into the board:
