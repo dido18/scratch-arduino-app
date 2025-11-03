@@ -10,15 +10,15 @@ Accessible from any device via a browser, it makes coding, electronics, and AI h
 ![Scratch for Arduion UNO Q](./doc/scratch-unoq.png)
 
 ## Installation
-
-- Open an `adb shell` into the board ([doc](https://docs.arduino.cc/software/app-lab/tutorials/cli/)
+- Connect the Arduino Uno Q board via USB
+- Open an `adb shell` into the board using [adb](https://docs.arduino.cc/software/app-lab/tutorials/cli/)
 - Copy and paste the following command into the terminal to install the latest `scratch-arduino-app` into the board:
 
 ```
 curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/install.sh | bash
 ```
 
-- Open the Scratch Iterface at the `<IP_OR_BOARD_NAME>:7000` address
+- Open the Scratch interface at the `<IP_OR_BOARD_NAME>:7000` address
 
 ### Local development
 
