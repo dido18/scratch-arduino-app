@@ -30,7 +30,7 @@ unzip -q app.zip
 mv -f scratch-arduino-app $HOME/ArduinoApps/
 rm -f app.zip
 
-echo "Installation completed: $ZIP_NAME installed at $HOME/ArduinoApps/scratch-arduino-app"
+echo "Installed $ZIP_NAME  at $HOME/ArduinoApps/scratch-arduino-app"
 
 arduino-app-cli app start user:scratch-arduino-app
 arduino-app-cli properties set default user:scratch-arduino-app
