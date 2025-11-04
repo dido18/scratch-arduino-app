@@ -58,11 +58,8 @@ def on_detect_objects(client_id, data):
             ui.send_message("detection_error", {"error": "No image data"})
             return
 
-        image_bytes = base64.b64decode(image_data)
-        pil_image = Image.open(io.BytesIO(image_bytes))
-
         start_time = time.time() * 1000
-        results = object_detection.detect(pil_image, confidence=confidence)
+        results = object_detection.detect(base64.b64decode(image_data), confidence=confidence)
         diff = time.time() * 1000 - start_time
 
         if results is None:
@@ -86,10 +83,8 @@ ui.on_message("matrix_draw", on_matrix_draw)
 ui.on_message("set_led_rgb", on_set_led_rgb)
 ui.on_message("detect_objects", on_detect_objects)
 
-
 def on_modulino_button_pressed(btn):
     ui.send_message("modulino_buttons_pressed", {"btn": btn})
-
 
 Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
 
