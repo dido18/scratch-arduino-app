@@ -49,10 +49,10 @@ def on_set_led_rgb(_, data):
 def on_detect_objects(client_id, data):
     """Callback function to handle object detection requests."""
     try:
-        print("on_detect_objects called", data)
         image_data = data.get("image")
         confidence = data.get("confidence", 0.5)
         if not image_data:
+            # TODO: implement the 'detection_error` in the extension
             ui.send_message("detection_error", {"error": "No image data"})
             return
 
