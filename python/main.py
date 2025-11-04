@@ -2,8 +2,6 @@ from arduino.app_utils import App, Bridge
 from arduino.app_bricks.web_ui import WebUI
 from arduino.app_bricks.object_detection import ObjectDetection
 import time
-from PIL import Image
-import io
 import base64
 
 object_detection = ObjectDetection()
