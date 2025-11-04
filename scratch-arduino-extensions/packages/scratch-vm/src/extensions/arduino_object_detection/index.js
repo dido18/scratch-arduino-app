@@ -163,6 +163,50 @@ ArduinoObjectDetection.prototype.getInfo = function() {
   };
 };
 
+ArduinoObjectDetection.prototype.startDetectionLoop = function(args) {
+  if (this._isLoopRunning) {
+    console.log("Detection loop is already running");
+    return;
+  }
+
+  this._isLoopRunning = true;
+  this.runtime.ioDevices.video.enableVideo();
+  this._loop();
+
+  this._loopIntervalId = setInterval(() => {
+    this._loop();
+  }, 1000); // 1000ms = 1s
+};
+
+ArduinoObjectDetection.prototype.stopDetectionLoop = function(args) {
+  this.runtime.ioDevices.video.disableVideo();
+ this.hideBoundingBoxes();
+
+ if (!this._isLoopRunning) {
+    console.log("Detection loop is not running");
+    return;
+  }
+
+  console.log("Stopping detection loop");
+  this._isLoopRunning = false;
+  if (this._loopIntervalId) {
+    clearInterval(this._loopIntervalId);
+    this._loopIntervalId = null;
+  }
+};
+
+
+ArduinoObjectDetection.prototype._loop = function() {
+  if (!this._isLoopRunning) {
+    return;
+  }
+  this._detectObjects();
+
+  // Note: The face detection state (_isfaceDetected) will be updated
+  // automatically when the detection_result event is received
+};
+
+
 ArduinoObjectDetection.prototype.whenPersonDetected = function(args) {
    return this.isPersonDetected();
 };
@@ -171,7 +215,17 @@ ArduinoObjectDetection.prototype.isPersonDetected = function(args) {
    return this._isfaceDetected;
 };
 
-ArduinoObjectDetection.prototype.detectObjects = function(args) {
+ArduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
+    this._enableBoundingBoxes = false;
+    this._clearBoundingBoxes();
+}
+
+ArduinoObjectDetection.prototype.showBoundingBoxes = function(args) {
+  this._enableBoundingBoxes = true;
+  this._drawBoundingBoxes();
+};
+
+ArduinoObjectDetection.prototype._detectObjects = function(args) {
   if (!this.runtime.ioDevices) {
     console.log("No ioDevices available.");
     return;
@@ -211,17 +265,6 @@ ArduinoObjectDetection.prototype._drawBoundingBoxes = function(args) {
     };
     this._drawRectangleWithPen(detectionObject.rectangle, penAttributes);
   });
-};
-
-ArduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
-    this._enableBoundingBoxes = false;
-    this._clearBoundingBoxes();
-}
-
-
-ArduinoObjectDetection.prototype.showBoundingBoxes = function(args) {
-  this._enableBoundingBoxes = true;
-  this._drawBoundingBoxes();
 };
 
 
@@ -285,58 +328,5 @@ ArduinoObjectDetection.prototype._createRectangleFromBoundingBox = function(x1, 
   return rectangle;
 };
 
-/**
- * Start automatic detection loop that runs every 2 seconds
- */
-ArduinoObjectDetection.prototype.startDetectionLoop = function(args) {
-  if (this._isLoopRunning) {
-    console.log("Detection loop is already running");
-    return;
-  }
-
-  this._isLoopRunning = true;
-
-  this.runtime.ioDevices.video.enableVideo();
-
-  this._loop();
-
-  this._loopIntervalId = setInterval(() => {
-    this._loop();
-  }, 1000); // 1000ms = 1s
-};
-
-/**
- * Stop automatic detection loop
- */
-ArduinoObjectDetection.prototype.stopDetectionLoop = function(args) {
-  this.runtime.ioDevices.video.disableVideo();
- this.hideBoundingBoxes();
-
- if (!this._isLoopRunning) {
-    console.log("Detection loop is not running");
-    return;
-  }
-
-  console.log("Stopping detection loop");
-  this._isLoopRunning = false;
-
-
-
-  if (this._loopIntervalId) {
-    clearInterval(this._loopIntervalId);
-    this._loopIntervalId = null;
-  }
-};
-
-ArduinoObjectDetection.prototype._loop = function() {
-  if (!this._isLoopRunning) {
-    return;
-  }
-  // Call the detect method
-  this.detectObjects();
-
-  // Note: The face detection state (_isfaceDetected) will be updated
-  // automatically when the detection_result event is received
-};
 
 module.exports = ArduinoObjectDetection;
