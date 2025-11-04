@@ -73,7 +73,6 @@ class ArduinoObjectDetection {
           this._createRectangleFromBoundingBox(x1, y1, x2, y2),
           parseFloat(detection.confidence),
         );
-
         this.detectedObjects.push(detectionObject);
 
         console.log(
@@ -82,6 +81,11 @@ class ArduinoObjectDetection {
           } took ${data.processing_time}`,
         );
       });
+
+      const personDetected = this.detectedObjects.some(detectionObject =>
+        detectionObject.label === MODEL_LABELS.PERSON
+      );
+      this._isfaceDetected = personDetected;
 
       this.showBoundingBoxes();
     });
@@ -138,12 +142,12 @@ ArduinoObjectDetection.prototype.getInfo = function() {
         arguments: {},
       },
       {
-        opcode: "personIsDetected",
+        opcode: "isPersonDetected",
         blockType: BlockType.BOOLEAN,
-        text: "is person detected?",
-        func: "personIsDetected",
+        text: "is person detected",
+        func: "isPersonDetected",
         arguments: {},
-      },
+      }
     ],
     menus: {
       modelsLabels: Object.values(MODEL_LABELS).sort(),
@@ -152,7 +156,11 @@ ArduinoObjectDetection.prototype.getInfo = function() {
 };
 
 ArduinoObjectDetection.prototype.whenPersonDetected = function(args) {
-  return this.personIsDetected();
+   return this._isfaceDetected;
+};
+
+ArduinoObjectDetection.prototype.isPersonDetected = function(args) {
+   return this._isfaceDetected;
 };
 
 ArduinoObjectDetection.prototype.enableVideo = function(args) {
@@ -208,17 +216,6 @@ ArduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
   }
 };
 
-ArduinoObjectDetection.prototype.personIsDetected = function(args) {
-  if (!this.detectedObjects || this.detectedObjects.length === 0) {
-    return false;
-  }
-  const isPersonDetected = this.detectedObjects.some(detection => detection.label === MODEL_LABELS.PERSON);
-  if (isPersonDetected) {
-    this._isfaceDetected = false;
-    return true;
-  }
-  return false;
-};
 
 /**
  * Get pen color based on confidence level
