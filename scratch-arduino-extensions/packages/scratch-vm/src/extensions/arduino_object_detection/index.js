@@ -100,7 +100,7 @@ class ArduinoObjectDetection {
 
       if (this._enableBoundingBoxes) {
         this._drawBoundingBoxes();
-      } else{
+      } else {
         this._clearBoundingBoxes();
       }
     });
@@ -114,14 +114,14 @@ ArduinoObjectDetection.prototype.getInfo = function() {
     menuIconURI: menuIconURI,
     blockIconURI: iconURI,
     blocks: [
-        {
+      {
         opcode: "whenPersonDetected",
         blockType: BlockType.HAT,
         text: "when person detected",
         func: "whenPersonDetected",
         arguments: {},
       },
-        {
+      {
         opcode: "startDetectionLoop",
         blockType: BlockType.COMMAND,
         text: "start detection",
@@ -180,9 +180,9 @@ ArduinoObjectDetection.prototype.startDetectionLoop = function(args) {
 
 ArduinoObjectDetection.prototype.stopDetectionLoop = function(args) {
   this.runtime.ioDevices.video.disableVideo();
- this.hideBoundingBoxes();
+  this.hideBoundingBoxes();
 
- if (!this._isLoopRunning) {
+  if (!this._isLoopRunning) {
     console.log("Detection loop is not running");
     return;
   }
@@ -195,7 +195,6 @@ ArduinoObjectDetection.prototype.stopDetectionLoop = function(args) {
   }
 };
 
-
 ArduinoObjectDetection.prototype._loop = function() {
   if (!this._isLoopRunning) {
     return;
@@ -206,19 +205,18 @@ ArduinoObjectDetection.prototype._loop = function() {
   // automatically when the detection_result event is received
 };
 
-
 ArduinoObjectDetection.prototype.whenPersonDetected = function(args) {
-   return this.isPersonDetected();
+  return this.isPersonDetected();
 };
 
 ArduinoObjectDetection.prototype.isPersonDetected = function(args) {
-   return this._isfaceDetected;
+  return this._isfaceDetected;
 };
 
 ArduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
-    this._enableBoundingBoxes = false;
-    this._clearBoundingBoxes();
-}
+  this._enableBoundingBoxes = false;
+  this._clearBoundingBoxes();
+};
 
 ArduinoObjectDetection.prototype.showBoundingBoxes = function(args) {
   this._enableBoundingBoxes = true;
@@ -266,7 +264,6 @@ ArduinoObjectDetection.prototype._drawBoundingBoxes = function(args) {
     this._drawRectangleWithPen(detectionObject.rectangle, penAttributes);
   });
 };
-
 
 /**
  * Get pen color based on confidence level
@@ -327,6 +324,5 @@ ArduinoObjectDetection.prototype._createRectangleFromBoundingBox = function(x1, 
   rectangle.initFromBounds(left, right, bottom, top);
   return rectangle;
 };
-
 
 module.exports = ArduinoObjectDetection;
