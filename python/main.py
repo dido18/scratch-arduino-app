@@ -75,7 +75,7 @@ def on_detect_objects(client_id, data):
         ui.send_message("detection_error", {"error": str(e)})
 
 
-ui = WebUI(use_ssl=Tru)
+ui = WebUI(use_ssl=True)
 ui.on_connect(lambda sid: (print(f"Client connected: {sid} "),))
 ui.on_message("matrix_draw", on_matrix_draw)
 ui.on_message("set_led_rgb", on_set_led_rgb)
