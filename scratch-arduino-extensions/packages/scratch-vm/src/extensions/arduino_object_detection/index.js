@@ -406,20 +406,4 @@ ArduinoObjectDetection.prototype._updateDetectionStates = function() {
   }
 };
 
-/**
- * Get all currently detected object labels
- * @returns {Array<string>} Array of currently detected object labels
- */
-ArduinoObjectDetection.prototype.getDetectedLabels = function() {
-  return Object.keys(this._detectionStates).filter(label => this._detectionStates[label]);
-};
-
-/**
- * Get detection states for all labels
- * @returns {Object<string, boolean>} Object mapping labels to detection state
- */
-ArduinoObjectDetection.prototype.getAllDetectionStates = function() {
-  return { ...this._detectionStates }; // Return a copy to prevent external modification
-};
-
 module.exports = ArduinoObjectDetection;
