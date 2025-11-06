@@ -93,6 +93,7 @@ class ArduinoObjectDetection {
         );
       });
 
+      // Update person detection for backward compatibility
       const personDetected = this.detectedObjects.some(detectionObject =>
         detectionObject.label === MODEL_LABELS.PERSON
       );
@@ -115,11 +116,17 @@ ArduinoObjectDetection.prototype.getInfo = function() {
     blockIconURI: iconURI,
     blocks: [
       {
-        opcode: "whenPersonDetected",
+        opcode: "whenObjectDetected",
         blockType: BlockType.HAT,
-        text: "when person detected",
-        func: "whenPersonDetected",
-        arguments: {},
+        text: "when [OBJECT] detected",
+        func: "whenObjectDetected",
+        arguments: {
+          OBJECT: {
+            type: ArgumentType.STRING,
+            menu: "modelsLabels",
+            defaultValue: MODEL_LABELS.PERSON,
+          },
+        },
       },
       {
         opcode: "startDetectionLoop",
@@ -205,8 +212,11 @@ ArduinoObjectDetection.prototype._loop = function() {
   // automatically when the detection_result event is received
 };
 
-ArduinoObjectDetection.prototype.whenPersonDetected = function(args) {
-  return this.isPersonDetected();
+ArduinoObjectDetection.prototype.whenObjectDetected = function(args) {
+  const objectLabel = args.OBJECT;
+  return this.detectedObjects.some(detectionObject => 
+    detectionObject.label === objectLabel
+  );
 };
 
 ArduinoObjectDetection.prototype.isPersonDetected = function(args) {
