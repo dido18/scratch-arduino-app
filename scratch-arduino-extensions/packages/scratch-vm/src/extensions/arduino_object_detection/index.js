@@ -42,7 +42,8 @@ class ArduinoObjectDetection {
 
     this._penSkinId = null;
 
-    this._isfaceDetected = false;
+    /** @type {Object<string, boolean>} */
+    this._detectionStates = this._initializeDetectionStates();
 
     /** @type {number|null} */
     this._loopIntervalId = null;
@@ -93,10 +94,7 @@ class ArduinoObjectDetection {
         );
       });
 
-      const personDetected = this.detectedObjects.some(detectionObject =>
-        detectionObject.label === MODEL_LABELS.PERSON
-      );
-      this._isfaceDetected = personDetected;
+      this._updateDetectionStates();
 
       if (this._enableBoundingBoxes) {
         this._drawBoundingBoxes();
@@ -115,11 +113,17 @@ ArduinoObjectDetection.prototype.getInfo = function() {
     blockIconURI: iconURI,
     blocks: [
       {
-        opcode: "whenPersonDetected",
+        opcode: "whenObjectDetected",
         blockType: BlockType.HAT,
-        text: "when person detected",
-        func: "whenPersonDetected",
-        arguments: {},
+        text: "when [OBJECT] detected",
+        func: "whenObjectDetected",
+        arguments: {
+          OBJECT: {
+            type: ArgumentType.STRING,
+            menu: "modelsLabels",
+            defaultValue: MODEL_LABELS.PERSON,
+          },
+        },
       },
       {
         opcode: "startDetectionLoop",
@@ -136,11 +140,17 @@ ArduinoObjectDetection.prototype.getInfo = function() {
         arguments: {},
       },
       {
-        opcode: "isPersonDetected",
+        opcode: "isObjectDetected",
         blockType: BlockType.BOOLEAN,
-        text: "is person detected",
-        func: "isPersonDetected",
-        arguments: {},
+        text: "is [OBJECT] detected",
+        func: "isObjectDetected",
+        arguments: {
+          OBJECT: {
+            type: ArgumentType.STRING,
+            menu: "modelsLabels",
+            defaultValue: MODEL_LABELS.PERSON,
+          },
+        },
       },
       {
         opcode: "showBoundingBoxes",
@@ -154,6 +164,20 @@ ArduinoObjectDetection.prototype.getInfo = function() {
         blockType: BlockType.COMMAND,
         text: "hide bounding boxes",
         func: "hideBoundingBoxes",
+        arguments: {},
+      },
+      {
+        opcode: "getDetectedObjectsCount",
+        blockType: BlockType.REPORTER,
+        text: "number",
+        func: "getDetectedObjectsCount",
+        arguments: {},
+      },
+      {
+        opcode: "getDetectedLabelsAsString",
+        blockType: BlockType.REPORTER,
+        text: "labels",
+        func: "getDetectedLabelsAsString",
         arguments: {},
       },
     ],
@@ -201,16 +225,18 @@ ArduinoObjectDetection.prototype._loop = function() {
   }
   this._detectObjects();
 
-  // Note: The face detection state (_isfaceDetected) will be updated
+  // Note: The detection states for all objects will be updated
   // automatically when the detection_result event is received
 };
 
-ArduinoObjectDetection.prototype.whenPersonDetected = function(args) {
-  return this.isPersonDetected();
+ArduinoObjectDetection.prototype.whenObjectDetected = function(args) {
+  const objectLabel = args.OBJECT;
+  return this.detectedObjects.some(detectionObject => detectionObject.label === objectLabel);
 };
 
-ArduinoObjectDetection.prototype.isPersonDetected = function(args) {
-  return this._isfaceDetected;
+ArduinoObjectDetection.prototype.isObjectDetected = function(args) {
+  const objectLabel = args.OBJECT;
+  return this.detectedObjects.some(detectionObject => detectionObject.label === objectLabel);
 };
 
 ArduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
@@ -323,6 +349,64 @@ ArduinoObjectDetection.prototype._createRectangleFromBoundingBox = function(x1, 
   const rectangle = new Rectangle();
   rectangle.initFromBounds(left, right, bottom, top);
   return rectangle;
+};
+
+/**
+ * Block function: Get the total number of detected objects
+ * @returns {number} Number of currently detected objects
+ */
+ArduinoObjectDetection.prototype.getDetectedObjectsCount = function() {
+  return this.detectedObjects.length;
+};
+
+/**
+ * Block function: Get detected object types as a comma-separated string
+ * @returns {string} Comma-separated list of detected object types
+ */
+ArduinoObjectDetection.prototype.getDetectedLabelsAsString = function() {
+  const detectedLabels = this._getDetectedLabels();
+  return detectedLabels.length > 0 ? detectedLabels.join(", ") : "none";
+};
+
+/**
+ * Initialize detection states for all model labels
+ * @returns {Object<string, boolean>} Object with all labels set to false
+ */
+ArduinoObjectDetection.prototype._initializeDetectionStates = function() {
+  const states = {};
+  Object.values(MODEL_LABELS).forEach(label => {
+    states[label] = false;
+  });
+  return states;
+};
+
+/**
+ * Update detection states based on currently detected objects
+ */
+ArduinoObjectDetection.prototype._updateDetectionStates = function() {
+  // Reset all states to false
+  Object.keys(this._detectionStates).forEach(label => {
+    this._detectionStates[label] = false;
+  });
+
+  // Set to true for currently detected objects
+  this.detectedObjects.forEach(detectionObject => {
+    this._detectionStates[detectionObject.label] = true;
+  });
+
+  // Log detection updates for debugging
+  const detectedLabels = Object.keys(this._detectionStates).filter(label => this._detectionStates[label]);
+  if (detectedLabels.length > 0) {
+    console.log(`Currently detected: ${detectedLabels.join(", ")}`);
+  }
+};
+
+/**
+ * Get all currently detected object labels
+ * @returns {Array<string>} Array of currently detected object labels
+ */
+ArduinoObjectDetection.prototype._getDetectedLabels = function() {
+  return Object.keys(this._detectionStates).filter(label => this._detectionStates[label]);
 };
 
 module.exports = ArduinoObjectDetection;
