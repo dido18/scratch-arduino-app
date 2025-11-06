@@ -88,4 +88,4 @@ def on_modulino_button_pressed(btn):
 
 Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
 
-App.run()
+App.run(use_ssl=True)
