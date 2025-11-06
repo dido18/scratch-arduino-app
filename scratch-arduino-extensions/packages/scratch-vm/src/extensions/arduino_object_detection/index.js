@@ -22,7 +22,6 @@ const iconURI = "";
 // eslint-disable-next-line max-len
 const menuIconURI = "";
 
-// Determine the appropriate protocol and URL for socket.io connection
 const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
 
 
@@ -71,7 +70,6 @@ class ArduinoObjectDetection {
     this.io = io(wsServerURL, {
       path: "/socket.io",
       transports: ["polling", "websocket"],
-      secure:true,
       autoConnect: true,
     });
 
