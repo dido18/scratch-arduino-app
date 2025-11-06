@@ -22,9 +22,15 @@ const iconURI = "";
 // eslint-disable-next-line max-len
 const menuIconURI = "";
 
-// const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
+// Determine the appropriate protocol and URL for socket.io connection
+const getSocketURL = () => {
+  const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+  const hostname = window.location.hostname || '192.168.1.39';
+  const port = 7000;
+  return `${protocol}//${hostname}:${port}`;
+};
 
-const wsServerURL = `ws://192.168.1.39:7000`;
+const wsServerURL = getSocketURL();
 
 /**
  * RGB color constants for confidence visualization
@@ -71,6 +77,7 @@ class ArduinoObjectDetection {
     this.io = io(wsServerURL, {
       path: "/socket.io",
       transports: ["polling", "websocket"],
+      secure:true,
       autoConnect: true,
     });
 
@@ -171,14 +178,14 @@ ArduinoObjectDetection.prototype.getInfo = function() {
       {
         opcode: "getDetectedObjectsCount",
         blockType: BlockType.REPORTER,
-        text: "number of detected objects",
+        text: "number",
         func: "getDetectedObjectsCount",
         arguments: {},
       },
       {
         opcode: "getDetectedLabelsAsString",
         blockType: BlockType.REPORTER,
-        text: "detected object labels",
+        text: "labels",
         func: "getDetectedLabelsAsString",
         arguments: {},
       },
