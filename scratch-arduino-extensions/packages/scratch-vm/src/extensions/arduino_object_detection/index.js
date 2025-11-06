@@ -23,14 +23,8 @@ const iconURI = "";
 const menuIconURI = "";
 
 // Determine the appropriate protocol and URL for socket.io connection
-const getSocketURL = () => {
-  const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
-  const hostname = window.location.hostname || '192.168.1.39';
-  const port = 7000;
-  return `${protocol}//${hostname}:${port}`;
-};
+const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
 
-const wsServerURL = getSocketURL();
 
 /**
  * RGB color constants for confidence visualization
