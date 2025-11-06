@@ -24,6 +24,7 @@ const menuIconURI = "";
 
 const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
 
+
 /**
  * RGB color constants for confidence visualization
  */
@@ -231,12 +232,16 @@ ArduinoObjectDetection.prototype._loop = function() {
 
 ArduinoObjectDetection.prototype.whenObjectDetected = function(args) {
   const objectLabel = args.OBJECT;
-  return this.detectedObjects.some(detectionObject => detectionObject.label === objectLabel);
+  return this.detectedObjects.some(detectionObject =>
+    detectionObject.label === objectLabel
+  );
 };
 
 ArduinoObjectDetection.prototype.isObjectDetected = function(args) {
   const objectLabel = args.OBJECT;
-  return this.detectedObjects.some(detectionObject => detectionObject.label === objectLabel);
+  return this.detectedObjects.some(detectionObject =>
+    detectionObject.label === objectLabel
+  );
 };
 
 ArduinoObjectDetection.prototype.hideBoundingBoxes = function(args) {
@@ -364,8 +369,8 @@ ArduinoObjectDetection.prototype.getDetectedObjectsCount = function() {
  * @returns {string} Comma-separated list of detected object types
  */
 ArduinoObjectDetection.prototype.getDetectedLabelsAsString = function() {
-  const detectedLabels = this.getDetectedLabels();
-  return detectedLabels.length > 0 ? detectedLabels.join(", ") : "none";
+  const detectedLabels = this._getDetectedLabels();
+  return detectedLabels.length > 0 ? detectedLabels.join(', ') : 'none';
 };
 
 /**
@@ -397,8 +402,17 @@ ArduinoObjectDetection.prototype._updateDetectionStates = function() {
   // Log detection updates for debugging
   const detectedLabels = Object.keys(this._detectionStates).filter(label => this._detectionStates[label]);
   if (detectedLabels.length > 0) {
-    console.log(`Currently detected: ${detectedLabels.join(", ")}`);
+    console.log(`Currently detected: ${detectedLabels.join(', ')}`);
   }
 };
+
+/**
+ * Get all currently detected object labels
+ * @returns {Array<string>} Array of currently detected object labels
+ */
+ArduinoObjectDetection.prototype._getDetectedLabels = function() {
+  return Object.keys(this._detectionStates).filter(label => this._detectionStates[label]);
+};
+
 
 module.exports = ArduinoObjectDetection;
