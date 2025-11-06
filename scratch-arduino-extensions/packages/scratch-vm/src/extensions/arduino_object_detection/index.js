@@ -178,7 +178,7 @@ ArduinoObjectDetection.prototype.getInfo = function() {
       {
         opcode: "getDetectedLabelsAsString",
         blockType: BlockType.REPORTER,
-        text: "detected object types",
+        text: "detected object labels",
         func: "getDetectedLabelsAsString",
         arguments: {},
       },
