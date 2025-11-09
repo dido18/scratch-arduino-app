@@ -1,11 +1,12 @@
 from arduino.app_utils import App, Bridge
 from arduino.app_bricks.web_ui import WebUI
 from arduino.app_bricks.object_detection import ObjectDetection
+from arduino.app_bricks.image_classification import ImageClassification
 import time
 import base64
 
 object_detection = ObjectDetection()
-
+image_classification = ImageClassification()
 
 def on_matrix_draw(_, data):
     print(f"Received frame to draw on matrix: {data}")
@@ -46,6 +47,27 @@ def on_set_led_rgb(_, data):
     Bridge.call("set_led_rgb", led, r_digital, g_digital, b_digital)
 
 
+def on_classify_image(client_id, data):
+    """Callback function to handle image classification requests."""
+    image_data = data.get("image")
+    if not image_data:
+        ui.send_message("classification_error", {"error": "No image data"})
+        return
+    start_time = time.time() * 1000
+    # TODO: define confidence
+    results = image_classification.classify(base64.b64decode(image_data))
+    diff = time.time() * 1000 - start_time
+
+    if results is None:
+        ui.send_message('classification_error', {'error': 'No results returned'})
+        return
+
+    response = {
+        'results': results,
+        'processing_time': f"{diff:.2f} ms"
+    }
+    ui.send_message('classification_result', response)
+
 def on_detect_objects(client_id, data):
     """Callback function to handle object detection requests."""
     try:
@@ -80,6 +102,7 @@ ui.on_connect(lambda sid: (print(f"Client connected: {sid} "),))
 ui.on_message("matrix_draw", on_matrix_draw)
 ui.on_message("set_led_rgb", on_set_led_rgb)
 ui.on_message("detect_objects", on_detect_objects)
+ui.on_message("classify_image", on_classify_image)
 
 
 def on_modulino_button_pressed(btn):

@@ -5,4 +5,5 @@ ports:
 bricks:
   - arduino:web_ui
   - arduino:object_detection
+  - arduino:image_classification
 icon: 🐱
