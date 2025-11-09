@@ -6,12 +6,11 @@ const Video = require("../../../../../../scratch-editor/packages/scratch-vm/src/
 const Rectangle = require("../../../../../../scratch-editor/packages/scratch-render/src/Rectangle.js");
 const StageLayering = require("../../../../../../scratch-editor/packages/scratch-vm/src/engine/stage-layering.js");
 const { Detection, MODEL_LABELS } = require("./object_detection");
-const {ArduinoUnoQ} = require("../ArduinoUnoQ");
+const { ArduinoUnoQ } = require("../ArduinoUnoQ");
 
-//TODO add icons
+// TODO add icons
 const iconURI = "";
 const menuIconURI = "";
-
 
 /**
  * RGB color constants for confidence visualization

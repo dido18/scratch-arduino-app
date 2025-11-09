@@ -16,6 +16,24 @@ class ArduinoUnoQ {
     this._setupConnectionHandlers();
   }
 
+  on(event, callback) {
+    if (this.io) {
+      this.io.on(event, callback);
+      console.log(`Registered event listener for: ${event}`);
+    } else {
+      console.error("Socket.io not initialized");
+    }
+  }
+
+  emit(event, data) {
+    if (this.io && this.isConnected) {
+      this.io.emit(event, data);
+      console.log(`Emitted event: ${event}`, data);
+    } else {
+      console.warn(`Cannot emit ${event}: Not connected to Arduino UNO Q`);
+    }
+  }
+
   _setupConnectionHandlers() {
     this.io.on("connect", () => {
       this.isConnected = true;
@@ -110,25 +128,6 @@ class ArduinoUnoQ {
   }
 
   // ===== EVENT HANDLING METHODS =====
-
-  on(event, callback) {
-    if (this.io) {
-      this.io.on(event, callback);
-      console.log(`Registered event listener for: ${event}`);
-    } else {
-      console.error("Socket.io not initialized");
-    }
-  }
-
-  emit(event, data) {
-    if (this.io && this.isConnected) {
-      this.io.emit(event, data);
-      console.log(`Emitted event: ${event}`, data);
-    } else {
-      console.warn(`Cannot emit ${event}: Not connected to Arduino UNO Q`);
-    }
-  }
-
 }
 
 module.exports = ArduinoUnoQ;
