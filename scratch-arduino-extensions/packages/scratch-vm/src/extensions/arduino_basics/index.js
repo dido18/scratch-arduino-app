@@ -2,7 +2,7 @@ const BlockType = require("../../../../../../scratch-editor/packages/scratch-vm/
 const ArgumentType = require(
   "../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/argument-type",
 );
-const ArduinoUnoQ = require("../ArduinoUnoQ");
+const {ArduinoUnoQ} = require("../ArduinoUnoQ");
 
 // TODO: add icons
 const iconURI = "";
