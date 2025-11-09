@@ -11,9 +11,8 @@ Accessible from any device via a browser, it makes coding, electronics, and AI h
 
 ## Installation
 
-- Connect the Arduino Uno Q board via USB
-- Open an `adb shell` into the board using [adb](https://docs.arduino.cc/software/app-lab/tutorials/cli/)
-- Copy and paste the following command into the terminal to install the latest `scratch-arduino-app` into the board:
+- Open a terminal inside the UNO Q board (you can also use the [adb](https://docs.arduino.cc/software/app-lab/tutorials/cli/) tool)
+- Copy and paste the following command into the terminal to install the latest `scratch-arduino-app`:
 
 ```
 curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/install.sh | bash
@@ -23,7 +22,7 @@ curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/inst
 
 NOTE: the `https` is needed by the `getUserMedia()` method for security reason.
 
-### Local development
+## Local development
 
 - `task scratch:init`
 - `task scratch:local:start`
