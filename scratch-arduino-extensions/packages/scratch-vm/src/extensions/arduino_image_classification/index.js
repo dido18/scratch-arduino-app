@@ -25,9 +25,17 @@ class ArduinoImageClassification {
     });
 
     this.unoq.on("classification_result", (data) => {
-        console.log(
-          `Classified ${data.results} with confidence took ${data.processing_time}`,
-        );
+        if (!data || !data.classification) {
+            console.log("No classification classification received.");
+            return;
+        }
+        if (data.classification.length === 0) {
+            console.log("No objects classified.");
+            return;
+        }
+
+        console.log(data.classification);
+
     });
   }
 }

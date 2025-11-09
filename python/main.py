@@ -63,7 +63,7 @@ def on_classify_image(client_id, data):
         return
 
     response = {
-        'results': results,
+        'classification': results.get('classification', []),
         'processing_time': f"{diff:.2f} ms"
     }
     ui.send_message('classification_result', response)
