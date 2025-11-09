@@ -1,8 +1,11 @@
 const io = require("./socket.io.min.js");
 
+// const DEFAULT_HOST = window.location.hostname;
+const DEFAULT_HOST = "192.168.1.39";
+
 class ArduinoUnoQ {
-  constructor(host, port) {
-    this.serverURL = `wss://${host}:${port}`;
+  constructor() {
+    this.serverURL = `wss://${DEFAULT_HOST}:7000`;
 
     this.io = io(this.serverURL, {
       path: "/socket.io",
@@ -99,6 +102,34 @@ class ArduinoUnoQ {
     const clearFrame = "0".repeat(25);
     this.matrixDraw(clearFrame);
   }
+
+  // AI object detection
+
+  detectObjects(imageData) {
+    this.io.emit("detect_objects", { image: imageData });
+    console.log("Emitted detect_objects event");
+  }
+
+  // ===== EVENT HANDLING METHODS =====
+
+  on(event, callback) {
+    if (this.io) {
+      this.io.on(event, callback);
+      console.log(`Registered event listener for: ${event}`);
+    } else {
+      console.error("Socket.io not initialized");
+    }
+  }
+
+  emit(event, data) {
+    if (this.io && this.isConnected) {
+      this.io.emit(event, data);
+      console.log(`Emitted event: ${event}`, data);
+    } else {
+      console.warn(`Cannot emit ${event}: Not connected to Arduino UNO Q`);
+    }
+  }
+
 }
 
 module.exports = ArduinoUnoQ;
