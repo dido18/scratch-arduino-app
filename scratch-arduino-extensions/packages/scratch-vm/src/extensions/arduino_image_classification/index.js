@@ -33,7 +33,7 @@ class ArduinoImageClassification {
             console.log("No objects classified.");
             return;
         }
-
+        // {'classification': [{'class_name': 'neutral', 'confidence': '45.82'}, {'class_name': 'stop', 'confidence': '54.16'}]}
         console.log(data.classification);
 
     });

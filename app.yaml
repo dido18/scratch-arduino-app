@@ -6,4 +6,6 @@ bricks:
   - arduino:web_ui
   - arduino:object_detection
   - arduino:image_classification
+     variables:
+        EI_CLASSIFICATION_MODEL: /home/arduino/.arduino-bricks/ei-models/tm-ok-stop.eim
 icon: 🐱
