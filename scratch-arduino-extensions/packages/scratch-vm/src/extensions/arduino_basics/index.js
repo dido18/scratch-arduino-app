@@ -1,35 +1,18 @@
-// const formatMessage = require('../../../../../../scratch-editor/node_modules/format-message');
 const BlockType = require("../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/block-type");
 const ArgumentType = require(
   "../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/argument-type",
 );
-const io = require("../socket.io.min.js");
+const ArduinoUnoQ = require("../ArduinoUnoQ");
 
-/**
- * Url of icon to be displayed at the left edge of each extension block.
- * @type {string}
- */
-// eslint-disable-next-line max-len
+// TODO: add icons
 const iconURI = "";
-
-/**
- * Url of icon to be displayed in the toolbox menu for the extension category.
- * @type {string}
- */
-// eslint-disable-next-line max-len
 const menuIconURI = "";
-
-const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
 
 class ArduinoBasics {
   constructor(runtime) {
     this.runtime = runtime;
-
-    this.io = io(wsServerURL, {
-      path: "/socket.io",
-      transports: ["polling", "websocket"],
-      autoConnect: true,
-    });
+    this.unoq = new ArduinoUnoQ();
+    this.unoq.connect();
   }
 }
 
@@ -88,27 +71,23 @@ ArduinoBasics.prototype.getInfo = function() {
 };
 
 ArduinoBasics.prototype.matrixDraw = function(args) {
-  console.log(`Drawing frame on matrix: ${args}`);
-  this.io.emit("matrix_draw", { frame: args.FRAME });
+  this.unoq.matrixDraw(args.FRAME);
 };
 
 ArduinoBasics.prototype.matrixClear = function() {
-  console.log("Clearing matrix");
-  this.io.emit("matrix_draw", { frame: "0000000000000000000000000" });
+  this.unoq.matrixClear();
 };
 
 ArduinoBasics.prototype.setLed3 = function(args) {
   const hexColor = args.HEX;
   const rgb = this.hexToRgb(hexColor);
-  console.log(`Setting led 3 to: r:${rgb.r}, g:${rgb.g}, b:${rgb.b} (HEX: ${hexColor})`);
-  this.io.emit("set_led_rgb", { led: "LED3", r: rgb.r, g: rgb.g, b: rgb.b });
+  this.unoq.setLedRGB("LED3", rgb.r, rgb.g, rgb.b);
 };
 
 ArduinoBasics.prototype.setLed4 = function(args) {
   const hexColor = args.HEX;
   const rgb = this.hexToRgb(hexColor);
-  console.log(`Setting led 4 to: r:${rgb.r}, g:${rgb.g}, b:${rgb.b} (HEX: ${hexColor})`);
-  this.io.emit("set_led_rgb", { led: "LED4", r: rgb.r, g: rgb.g, b: rgb.b });
+  this.unoq.setLedRGB("LED4", rgb.r, rgb.g, rgb.b);
 };
 
 ArduinoBasics.prototype.hexToRgb = function(hex) {

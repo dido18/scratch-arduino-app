@@ -2,36 +2,21 @@ const BlockType = require("../../../../../../scratch-editor/packages/scratch-vm/
 const ArgumentType = require(
   "../../../../../../scratch-editor/packages/scratch-vm/src/extension-support/argument-type",
 );
-const io = require("../socket.io.min.js");
+const ArduinoUnoQ = require("../ArduinoUnoQ");
 
-/**
- * Url of icon to be displayed at the left edge of each extension block.
- * @type {string}
- */
-// eslint-disable-next-line max-len
+// TODO: add icons
 const iconURI = "";
-
-/**
- * Url of icon to be displayed in the toolbox menu for the extension category.
- * @type {string}
- */
-// eslint-disable-next-line max-len
 const menuIconURI = "";
-
-const wsServerURL = `${window.location.protocol}//${window.location.hostname}:7000`;
 
 class ArduinoModulino {
   constructor(runtime) {
     this.runtime = runtime;
-    this.io = io(wsServerURL, {
-      path: "/socket.io",
-      transports: ["polling", "websocket"],
-      autoConnect: true,
-    });
+    this.unoq = new ArduinoUnoQ();
+    this.unoq.connect();
 
     // TODO: move to ModulinoPeripheral
     this._button_pressed = "";
-    this.io.on("modulino_buttons_pressed", (data) => {
+    this.unoq.on("modulino_buttons_pressed", (data) => {
       console.log(`Modulino button pressed event received: ${data.btn}`);
       this._button_pressed = data.btn.toUpperCase();
     });
