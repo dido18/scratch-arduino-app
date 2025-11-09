@@ -11,7 +11,7 @@ const menuIconURI = "";
 class ArduinoBasics {
   constructor(runtime) {
     this.runtime = runtime;
-    this.unoq = new ArduinoUnoQ("192.168.1.39", 7000);
+    this.unoq = new ArduinoUnoQ(`${window.location.hostname}`, 7000);
     this.unoq.connect();
   }
 }
