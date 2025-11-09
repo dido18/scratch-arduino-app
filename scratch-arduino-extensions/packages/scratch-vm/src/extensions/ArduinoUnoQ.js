@@ -1,7 +1,6 @@
 const io = require("./socket.io.min.js");
 
-// const DEFAULT_HOST = window.location.hostname;
-const DEFAULT_HOST = "192.168.1.39";
+const DEFAULT_HOST = window.location.hostname;
 
 class ArduinoUnoQ {
   constructor() {
