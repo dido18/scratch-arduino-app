@@ -39,10 +39,12 @@ tasks:
   app:build:
     desc: "Copy app files (python, assets, app.yaml) to a build directory"
     cmds:
+      - rm -rf build/scratch-arduino-app/
       - mkdir -p build/scratch-arduino-app
       - cp ./app.yaml build/scratch-arduino-app/app.yaml
-      - cp -r ./sketch/ build/scratch-arduino-app/sketch
-      - cp -r ./python/ build/scratch-arduino-app/python
+      - cp -r ./sketch build/scratch-arduino-app/sketch
+      - cp -r ./python build/scratch-arduino-app/python
+      - cp -r ./certs build/scratch-arduino-app/certs
       - task scratch:build
       - mkdir -p build/scratch-arduino-app/assets
       - cp scratch-editor/packages/scratch-gui/build/index.html build/scratch-arduino-app/assets/index.html
