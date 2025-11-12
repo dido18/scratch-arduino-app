@@ -206,7 +206,6 @@ tasks:
 
           echo "🔨 Compiling and uploading..."
           if task sketch:compile-and-upload; then
-            echo "✅ Arduino sketch deployed successfully!"
             echo "📺 You can run 'task sketch:serial' in another terminal to see serial output"
           else
             echo "❌ Compilation or upload failed, continuing to watch..."
@@ -218,26 +217,14 @@ tasks:
   sketch:compile-and-upload:
     desc: "Compile and upload Arduino sketch"
     cmds:
-      - task: sketch:compile
-      - task: sketch:upload
-      - echo "🚀 Arduino sketch deployed successfully!"
-
-  sketch:compile:
-    desc: "Compile Arduino sketch without uploading"
-    cmds:
       - echo "🔨 Compiling Arduino sketch..."
       - |
         if [ ! -d "sketch" ]; then
           echo "❌ sketch/ folder not found"
           exit 1
         fi
-      - arduino-cli compile -b arduino:zephyr:unoq sketch/
+      - arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/ --profile default
       - echo "✅ Compilation completed successfully"
-
-
-  sketch:upload:
-    desc: "Upload Arduino sketch to board"
-    cmds:
       - echo "📤 Uploading Arduino sketch to board..."
       - |
         echo "🔍 Detecting Arduino boards..."
@@ -279,5 +266,5 @@ tasks:
         fi
 
         echo "📡 Found Arduino board at: $PORT_ADDRESS (FQBN: $BOARD_FQBN)"
-        arduino-cli upload -p "$PORT_ADDRESS" -b arduino:zephyr:unoq sketch/
+        arduino-cli upload -p "$PORT_ADDRESS" -b arduino:zephyr:unoq:flash_mode=ram sketch/ --input-dir .cache
       - echo "✅ Upload completed successfully"

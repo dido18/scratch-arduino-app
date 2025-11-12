@@ -1,3 +1,4 @@
 scratch-editor
 build/
 .bin/
+.cache/
