@@ -6,6 +6,8 @@ Arduino_LED_Matrix matrix;
 ModulinoButtons buttons;
 
 void setup() {
+ Monitor.begin(9600);
+ Monitor.println("<Arduino is ready>");
   matrix.begin();
   Bridge.begin();
   Modulino.begin(Wire1);
@@ -54,7 +56,7 @@ void matrix_draw(String frame){
   }
   for (int i = 0; i < 104; i++) {
     if (frame.charAt(i) == '1') {
-      shades[i] = 7; 
+      shades[i] = 7;
     } else{
       shades[i] = 0;
     }
