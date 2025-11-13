@@ -6,8 +6,6 @@ Arduino_LED_Matrix matrix;
 ModulinoButtons buttons;
 
 void setup() {
- Monitor.begin(9600);
- Monitor.println("<Arduino is ready>");
   matrix.begin();
   Bridge.begin();
   Modulino.begin(Wire1);
