@@ -90,181 +90,84 @@ tasks:
   python:watch:
     desc: "Watch Python folder for changes and auto-upload/restart"
     cmds:
-      - echo "👀 Watching python/ folder for changes..."
       - echo "Press Ctrl+C to stop watching"
       - |
-        # Check if inotify-tools is available
-        if ! command -v inotifywait &> /dev/null; then
-           echo "❌ inotifywait not found. Please install inotify-tools manually"
-           exit 1
-        fi
-      - |
         while true; do
-          echo "🔍 Waiting for changes in python/ folder..."
-
-          # Watch for modify, create, delete, move events in python folder
+          echo "Waiting for changes in python/ folder..."
           inotifywait -r -e modify,create,delete,move python/ 2>/dev/null || {
-            echo "❌ inotifywait failed"
+            echo "inotifywait failed, retrying..."
             sleep 2
             continue
           }
 
-          echo "📝 Change detected in python/ folder!"
-          echo "⏳ Waiting 1 second for file writes to complete..."
-          sleep 1
+          sleep 1 #W aiting 1 second for file writes to complete..."
 
-          echo "🚀 Uploading and restarting..."
           task python:upload-and-restart || {
-            echo "❌ Upload/restart failed, continuing to watch..."
+            echo "Upload/restart failed, continuing to watch..."
             continue
           }
 
-          echo "✅ Upload and restart completed!"
-          echo "---"
+          echo "[ok] Upload and restart completed!"
         done
 
   python:upload-and-restart:
     desc: "Upload Python files and restart container"
     cmds:
-      - echo "Uploading Python files..."
-      - adb push ./python/ /home/arduino/ArduinoApps/scratch-arduino-app/
-      - echo "Python files uploaded successfully"
-      - echo "🔍 Searching for Arduino app container..."
       - |
+        adb push ./python/ /home/arduino/ArduinoApps/scratch-arduino-app/
+        echo "Python files uploaded successfully"
+
         CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
         if [ -n "$CONTAINER_ID" ]; then
-          echo "📦 Found container: $CONTAINER_ID"
           adb shell "docker restart $CONTAINER_ID"
-          echo "✅ Container restarted successfully"
+          echo "[ok] Container restarted successfully"
         else
-          echo "⚠️  No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
+          echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
         fi
 
-  sketch:monitor:
-    desc: "Open serial monitor for Arduino debugging"
-    cmds:
-      - echo "📺 Opening serial monitor (Press Ctrl+C to exit)..."
-      - |
-        echo "🔍 Detecting Arduino board..."
-        BOARD_JSON=$(arduino-cli board list --json 2>/dev/null)
-        if [ $? -ne 0 ] || [ -z "$BOARD_JSON" ]; then
-          echo "❌ Failed to detect boards. Make sure arduino-cli is installed and Arduino is connected."
-          exit 1
-        fi
-
-        # Use jq for proper JSON parsing if available, otherwise fallback
-        if command -v jq &> /dev/null; then
-          # Only use serial ports (USB connection)
-          PORT_ADDRESS=$(echo "$BOARD_JSON" | jq -r '
-            .detected_ports[] |
-            select(.port.protocol == "serial") |
-            .port.address' 2>/dev/null | head -1)
-        else
-          # Fallback to grep method for serial ports only
-          PORT_ADDRESS=$(echo "$BOARD_JSON" | grep -A10 '"protocol":"serial"' | grep '"address"' | head -1 | cut -d'"' -f4)
-        fi
-
-        if [ -z "$PORT_ADDRESS" ] || [ "$PORT_ADDRESS" = "null" ]; then
-          echo "❌ No Arduino boards detected. Make sure your Arduino UNO Q is connected."
-          exit 1
-        fi
-        echo "📡 Connecting to Arduino at: $PORT_ADDRESS"
-        arduino-cli monitor -p "$PORT_ADDRESS"
 
   sketch:watch:
     desc: "Watch sketch folder for changes and auto-compile/upload"
     cmds:
-      - echo "👀 Watching sketch/ folder for changes..."
-      - echo "Press Ctrl+C to stop watching"
       - |
-        if ! command -v arduino-cli &> /dev/null; then
-          echo "❌ arduino-cli not found. Installing..."
-          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
-          echo "✅ arduino-cli installed. Please restart this task."
-          exit 1
-        fi
-      - |
-        if ! command -v inotifywait &> /dev/null; then
-          echo "❌ inotifywait not found. Please install inotify-tools manually"
-          exit 1
-        fi
-      - |
-        # Start watching for changes in sketch folder
+        echo "Press Ctrl+C to stop watching"
         while true; do
-          echo "🔍 Waiting for changes in sketch/ folder..."
-
-          # Watch for modify, create, delete events in sketch folder
+          echo "Waiting for changes in sketch folder..."
           inotifywait -r -e modify,create,delete sketch/ --include '\.(ino|cpp|h|c)$' 2>/dev/null || {
-            echo "❌ inotifywait failed, falling back to polling..."
+            echo "inotifywait failed, retrying..."
             sleep 2
             continue
           }
 
-          echo "📝 Arduino code change detected!"
-          echo "⏳ Waiting 1 second for file writes to complete..."
-          sleep 1
+          sleep 1   # Waiting 1 second for file writes to complete
 
-          echo "🔨 Compiling and uploading..."
-          if task sketch:compile-and-upload; then
-            echo "📺 You can run 'task sketch:serial' in another terminal to see serial output"
-          else
-            echo "❌ Compilation or upload failed, continuing to watch..."
-          fi
-
-          echo "---"
+          task sketch:compile-and-upload|| {
+            echo "Compile/upload failed, continuing to watch..."
+            continue
+          }
         done
 
   sketch:compile-and-upload:
     desc: "Compile and upload Arduino sketch"
     cmds:
-      - echo "🔨 Compiling Arduino sketch..."
+      - arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/
+      - arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  sketch/
+
+  sketch:monitor:
+    desc: "Open serial monitor for Arduino debugging"
+    cmds:
+      - echo "Opening serial monitor (Press Ctrl+C to exit)..."
+      - arduino-cli monitor -p /dev/ttyACM0
+
+  python:monitor:
+    desc: "Watch sketch folder for changes and auto-compile/upload"
+    cmds:
       - |
-        if [ ! -d "sketch" ]; then
-          echo "❌ sketch/ folder not found"
-          exit 1
-        fi
-      - arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/ --profile default
-      - echo "✅ Compilation completed successfully"
-      - echo "📤 Uploading Arduino sketch to board..."
-      - |
-        echo "🔍 Detecting Arduino boards..."
-        BOARD_JSON=$(arduino-cli board list --json 2>/dev/null)
-        if [ $? -ne 0 ] || [ -z "$BOARD_JSON" ]; then
-          echo "❌ Failed to detect boards. Make sure arduino-cli is installed and Arduino is connected."
-          exit 1
-        fi
-
-        # Check if jq is available, if not install it
-        if ! command -v jq &> /dev/null; then
-          echo "📦 Installing jq for JSON parsing..."
-          sudo apt-get update && sudo apt-get install -y jq 2>/dev/null || {
-            echo "❌ Could not install jq. Using fallback method..."
-            # Fallback to grep method for the nested structure
-            PORT_ADDRESS=$(echo "$BOARD_JSON" | grep -A10 '"port"' | grep '"address"' | head -1 | cut -d'"' -f4)
-            BOARD_FQBN=$(echo "$BOARD_JSON" | grep -A5 '"matching_boards"' | grep '"fqbn"' | head -1 | cut -d'"' -f4)
-          }
-        fi
-
-        # Use jq for proper JSON parsing if available
-        if command -v jq &> /dev/null; then
-          # Only use serial ports (USB connection)
-          PORT_ADDRESS=$(echo "$BOARD_JSON" | jq -r '
-            .detected_ports[] |
-            select(.port.protocol == "serial") |
-            .port.address' 2>/dev/null | head -1)
-
-          BOARD_FQBN=$(echo "$BOARD_JSON" | jq -r '
-            .detected_ports[] |
-            select(.port.protocol == "serial") |
-            .matching_boards[0].fqbn' 2>/dev/null | head -1)
-        fi
-
-        if [ -z "$PORT_ADDRESS" ] || [ "$PORT_ADDRESS" = "null" ]; then
-          echo "❌ No Arduino boards detected. Make sure your Arduino UNO Q is connected."
-          echo "💡 Run 'arduino-cli board list' to see available boards"
-          exit 1
-        fi
-
-        echo "📡 Found Arduino board at: $PORT_ADDRESS (FQBN: $BOARD_FQBN)"
-        arduino-cli upload -p "$PORT_ADDRESS" -b arduino:zephyr:unoq:flash_mode=ram sketch/ --input-dir .cache
-      - echo "✅ Upload completed successfully"
+         while true; do
+          CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
+          if [ -n "$CONTAINER_ID" ]; then
+            adb shell "docker logs -f $CONTAINER_ID"
+          else
+            echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
+          fi
+          done
