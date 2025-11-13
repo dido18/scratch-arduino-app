@@ -92,60 +92,59 @@ tasks:
     cmds:
       - echo "Press Ctrl+C to stop watching"
       - |
-        while true; do
-          echo "Waiting for changes in python/ folder..."
-          inotifywait -r -e modify,create,delete,move python/ 2>/dev/null || {
-            echo "inotifywait failed, retrying..."
-            sleep 2
-            continue
-          }
+          while true; do
+            echo "Waiting for changes in python/ folder..."
+            inotifywait -r -e modify,create,delete,move python/ 2>/dev/null || {
+              echo "inotifywait failed, retrying..."
+              sleep 2
+              continue
+            }
 
-          sleep 1 #W aiting 1 second for file writes to complete..."
+            sleep 1 #W aiting 1 second for file writes to complete..."
 
-          task python:upload-and-restart || {
-            echo "Upload/restart failed, continuing to watch..."
-            continue
-          }
+            task python:upload-and-restart || {
+              echo "Upload/restart failed, continuing to watch..."
+              continue
+            }
 
-          echo "[ok] Upload and restart completed!"
-        done
+            echo "[ok] Upload and restart completed!"
+          done
 
   python:upload-and-restart:
     desc: "Upload Python files and restart container"
     cmds:
       - |
-        adb push ./python/ /home/arduino/ArduinoApps/scratch-arduino-app/
-        echo "Python files uploaded successfully"
+          adb push ./python/ /home/arduino/ArduinoApps/scratch-arduino-app/
+          echo "Python files uploaded successfully"
 
-        CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
-        if [ -n "$CONTAINER_ID" ]; then
-          adb shell "docker restart $CONTAINER_ID"
-          echo "[ok] Container restarted successfully"
-        else
-          echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
-        fi
-
+          CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
+          if [ -n "$CONTAINER_ID" ]; then
+            adb shell "docker restart $CONTAINER_ID"
+            echo "[ok] Container restarted successfully"
+          else
+            echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
+          fi
 
   sketch:watch:
     desc: "Watch sketch folder for changes and auto-compile/upload"
     cmds:
       - |
-        echo "Press Ctrl+C to stop watching"
-        while true; do
-          echo "Waiting for changes in sketch folder..."
-          inotifywait -r -e modify,create,delete sketch/ --include '\.(ino|cpp|h|c)$' 2>/dev/null || {
-            echo "inotifywait failed, retrying..."
-            sleep 2
-            continue
-          }
+          echo "Press Ctrl+C to stop watching"
+          while true; do
+            echo "Waiting for changes in sketch folder..."
+            inotifywait -r -e modify,create,delete sketch/ --include '\.(ino|cpp|h|c)$' 2>/dev/null || {
+              echo "inotifywait failed, retrying..."
+              sleep 2
+              continue
+            }
 
-          sleep 1   # Waiting 1 second for file writes to complete
+            sleep 1   # Waiting 1 second for file writes to complete
 
-          task sketch:compile-and-upload|| {
-            echo "Compile/upload failed, continuing to watch..."
-            continue
-          }
-        done
+            task sketch:compile-and-upload|| {
+              echo "Compile/upload failed, continuing to watch..."
+              continue
+            }
+          done
 
   sketch:compile-and-upload:
     desc: "Compile and upload Arduino sketch"
@@ -163,11 +162,11 @@ tasks:
     desc: "Watch sketch folder for changes and auto-compile/upload"
     cmds:
       - |
-         while true; do
-          CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
-          if [ -n "$CONTAINER_ID" ]; then
-            adb shell "docker logs -f $CONTAINER_ID"
-          else
-            echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
-          fi
-          done
+          while true; do
+           CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
+           if [ -n "$CONTAINER_ID" ]; then
+             adb shell "docker logs -f $CONTAINER_ID"
+           else
+             echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
+           fi
+           done
