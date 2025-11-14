@@ -58,7 +58,6 @@ tasks:
     cmds:
       - npm run build:dev --workspace @scratch/scratch-gui
 
-
   board:app:upload:
     desc: "Upload zip file to Arduino board, unzip and deploy to /home/arduino/ArduinoApps"
     cmds:
@@ -94,7 +93,6 @@ tasks:
       - python:watch
       - sketch:watch
 
-
   python:watch:
     desc: "Watch Python folder for changes and auto-upload/restart"
     silent: true
@@ -123,12 +121,12 @@ tasks:
     cmds:
       - |
           adb push ./python/ /home/arduino/ArduinoApps/scratch-arduino-app/
-          echo "Python files uploaded successfully"
+          echo "🐍 files uploaded successfully"
 
           CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
           if [ -n "$CONTAINER_ID" ]; then
             adb shell "docker restart $CONTAINER_ID"
-            echo "[ok] Container restarted successfully"
+            echo "🐍 Container restarted successfully"
           else
             echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
           fi
