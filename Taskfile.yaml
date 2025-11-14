@@ -124,10 +124,7 @@ tasks:
 
           CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
           if [ -n "$CONTAINER_ID" ]; then
-            RESTART_START=$(date +%s)
-            adb shell "docker restart $CONTAINER_ID"
-            RESTART_END=$(date +%s)
-            echo "🐍 Container restarted in $((RESTART_END - RESTART_START))s"
+            /usr/bin/time -f "🐍 Restarted in %es" adb shell "docker restart $CONTAINER_ID"
           else
             echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
           fi
@@ -159,14 +156,9 @@ tasks:
     silent: true
     cmds:
       - |
-          C_START=$(date +%s)
-          arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/
-          C_END=$(date +%s)
-
-          U_START=$(date +%s)
-          arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  sketch/
-          U_END=$(date +%s)
-          echo "♾️  Compiled in $((C_END - C_START))s, Uploaded in $((U_END - U_START))s"
+          /usr/bin/time -f "♾️  Compiled in %es" arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/
+          /usr/bin/time -f "♾️  Uploaded in %es" arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  sketch/
+          echo "♾️  Compiled and uploaded successfully"
       # even if not necessary: the sketch folder is sync into the board to have the updated version
       - adb push ./sketch/ /home/arduino/ArduinoApps/scratch-arduino-app/
 
