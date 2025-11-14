@@ -156,9 +156,11 @@ tasks:
     silent: true
     cmds:
       - |
+          TOTAL_START=$(date +%s)
           /usr/bin/time -f "♾️  Compiled in %es" arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/
           /usr/bin/time -f "♾️  Uploaded in %es" arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  sketch/
-          echo "♾️  Compiled and uploaded successfully"
+          TOTAL_END=$(date +%s)
+          echo "♾️  Total time: $((TOTAL_END - TOTAL_START))s"
       # even if not necessary: the sketch folder is sync into the board to have the updated version
       - adb push ./sketch/ /home/arduino/ArduinoApps/scratch-arduino-app/
 
