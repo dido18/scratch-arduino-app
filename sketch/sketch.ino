@@ -54,7 +54,7 @@ void matrix_draw(String frame){
   }
   for (int i = 0; i < 104; i++) {
     if (frame.charAt(i) == '1') {
-      shades[i] = 7; 
+      shades[i] = 7;
     } else{
       shades[i] = 0;
     }
