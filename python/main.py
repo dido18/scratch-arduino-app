@@ -8,6 +8,7 @@ import base64
 object_detection = ObjectDetection()
 image_classification = ImageClassification()
 
+
 def on_matrix_draw(_, data):
     print(f"Received frame to draw on matrix: {data}")
     # from 5x5 to 8x13 matrix
@@ -59,14 +60,15 @@ def on_classify_image(client_id, data):
     diff = time.time() * 1000 - start_time
 
     if results is None:
-        ui.send_message('classification_error', {'error': 'No results returned'})
+        ui.send_message("classification_error", {"error": "No results returned"})
         return
 
     response = {
-        'classification': results.get('classification', []),
-        'processing_time': f"{diff:.2f} ms"
+        "classification": results.get("classification", []),
+        "processing_time": f"{diff:.2f} ms",
     }
-    ui.send_message('classification_result', response)
+    ui.send_message("classification_result", response)
+
 
 def on_detect_objects(client_id, data):
     """Callback function to handle object detection requests."""
