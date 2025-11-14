@@ -87,51 +87,55 @@ tasks:
       - echo "Creating zip with version {{.APP_VERSION}}"
       - cd build && zip -r scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
 
+  watch:
+    desc: "wath cfile changes for both python and sketch, and upload the changes to the board and restart"
+    deps:
+      - python:watch
+      - sketch:watch
+
   python:watch:
     desc: "Watch Python folder for changes and auto-upload/restart"
+    silent: true
     cmds:
-      - echo "Press Ctrl+C to stop watching"
       - |
           while true; do
-            echo "Waiting for changes in python/ folder..."
+            echo "🐍 Waiting for changes in python folder..."
             inotifywait -r -e modify,create,delete,move python/ 2>/dev/null || {
               echo "inotifywait failed, retrying..."
               sleep 2
               continue
             }
 
-            sleep 1 #W aiting 1 second for file writes to complete..."
-
+            sleep 1 # Waiting 1 second for file writes to complete..."
+            echo "🐍  Change detected: uploading and restarting service..."
             task python:upload-and-restart || {
               echo "Upload/restart failed, continuing to watch..."
               continue
             }
 
-            echo "[ok] Upload and restart completed!"
           done
 
   python:upload-and-restart:
     desc: "Upload Python files and restart container"
+    silent: true
     cmds:
       - |
           adb push ./python/ /home/arduino/ArduinoApps/scratch-arduino-app/
-          echo "Python files uploaded successfully"
 
           CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
           if [ -n "$CONTAINER_ID" ]; then
-            adb shell "docker restart $CONTAINER_ID"
-            echo "[ok] Container restarted successfully"
+            /usr/bin/time -f "🐍 Restarted in %es" adb shell "docker restart $CONTAINER_ID"
           else
             echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
           fi
 
   sketch:watch:
     desc: "Watch sketch folder for changes and auto-compile/upload"
+    silent: true
     cmds:
       - |
-          echo "Press Ctrl+C to stop watching"
           while true; do
-            echo "Waiting for changes in sketch folder..."
+            echo "♾️  Waiting for changes in sketch folder..."
             inotifywait -r -e modify,create,delete sketch/ --include '\.(ino|cpp|h|c)$' 2>/dev/null || {
               echo "inotifywait failed, retrying..."
               sleep 2
@@ -139,29 +143,39 @@ tasks:
             }
 
             sleep 1   # Waiting 1 second for file writes to complete
-
+            echo "♾️  Change detected: compiling and uploading..."
             task sketch:compile-and-upload|| {
               echo "Compile/upload failed, continuing to watch..."
               continue
             }
+            echo
           done
 
   sketch:compile-and-upload:
     desc: "Compile and upload Arduino sketch"
+    silent: true
     cmds:
-      - arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/
-      - arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  sketch/
+      - |
+          TOTAL_START=$(date +%s)
+          /usr/bin/time -f "♾️  Compiled in %es" arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/
+          /usr/bin/time -f "♾️  Uploaded in %es" arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  sketch/
+          TOTAL_END=$(date +%s)
+          echo "♾️  Total time: $((TOTAL_END - TOTAL_START))s"
+      # even if not necessary: the sketch folder is sync into the board to have the updated version
+      - adb push ./sketch/ /home/arduino/ArduinoApps/scratch-arduino-app/
 
   sketch:monitor:
     desc: "Open serial monitor for Arduino debugging"
+    silent: true
     cmds:
-      - echo "Opening serial monitor (Press Ctrl+C to exit)..."
+      - echo " ♾️  Opening serial monitor (Press Ctrl+C to exit)..."
       - arduino-cli monitor -p /dev/ttyACM0
 
   python:monitor:
     desc: "Watch sketch folder for changes and auto-compile/upload"
     cmds:
       - |
+          echo "🐍 Python container logs"
           while true; do
            CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
            if [ -n "$CONTAINER_ID" ]; then
