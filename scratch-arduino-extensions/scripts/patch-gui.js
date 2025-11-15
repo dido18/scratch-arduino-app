@@ -5,6 +5,7 @@ const extensions = [
   { name: "ArduinoBasics", directory: "arduino_basics" },
   { name: "ArduinoModulino", directory: "arduino_modulino" },
   { name: "ArduinoObjectDetection", directory: "arduino_object_detection" },
+  { name: "TeachableMachineImage", directory: "tmachine_image" },
 ];
 
 // base dir is the 'scratch-arduino-extensions' folder

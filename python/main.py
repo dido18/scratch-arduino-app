@@ -1,11 +1,12 @@
 from arduino.app_utils import App, Bridge
 from arduino.app_bricks.web_ui import WebUI
 from arduino.app_bricks.object_detection import ObjectDetection
+from fastapi.responses import FileResponse
 import time
 import base64
+import os
 
 object_detection = ObjectDetection()
-
 
 def on_matrix_draw(_, data):
     print(f"Received frame to draw on matrix: {data}")
@@ -86,6 +87,12 @@ def on_modulino_button_pressed(btn):
     ui.send_message("modulino_buttons_pressed", {"btn": btn})
 
 
+
 Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
+
+
+ui.expose_api("GET", "/my-model/model.json", lambda: FileResponse(os.path.join("/app/assets/models/tm-my-image-model", "model.json"), headers={"Cache-Control": "no-store"}))
+ui.expose_api("GET", "/my-model/metadata.json", lambda: FileResponse(os.path.join("/app/assets/models/tm-my-image-model", "metadata.json"), headers={"Cache-Control": "no-store"}))
+ui.expose_api("GET", "/my-model/weights.bin", lambda: FileResponse(os.path.join("/app/assets/models/tm-my-image-model", "weights.bin"), headers={"Cache-Control": "no-store"}))
 
 App.run()
