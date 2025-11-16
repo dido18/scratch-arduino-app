@@ -8,6 +8,7 @@ import os
 
 object_detection = ObjectDetection()
 
+
 def on_matrix_draw(_, data):
     print(f"Received frame to draw on matrix: {data}")
     # from 5x5 to 8x13 matrix
@@ -87,12 +88,24 @@ def on_modulino_button_pressed(btn):
     ui.send_message("modulino_buttons_pressed", {"btn": btn})
 
 
-
 Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
 
 
-ui.expose_api("GET", "/my-model/model.json", lambda: FileResponse(os.path.join("/app/assets/models/tm-my-image-model", "model.json"), headers={"Cache-Control": "no-store"}))
-ui.expose_api("GET", "/my-model/metadata.json", lambda: FileResponse(os.path.join("/app/assets/models/tm-my-image-model", "metadata.json"), headers={"Cache-Control": "no-store"}))
-ui.expose_api("GET", "/my-model/weights.bin", lambda: FileResponse(os.path.join("/app/assets/models/tm-my-image-model", "weights.bin"), headers={"Cache-Control": "no-store"}))
+def serve_model_file(filepath):
+    """Serve model files with CORS headers"""
+    return FileResponse(
+        os.path.join("/app/assets/models/tm-my-image-model", filepath),
+        headers={
+            "Cache-Control": "no-store",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        },
+    )
+
+
+ui.expose_api("GET", "/my-model/model.json", lambda: serve_model_file("model.json"))
+ui.expose_api("GET", "/my-model/metadata.json", lambda: serve_model_file("metadata.json"))
+ui.expose_api("GET", "/my-model/weights.bin", lambda: serve_model_file("weights.bin"))
 
 App.run()

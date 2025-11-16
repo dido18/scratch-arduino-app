@@ -5,7 +5,6 @@ const ArgumentType = require(
 
 const Video = require("../../../../../../scratch-editor/packages/scratch-vm/src/io/video");
 
-
 // TODO add icons
 const iconURI = "";
 const menuIconURI = "";
@@ -26,12 +25,12 @@ class TeachableMachineImage {
 
   async fetchModelLabels() {
     try {
-      const response = await fetch('https://192.168.1.39:7000/my-model/metadata.json');
+      const response = await fetch(this.modelURL + "/metadata.json");
       const metadata = await response.json();
       this.modelLabels = metadata.labels || [];
-      console.log('Fetched model labels:', this.modelLabels);
+      console.log("Fetched model labels:", this.modelLabels);
     } catch (error) {
-      console.error('Error fetching model labels:', error);
+      console.error("Error fetching model labels:", error);
       this.modelLabels = []; // fallback
     }
   }
@@ -40,10 +39,12 @@ class TeachableMachineImage {
     try {
       // Load TensorFlow.js and Teachable Machine library
       if (!window.tf) {
-        await this.loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js');
+        await this.loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js");
       }
       if (!window.tmImage) {
-        await this.loadScript('https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js');
+        await this.loadScript(
+          "https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js",
+        );
       }
 
       const modelURL = this.modelURL + "model.json";
@@ -51,16 +52,15 @@ class TeachableMachineImage {
 
       this.model = await tmImage.load(modelURL, metadataURL);
       this.isModelLoaded = true;
-      console.log('Teachable Machine model loaded successfully');
-
+      console.log("Teachable Machine model loaded successfully");
     } catch (error) {
-      console.error('Error loading Teachable Machine model:', error);
+      console.error("Error loading Teachable Machine model:", error);
     }
   }
 
   loadScript(src) {
     return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
+      const script = document.createElement("script");
       script.src = src;
       script.onload = resolve;
       script.onerror = reject;
@@ -70,26 +70,25 @@ class TeachableMachineImage {
 
   startPredictionLoop() {
     if (!this.isModelLoaded) {
-        console.log("Model not loaded");
-        return;
-    };
+      console.log("Model not loaded");
+      return;
+    }
 
     const predict = async () => {
       try {
-         const canvas = this.runtime.ioDevices.video.getFrame({
-        format: Video.FORMAT_CANVAS,
-        dimensions: [480, 360], // the same as the stage resolution
-    });
-  if (!canvas) {
-    console.log("No canvas available from video frame.");
-    return;
-  }
-    const prediction = await this.model.predict(canvas);
-    this.predictions = prediction;
-    console.log("preditions", predictions);
-
+        const canvas = this.runtime.ioDevices.video.getFrame({
+          format: Video.FORMAT_CANVAS,
+          dimensions: [480, 360], // the same as the stage resolution
+        });
+        if (!canvas) {
+          console.log("No canvas available from video frame.");
+          return;
+        }
+        const prediction = await this.model.predict(canvas);
+        console.log("preditions", prediction);
+        this.predictions = prediction;
       } catch (error) {
-        console.error('Prediction error:', error);
+        console.error("Prediction error:", error);
       }
 
       // Continue loop
@@ -113,7 +112,7 @@ TeachableMachineImage.prototype.getInfo = function() {
     menuIconURI: menuIconURI,
     blockIconURI: iconURI,
     blocks: [
-         {
+      {
         opcode: "startDetectionLoop",
         blockType: BlockType.COMMAND,
         text: "start detection",
@@ -128,13 +127,13 @@ TeachableMachineImage.prototype.getInfo = function() {
         arguments: {
           OBJECT: {
             type: ArgumentType.STRING,
-            menu: 'modelLabels',
-            defaultValue: 'ok',
+            menu: "modelLabels",
+            defaultValue: "ok",
           },
           THRESHOLD: {
             type: ArgumentType.NUMBER,
-            defaultValue: 50
-          }
+            defaultValue: 50,
+          },
         },
       },
       {
@@ -150,15 +149,15 @@ TeachableMachineImage.prototype.getInfo = function() {
           },
           THRESHOLD: {
             type: ArgumentType.NUMBER,
-            defaultValue: 50
-          }
+            defaultValue: 50,
+          },
         },
       },
       {
         opcode: "getConfidence",
         blockType: BlockType.REPORTER,
         text: "confidence of [OBJECT]",
-        func: "getConfidenceBlock",
+        func: "getConfidence",
         arguments: {
           OBJECT: {
             type: ArgumentType.STRING,
@@ -169,7 +168,7 @@ TeachableMachineImage.prototype.getInfo = function() {
       },
     ],
     menus: {
-      modelLabels: 'getModelLabels'
+      modelLabels: "getModelLabels",
     },
   };
 };
@@ -188,9 +187,19 @@ TeachableMachineImage.prototype.isObjectDetected = function(args) {
   return confidence > (args.THRESHOLD / 100);
 };
 
+TeachableMachineImage.prototype.getConfidence = function(args) {
+  if (!this.predictions || this.predictions.length === 0) return 0;
+
+  const prediction = this.predictions.find(p => p.className === args.OBJECT);
+  const confidence = prediction ? Math.round(prediction.probability * 100) : 0;
+
+  console.log("get confidence for", args.OBJECT, "=", confidence + "%");
+  return confidence;
+};
+
 TeachableMachineImage.prototype.startDetectionLoop = function(args) {
-this.runtime.ioDevices.video.enableVideo();
-this.startPredictionLoop()
+  this.runtime.ioDevices.video.enableVideo();
+  this.startPredictionLoop();
 };
 
 module.exports = TeachableMachineImage;
