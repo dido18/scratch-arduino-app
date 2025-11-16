@@ -1,8 +1,10 @@
 from arduino.app_utils import App, Bridge
 from arduino.app_bricks.web_ui import WebUI
 from arduino.app_bricks.object_detection import ObjectDetection
+from fastapi.responses import FileResponse
 import time
 import base64
+import os
 
 object_detection = ObjectDetection()
 
@@ -87,5 +89,23 @@ def on_modulino_button_pressed(btn):
 
 
 Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
+
+
+def serve_model_file(filepath):
+    """Serve model files with CORS headers"""
+    return FileResponse(
+        os.path.join("/app/assets/models/tm-my-image-model", filepath),
+        headers={
+            "Cache-Control": "no-store",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        },
+    )
+
+
+ui.expose_api("GET", "/my-model/model.json", lambda: serve_model_file("model.json"))
+ui.expose_api("GET", "/my-model/metadata.json", lambda: serve_model_file("metadata.json"))
+ui.expose_api("GET", "/my-model/weights.bin", lambda: serve_model_file("weights.bin"))
 
 App.run()
