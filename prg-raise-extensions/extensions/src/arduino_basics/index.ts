@@ -62,13 +62,14 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
   }
 
 
+
   @(scratch.command(function(_, tag) {
-    const gradientMatrix = this.createGradientPattern();
+    const pattern = this.createHeartPattern();
     const arg = this.makeCustomArgument({
       component: MatrixArgument,
       initial: {
-        value: gradientMatrix,
-        text: "GRADIENT"
+        value: pattern,
+        text: "FRAME"
       }
     });
     return tag`draw ${arg} matrix`;
@@ -76,9 +77,9 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
   drawMatrix(matrix: number[][]) {
     var matrixString = matrix.flat().join('');
     console.log("received matrix update", matrixString);
-    // Send to socket if connected
     if (this.socket) {
       this.socket.emit("matrix_draw", { frame: matrixString });
     }
   }
+
 }
