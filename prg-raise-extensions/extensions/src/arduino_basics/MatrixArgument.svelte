@@ -55,22 +55,23 @@
     currentMouseButton = event.button;
 
     if (event.button === MOUSE_BUTTON.RIGHT) {
-      changeLEDBrightness(row, col, true);
+      toggleLED(row, col);
     } else if (event.button === MOUSE_BUTTON.LEFT) {
       changeLEDBrightness(row, col, false);
     } else if (event.button === MOUSE_BUTTON.MIDDLE) {
-      toggleLED(row, col);
+      changeLEDBrightness(row, col, true);
     }
   };
 
   const handleMouseEnter = (row: number, col: number) => {
     if (isMousePressed) {
-      if (currentMouseButton === MOUSE_BUTTON.RIGHT) {
-        changeLEDBrightness(row, col, true);
-      } else if (currentMouseButton === MOUSE_BUTTON.LEFT) {
+      if (currentMouseButton === MOUSE_BUTTON.LEFT) {
         changeLEDBrightness(row, col, false);
+      } else if (currentMouseButton === MOUSE_BUTTON.MIDDLE) {
+        changeLEDBrightness(row, col, true);
+      } else if (currentMouseButton === MOUSE_BUTTON.RIGHT) {
+        toggleLED(row, col);
       }
-      // Middle button doesn't paint on hover, only on click
     }
   };
 
