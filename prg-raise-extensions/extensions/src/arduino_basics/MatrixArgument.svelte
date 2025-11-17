@@ -9,26 +9,83 @@
 
   let matrix = current.value;
 
+  const MOUSE_BUTTON = {
+    LEFT: 2,
+    MIDDLE: 1,
+    RIGHT: 0
+  };
+
+  let isMousePressed = false;
+  let currentMouseButton = 0;
+
   const clearMatrix = () => {
-    matrix = matrix.map(row => row.map(cell => 0));
+    matrix = matrix.map(row => row.map((cell: any) => 0));
   };
 
   const fillMatrix = () => {
     matrix = matrix.map(row => row.map(cell => 7));
   };
 
-  const cycleLED = (row: number, col: number) => {
+  const changeLEDBrightness = (row: number, col: number, increase: boolean) => {
+    matrix = matrix.map((r: number[], rIndex: number) =>
+      r.map((cell, cIndex) => {
+        if (rIndex === row && cIndex === col) {
+          if (increase) {
+            return Math.min(7, cell + 1); // Increase up to 7
+          } else {
+            return Math.max(0, cell - 1); // Decrease down to 0
+          }
+        }
+        return cell;
+      })
+    );
+  };
+
+  const toggleLED = (row: number, col: number) => {
     matrix = matrix.map((r, rIndex) =>
       r.map((cell, cIndex) =>
-        rIndex === row && cIndex === col ? (cell + 1) % 8 : cell
+        rIndex === row && cIndex === col ? (cell > 0 ? 0 : 7) : cell
       )
     );
+  };
+
+  const handleMouseDown = (event: MouseEvent, row: number, col: number) => {
+    event.preventDefault();
+    isMousePressed = true;
+    currentMouseButton = event.button;
+
+    if (event.button === MOUSE_BUTTON.RIGHT) {
+      changeLEDBrightness(row, col, true);
+    } else if (event.button === MOUSE_BUTTON.LEFT) {
+      changeLEDBrightness(row, col, false);
+    } else if (event.button === MOUSE_BUTTON.MIDDLE) {
+      toggleLED(row, col);
+    }
+  };
+
+  const handleMouseEnter = (row: number, col: number) => {
+    if (isMousePressed) {
+      if (currentMouseButton === MOUSE_BUTTON.RIGHT) {
+        changeLEDBrightness(row, col, true);
+      } else if (currentMouseButton === MOUSE_BUTTON.LEFT) {
+        changeLEDBrightness(row, col, false);
+      }
+      // Middle button doesn't paint on hover, only on click
+    }
+  };
+
+  const handleMouseUp = () => {
+    isMousePressed = false;
+  };
+
+  const handleContextMenu = (event: MouseEvent) => {
+    event.preventDefault(); // Prevent right-click context menu
   };
 
   const handleKeyPress = (event: KeyboardEvent, row: number, col: number) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      cycleLED(row, col);
+      toggleLED(row, col);
     }
   };
 
@@ -110,16 +167,20 @@
   }
 </style>
 
-<div style:background-color={color.ui.white}>
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div style:background-color={color.ui.white} on:mouseup={handleMouseUp}>
   <div class="matrix">
     {#each matrix as row, rowIndex}
       <div class="matrix-row">
         {#each row as ledValue, colIndex}
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
             class="led"
             style:background-color={ledValue > 0 ? `rgba(0, 123, 255, ${getBrightness(ledValue)})` : '#222'}
             style:box-shadow={ledValue > 0 ? `0 0 ${ledValue * 2}px rgba(0, 123, 255, 0.8)` : 'none'}
-            on:click={() => cycleLED(rowIndex, colIndex)}
+            on:mousedown={(e) => handleMouseDown(e, rowIndex, colIndex)}
+            on:mouseenter={() => handleMouseEnter(rowIndex, colIndex)}
+            on:contextmenu={handleContextMenu}
             on:keydown={(e) => handleKeyPress(e, rowIndex, colIndex)}
             tabindex="0"
             role="button"
