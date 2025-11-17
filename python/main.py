@@ -8,20 +8,9 @@ object_detection = ObjectDetection()
 
 
 def on_matrix_draw(_, data):
-    print(f"Received frame to draw on matrix: {data}")
-    # from 5x5 to 8x13 matrix
-    frame_5x5 = data.get("frame")
-    row0 = "0" * 13
-    row1 = "0" * 4 + frame_5x5[0:5] + "0" * 4
-    row2 = "0" * 4 + frame_5x5[5:10] + "0" * 4
-    row3 = "0" * 4 + frame_5x5[10:15] + "0" * 4
-    row4 = "0" * 4 + frame_5x5[15:20] + "0" * 4
-    row5 = "0" * 4 + frame_5x5[20:25] + "0" * 4
-    row6 = "0" * 13
-    row7 = "0" * 13
-    frame_8x13 = row0 + row1 + row2 + row3 + row4 + row5 + row6 + row7
-    print(f"Transformed frame to draw on 8x13 matrix: {frame_8x13}")
-    Bridge.call("matrix_draw", frame_8x13)
+    frame = data.get("frame")
+    print(f"Frame to draw on 8x13 matrix: {frame}")
+    Bridge.call("matrix_draw", frame)
 
 
 def rgb_to_digital(value, threshold=128) -> bool:

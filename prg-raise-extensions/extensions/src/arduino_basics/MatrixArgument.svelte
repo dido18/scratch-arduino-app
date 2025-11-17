@@ -17,6 +17,21 @@
     matrix = matrix.map(row => row.map(cell => 7));
   };
 
+  const cycleLED = (row: number, col: number) => {
+    matrix = matrix.map((r, rIndex) =>
+      r.map((cell, cIndex) =>
+        rIndex === row && cIndex === col ? (cell + 1) % 8 : cell
+      )
+    );
+  };
+
+  const handleKeyPress = (event: KeyboardEvent, row: number, col: number) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      cycleLED(row, col);
+    }
+  };
+
   // Get brightness level for LED display
   function getBrightness(value: number): number {
     return value / 7; // Scale 0-7 to 0-1
@@ -95,7 +110,6 @@
   }
 </style>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div style:background-color={color.ui.white}>
   <div class="matrix">
     {#each matrix as row, rowIndex}
@@ -105,6 +119,8 @@
             class="led"
             style:background-color={ledValue > 0 ? `rgba(0, 123, 255, ${getBrightness(ledValue)})` : '#222'}
             style:box-shadow={ledValue > 0 ? `0 0 ${ledValue * 2}px rgba(0, 123, 255, 0.8)` : 'none'}
+            on:click={() => cycleLED(rowIndex, colIndex)}
+            on:keydown={(e) => handleKeyPress(e, rowIndex, colIndex)}
             tabindex="0"
             role="button"
             aria-label="LED {rowIndex},{colIndex}: brightness {ledValue}"

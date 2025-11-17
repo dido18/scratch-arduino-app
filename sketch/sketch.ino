@@ -53,10 +53,35 @@ void matrix_draw(String frame){
     return;
   }
   for (int i = 0; i < 104; i++) {
-    if (frame.charAt(i) == '1') {
-      shades[i] = 7;
-    } else{
-      shades[i] = 0;
+    char c = frame.charAt(i);
+    switch (c) {
+      case '0':
+        shades[i] = 0;
+        break;
+      case '1':
+        shades[i] = 1;
+        break;
+      case '2':
+        shades[i] = 2;
+        break;
+      case '3':
+        shades[i] = 3;
+        break;
+      case '4':
+        shades[i] = 4;
+        break;
+      case '5':
+        shades[i] = 5;
+        break;
+      case '6':
+        shades[i] = 6;
+        break;
+      case '7':
+        shades[i] = 7;
+        break;
+      default:
+        shades[i] = 0; // Default to 0 for invalid characters
+        break;
     }
   }
   matrix.draw(shades);

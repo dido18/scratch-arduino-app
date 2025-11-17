@@ -15,29 +15,21 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
   private socket: Socket | null = null;
 
   init(env: Environment) {
-    //  var serverURL = `wss://${DEFAULT_HOST}:7000`;
+    var serverURL = `wss://${DEFAULT_HOST}:7000`;  // Changed from wss to ws
 
-    //  this.socket = io(serverURL, {
-    //       path: "/socket.io",
-    //       transports: ["polling", "websocket"],
-    //       autoConnect: true,
-    // });
+    this.socket = io(serverURL, {
+         path: "/socket.io",
+         transports: ["polling", "websocket"],
+         autoConnect: true,
+   });
 
-    // this.socket.on("connect", () => {
-    //   console.log(`Connected to Arduino UNO Q`);
-    // });
+    this.socket.on("connect", () => {
+      console.log(`Connected to Arduino UNO Q`);
+    });
 
     // this.socket.on("disconnect", (reason) => {
     //       console.log(`Disconnected from Arduino UNO Q: ${reason}`);
     //     });
-
-    // this.socket.on("connect_error", (error) => {
-    //     console.error(`Connection error:`, error.message);
-    // });
-
-    // this.socket.on("reconnect", (attemptNumber) => {
-    //     console.log(`Reconnected to Arduino UNO Q after ${attemptNumber} attempts`);
-    // });
    }
 
 
@@ -69,18 +61,24 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
     ];
   }
 
+
   @(scratch.command(function(_, tag) {
     const gradientMatrix = this.createGradientPattern();
     const arg = this.makeCustomArgument({
       component: MatrixArgument,
       initial: {
         value: gradientMatrix,
-        text: "gradient"
+        text: "GRADIENT"
       }
     });
     return tag`draw ${arg} matrix`;
   }))
-  drawMatrix(matrixData: number[][]) {
-    console.log("received matrix update", matrixData);
+  drawMatrix(matrix: number[][]) {
+    var matrixString = matrix.flat().join('');
+    console.log("received matrix update", matrixString);
+    // Send to socket if connected
+    if (this.socket) {
+      this.socket.emit("matrix_draw", { frame: matrixString });
+    }
   }
 }

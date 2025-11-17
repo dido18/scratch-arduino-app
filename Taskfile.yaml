@@ -196,4 +196,4 @@ tasks:
     - ln -s $PWD/prg-raise-extensions/extensions/src/arduino_basics $PWD/prg-raise-playground/extensions/src/arduino_basics
 
   prg:watch:
-    - cd prg-raise-playground && pnpm dev -i arduino_basics_2
+    - cd prg-raise-playground && pnpm dev -i arduino_basics
