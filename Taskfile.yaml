@@ -184,3 +184,16 @@ tasks:
              echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
            fi
            done
+
+### experimental
+  prg:init:
+    - git clone --recurse-submodules  https://github.com/mitmedialab/prg-raise-playground.git
+    - cd prg-raise-playground
+    - git checkout dev
+    - pnpm install
+
+  prg:patch:
+    - ln -s $PWD/prg-raise-extensions/extensions/src/arduino_basics $PWD/prg-raise-playground/extensions/src/arduino_basics
+
+  prg:watch:
+    - cd prg-raise-playground && pnpm dev -i arduino_basics_2
