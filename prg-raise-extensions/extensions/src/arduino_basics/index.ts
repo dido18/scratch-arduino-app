@@ -11,6 +11,36 @@ const details: ExtensionMenuDisplayDetails = {
 
 const DEFAULT_HOST = "192.168.1.39";
 
+// Pattern constants mapping names to matrix arrays
+const PATTERNS = {
+  heart: [
+    [0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,7,7,0,0,0,0,0,7,7,0,0],
+    [0,7,7,7,7,0,0,0,7,7,7,7,0],
+    [7,7,7,7,7,7,0,7,7,7,7,7,7],
+    [7,7,7,7,7,7,7,7,7,7,7,7,7],
+    [0,7,7,7,7,7,7,7,7,7,7,7,0],
+    [0,0,7,7,7,7,7,7,7,7,7,0,0],
+    [0,0,0,7,7,7,7,7,7,7,0,0,0]
+  ] as number[][],
+
+  gradient: [
+    [0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [2,2,2,2,2,2,2,2,2,2,2,2,2],
+    [3,3,3,3,3,3,3,3,3,3,3,3,3],
+    [4,4,4,4,4,4,4,4,4,4,4,4,4],
+    [5,5,5,5,5,5,5,5,5,5,5,5,5],
+    [6,6,6,6,6,6,6,6,6,6,6,6,6],
+    [7,7,7,7,7,7,7,7,7,7,7,7,7]
+  ] as number[][],
+
+// TODO  arduino: // TO
+
+
+  empty: Array(8).fill(null).map(() => Array(13).fill(0)) as number[][]
+} as const;
+
 export default class ArduinoBasics extends extension(details, "ui", "customArguments") {
   private socket: Socket | null = null;
 
@@ -33,43 +63,13 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
    }
 
 
-  // Create a heart pattern for 13x8 matrix (13 columns, 8 rows)
-  private createHeartPattern(): number[][] {
-    return [
-      [0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,7,7,0,0,0,0,0,7,7,0,0],
-      [0,7,7,7,7,0,0,0,7,7,7,7,0],
-      [7,7,7,7,7,7,0,7,7,7,7,7,7],
-      [7,7,7,7,7,7,7,7,7,7,7,7,7],
-      [0,7,7,7,7,7,7,7,7,7,7,7,0],
-      [0,0,7,7,7,7,7,7,7,7,7,0,0],
-      [0,0,0,7,7,7,7,7,7,7,0,0,0]
-    ];
-  }
-
-  // Create a gradient pattern from bottom (7) to top (0)
-  private createGradientPattern(): number[][] {
-    return [
-      [0,0,0,0,0,0,0,0,0,0,0,0,0], // Row 0: brightness 0
-      [1,1,1,1,1,1,1,1,1,1,1,1,1], // Row 1: brightness 1
-      [2,2,2,2,2,2,2,2,2,2,2,2,2], // Row 2: brightness 2
-      [3,3,3,3,3,3,3,3,3,3,3,3,3], // Row 3: brightness 3
-      [4,4,4,4,4,4,4,4,4,4,4,4,4], // Row 4: brightness 4
-      [5,5,5,5,5,5,5,5,5,5,5,5,5], // Row 5: brightness 5
-      [6,6,6,6,6,6,6,6,6,6,6,6,6], // Row 6: brightness 6
-      [7,7,7,7,7,7,7,7,7,7,7,7,7]  // Row 7: brightness 7
-    ];
-  }
-
-
-
   @(scratch.command(function(_, tag) {
-    const pattern = this.createHeartPattern();
+    const pattern = PATTERNS.gradient;
     const arg = this.makeCustomArgument({
       component: MatrixArgument,
       initial: {
         value: pattern,
-        text: "FRAME"
+        text: "pattern"
       }
     });
     return tag`draw ${arg} matrix`;
@@ -81,5 +81,4 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
       this.socket.emit("matrix_draw", { frame: matrixString });
     }
   }
-
 }
