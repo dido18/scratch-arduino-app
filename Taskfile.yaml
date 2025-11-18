@@ -45,12 +45,8 @@ tasks:
       - cp -r ./sketch build/scratch-arduino-app/sketch
       - cp -r ./python build/scratch-arduino-app/python
       - cp -r ./certs build/scratch-arduino-app/certs
-      - task scratch:build
-      - mkdir -p build/scratch-arduino-app/assets
-      - cp scratch-editor/packages/scratch-gui/build/index.html build/scratch-arduino-app/assets/index.html
-      - cp scratch-editor/packages/scratch-gui/build/gui.js build/scratch-arduino-app/assets/gui.js
-      - mkdir -p build/scratch-arduino-app/assets/static
-      - cp -r scratch-editor/packages/scratch-gui/build/static/blocks-media  build/scratch-arduino-app/assets/static/blocks-media
+      - task prg:build
+      - cp -r prg-raise-playground/build/. build/scratch-arduino-app/assets
 
   scratch:build:
     desc: "Build Scratch GUI files"
@@ -197,3 +193,12 @@ tasks:
 
   prg:watch:
     - cd prg-raise-playground && pnpm dev -i arduino_basics
+
+  prg:build:
+    dir: prg-raise-playground
+    cmds:
+      - CI=true pnpm build
+
+  prg:upload:
+    cmds:
+      - adb push prg-raise-playground/build/. /home/arduino/ArduinoApps/scratch-arduino-app/assets
