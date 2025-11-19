@@ -5,9 +5,12 @@ import { io, Socket } from "socket.io-client";
 const details: ExtensionMenuDisplayDetails = {
   name: "Arduino Basics",
   description: "Arduino Basics for Uno Q",
-  iconURL: "Replace with the name of your icon image file (which should be placed in the same directory as this file)",
-  insetIconURL: "Replace with the name of your inset icon image file (which should be placed in the same directory as this file)",
+  iconURL: "ArduinoLogo_Blue.png",
+  insetIconURL: "ArduinoLogo_Blue.jpg",
   tags: ["Arduino"],
+  blockColor: "#00878F",
+  menuColor: "#62AEB2",
+  menuSelectColor: "#62AEB2"
 };
 
 const DEFAULT_HOST = "192.168.1.39";
