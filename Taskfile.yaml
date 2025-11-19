@@ -8,6 +8,7 @@ tasks:
     cmds:
       - curl -fsSL https://dprint.dev/install.sh | sh -s {{ .DPRINT_VERSION }}
       - mkdir -p .bin && cp $HOME/.dprint/bin/dprint .bin/dprint # workaround for local install
+      - curl -fsSL https://get.pnpm.io/install.sh | sh -
 
   fmt:
     desc: Run format
@@ -20,21 +21,17 @@ tasks:
       - ${PWD}/.bin/dprint check
 
   scratch:init:
-    cmds:
-      - rm -rf scratch-editor
-      - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
-      - cd scratch-editor && npm install
-      - cd scratch-editor && npm run build
-      - task scratch:patch
+    - git clone --recurse-submodules  https://github.com/mitmedialab/prg-raise-playground.git
+    - cd prg-raise-playground
+    - git checkout dev
+    - pnpm install
+    - task scratch:patch
 
   scratch:patch:
-    cmds:
-      - cd scratch-editor/packages/scratch-gui && node ../../../scratch-arduino-extensions/scripts/patch-gui.js
+    - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_basics $PWD/prg-raise-playground/extensions/src/arduino_basics
 
   scratch:local:start:
-    dir: scratch-editor
-    cmds:
-      - npm start --workspace @scratch/scratch-gui
+    - cd prg-raise-playground && pnpm dev -i arduino_basics
 
   app:build:
     desc: "Copy app files (python, assets, app.yaml) to a build directory"
@@ -45,14 +42,14 @@ tasks:
       - cp -r ./sketch build/scratch-arduino-app/sketch
       - cp -r ./python build/scratch-arduino-app/python
       - cp -r ./certs build/scratch-arduino-app/certs
-      - task prg:build
+      - task scratch:build
       - cp -r prg-raise-playground/build/. build/scratch-arduino-app/assets
 
   scratch:build:
-    desc: "Build Scratch GUI files"
-    dir: scratch-editor/packages/scratch-gui
+    internal: true
+    dir: prg-raise-playground
     cmds:
-      - npm run build:dev --workspace @scratch/scratch-gui
+      - CI=true pnpm build
 
   board:app:upload:
     desc: "Upload zip file to Arduino board, unzip and deploy to /home/arduino/ArduinoApps"
@@ -181,24 +178,4 @@ tasks:
            fi
            done
 
-### experimental
-  prg:init:
-    - git clone --recurse-submodules  https://github.com/mitmedialab/prg-raise-playground.git
-    - cd prg-raise-playground
-    - git checkout main
-    - pnpm install
 
-  prg:patch:
-    - ln -s $PWD/prg-raise-extensions/extensions/src/arduino_basics $PWD/prg-raise-playground/extensions/src/arduino_basics
-
-  prg:watch:
-    - cd prg-raise-playground && pnpm dev -i arduino_basics
-
-  prg:build:
-    dir: prg-raise-playground
-    cmds:
-      - CI=true pnpm build
-
-  prg:upload:
-    cmds:
-      - adb push prg-raise-playground/build/. /home/arduino/ArduinoApps/scratch-arduino-app/assets

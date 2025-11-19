@@ -7,7 +7,7 @@ const details: ExtensionMenuDisplayDetails = {
   description: "Arduino Basics for Uno Q",
   iconURL: "ArduinoLogo_Blue.png",
   insetIconURL: "ArduinoLogo_Blue.jpg",
-  tags: ["Arduino"],
+//   tags: ["Arduino"],
   blockColor: "#00878F",
   menuColor: "#62AEB2",
   menuSelectColor: "#62AEB2"
