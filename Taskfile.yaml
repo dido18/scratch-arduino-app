@@ -185,7 +185,7 @@ tasks:
   prg:init:
     - git clone --recurse-submodules  https://github.com/mitmedialab/prg-raise-playground.git
     - cd prg-raise-playground
-    - git checkout dev
+    - git checkout main
     - pnpm install
 
   prg:patch:

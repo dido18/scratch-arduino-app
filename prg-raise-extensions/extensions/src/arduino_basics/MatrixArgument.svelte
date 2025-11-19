@@ -9,14 +9,53 @@
 
   let matrix = current.value;
 
-  const MOUSE_BUTTON = {
-    LEFT: 2,
-    MIDDLE: 1,
-    RIGHT: 0
+  let isMousePressed = false;
+  let capturedValue = 0; // Store the value from the first clicked LED
+  let paintMode = true; // true = paint mode, false = erase Mode
+
+  const handleMouseDown = (event: MouseEvent, row: number, col: number) => {
+    event.preventDefault();
+    isMousePressed = true;
+
+    capturedValue = matrix[row][col];
+    if (capturedValue === 0) {
+      paintMode = true;
+      setLEDValue(row, col, 7);
+    } else {
+      paintMode = false;
+      setLEDValue(row, col, 0);
+    }
   };
 
-  let isMousePressed = false;
-  let currentMouseButton = 0;
+  const handleMouseUp = () => {
+    isMousePressed = false;
+  };
+
+  const handleMouseEnter = (row: number, col: number) => {
+    if (isMousePressed) {
+        if (paintMode) {
+          setLEDValue(row, col, 7);
+        } else {
+          setLEDValue(row, col, 0);
+        }
+    }
+  };
+
+ const setLEDValue = (row: number, col: number, value: number) => {
+    matrix = matrix.map((r: number[], rIndex: number) =>
+      r.map((cell, cIndex) => {
+        if (rIndex === row && cIndex === col) {
+          return value;
+        }
+        return cell;
+      })
+    );
+  };
+
+
+  const handleContextMenu = (event: MouseEvent) => {
+    event.preventDefault(); // Prevent right-click context menu
+  };
 
   const clearMatrix = () => {
     matrix = matrix.map(row => row.map((cell: any) => 0));
@@ -25,75 +64,6 @@
   const fillMatrix = () => {
     matrix = matrix.map(row => row.map(cell => 7));
   };
-
-  const changeLEDBrightness = (row: number, col: number, increase: boolean) => {
-    matrix = matrix.map((r: number[], rIndex: number) =>
-      r.map((cell, cIndex) => {
-        if (rIndex === row && cIndex === col) {
-          if (increase) {
-            return Math.min(7, cell + 1); // Increase up to 7
-          } else {
-            return Math.max(0, cell - 1); // Decrease down to 0
-          }
-        }
-        return cell;
-      })
-    );
-  };
-
-  const toggleLED = (row: number, col: number) => {
-    matrix = matrix.map((r, rIndex) =>
-      r.map((cell, cIndex) =>
-        rIndex === row && cIndex === col ? (cell > 0 ? 0 : 7) : cell
-      )
-    );
-  };
-
-  const handleMouseDown = (event: MouseEvent, row: number, col: number) => {
-    event.preventDefault();
-    isMousePressed = true;
-    currentMouseButton = event.button;
-
-    if (event.button === MOUSE_BUTTON.RIGHT) {
-      toggleLED(row, col);
-    } else if (event.button === MOUSE_BUTTON.LEFT) {
-      changeLEDBrightness(row, col, false);
-    } else if (event.button === MOUSE_BUTTON.MIDDLE) {
-      changeLEDBrightness(row, col, true);
-    }
-  };
-
-  const handleMouseEnter = (row: number, col: number) => {
-    if (isMousePressed) {
-      if (currentMouseButton === MOUSE_BUTTON.LEFT) {
-        changeLEDBrightness(row, col, false);
-      } else if (currentMouseButton === MOUSE_BUTTON.MIDDLE) {
-        changeLEDBrightness(row, col, true);
-      } else if (currentMouseButton === MOUSE_BUTTON.RIGHT) {
-        toggleLED(row, col);
-      }
-    }
-  };
-
-  const handleMouseUp = () => {
-    isMousePressed = false;
-  };
-
-  const handleContextMenu = (event: MouseEvent) => {
-    event.preventDefault(); // Prevent right-click context menu
-  };
-
-  const handleKeyPress = (event: KeyboardEvent, row: number, col: number) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      toggleLED(row, col);
-    }
-  };
-
-  // Get brightness level for LED display
-  function getBrightness(value: number): number {
-    return value / 7; // Scale 0-7 to 0-1
-  }
 
  $: setter({ value: matrix, text:"frame" });
 </script>
@@ -177,12 +147,11 @@
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
             class="led"
-            style:background-color={ledValue > 0 ? `rgba(0, 123, 255, ${getBrightness(ledValue)})` : '#222'}
+            style:background-color={ledValue > 0 ? `rgba(0, 123, 255)` : '#222'}
             style:box-shadow={ledValue > 0 ? `0 0 ${ledValue * 2}px rgba(0, 123, 255, 0.8)` : 'none'}
             on:mousedown={(e) => handleMouseDown(e, rowIndex, colIndex)}
             on:mouseenter={() => handleMouseEnter(rowIndex, colIndex)}
             on:contextmenu={handleContextMenu}
-            on:keydown={(e) => handleKeyPress(e, rowIndex, colIndex)}
             tabindex="0"
             role="button"
             aria-label="LED {rowIndex},{colIndex}: brightness {ledValue}"

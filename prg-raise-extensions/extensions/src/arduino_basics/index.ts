@@ -1,43 +1,29 @@
-import { scratch, extension, type ExtensionMenuDisplayDetails, type BlockUtilityWithID, type Environment } from "$common";
+import { scratch, extension, Language, type ExtensionMenuDisplayDetails, type BlockUtilityWithID, type Environment } from "$common";
 import MatrixArgument from "./MatrixArgument.svelte";
 import { io, Socket } from "socket.io-client";
 
 const details: ExtensionMenuDisplayDetails = {
   name: "Arduino Basics",
-  description: "Arduino Basics for Uno Q ",
+  description: "Arduino Basics for Uno Q",
   iconURL: "Replace with the name of your icon image file (which should be placed in the same directory as this file)",
-  insetIconURL: "Replace with the name of your inset icon image file (which should be placed in the same directory as this file)"
+  insetIconURL: "Replace with the name of your inset icon image file (which should be placed in the same directory as this file)",
+  tags: ["Arduino"],
 };
 
 const DEFAULT_HOST = "192.168.1.39";
 
-// Pattern constants mapping names to matrix arrays
+// TODO: support the brightness `0-7' of the leds
 const PATTERNS = {
   heart: [
-    [0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,0,7,7,0,0,0,0,0,7,7,0,0],
-    [0,7,7,7,7,0,0,0,7,7,7,7,0],
-    [7,7,7,7,7,7,0,7,7,7,7,7,7],
-    [7,7,7,7,7,7,7,7,7,7,7,7,7],
-    [0,7,7,7,7,7,7,7,7,7,7,7,0],
-    [0,0,7,7,7,7,7,7,7,7,7,0,0],
-    [0,0,0,7,7,7,7,7,7,7,0,0,0]
+    [0,0,0,7,7,0,0,0,7,7,0,0,0],
+    [0,0,7,0,0,7,0,7,0,0,7,0,0],
+    [0,7,0,0,0,0,7,0,0,0,0,7,0],
+    [0,7,0,0,0,0,0,0,0,0,0,7,0],
+    [0,0,7,0,0,0,0,0,0,0,7,0,0],
+    [0,0,0,7,0,0,0,0,0,7,0,0,0],
+    [0,0,0,0,7,0,0,0,7,0,0,0,0],
+    [0,0,0,0,0,7,0,7,0,0,0,0,0]
   ] as number[][],
-
-  gradient: [
-    [0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [2,2,2,2,2,2,2,2,2,2,2,2,2],
-    [3,3,3,3,3,3,3,3,3,3,3,3,3],
-    [4,4,4,4,4,4,4,4,4,4,4,4,4],
-    [5,5,5,5,5,5,5,5,5,5,5,5,5],
-    [6,6,6,6,6,6,6,6,6,6,6,6,6],
-    [7,7,7,7,7,7,7,7,7,7,7,7,7]
-  ] as number[][],
-
-// TODO  arduino: // TO
-
-
   empty: Array(8).fill(null).map(() => Array(13).fill(0)) as number[][]
 } as const;
 
@@ -57,19 +43,19 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
       console.log(`Connected to Arduino UNO Q`);
     });
 
-    // this.socket.on("disconnect", (reason) => {
-    //       console.log(`Disconnected from Arduino UNO Q: ${reason}`);
-    //     });
-   }
+    this.socket.on("disconnect", (reason) => {
+       console.log(`Disconnected from Arduino UNO Q: ${reason}`);
+    });
+ }
 
 
   @(scratch.command(function(_, tag) {
-    const pattern = PATTERNS.gradient;
+    const pattern = PATTERNS.heart;
     const arg = this.makeCustomArgument({
       component: MatrixArgument,
       initial: {
         value: pattern,
-        text: "pattern"
+        text: "heart"
       }
     });
     return tag`draw ${arg} matrix`;
@@ -81,4 +67,11 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
       this.socket.emit("matrix_draw", { frame: matrixString });
     }
   }
+
+  @(scratch.command`Clear matrix`)
+  clearMatrix(matrix: number[][]) {
+    var matrixString = PATTERNS.empty.flat().join('');
+    this.socket.emit("matrix_draw", { frame: matrixString });
+  }
+
 }
