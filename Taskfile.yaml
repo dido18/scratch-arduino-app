@@ -46,7 +46,6 @@ tasks:
       - cp -r prg-raise-playground/build/. build/scratch-arduino-app/assets
 
   scratch:build:
-    internal: true
     dir: prg-raise-playground
     cmds:
       - CI=true pnpm build
