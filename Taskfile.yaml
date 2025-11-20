@@ -176,5 +176,3 @@ tasks:
              echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
            fi
            done
-
-
