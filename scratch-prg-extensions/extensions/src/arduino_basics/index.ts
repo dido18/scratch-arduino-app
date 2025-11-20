@@ -15,12 +15,12 @@ const details: ExtensionMenuDisplayDetails = {
 
 // Get Arduino board IP or hostname from URL parameter
 const getArduinoBoardHost = () => {
-const urlParams = new URLSearchParams(window.location.search);
-const boardHost = urlParams.get("host");
-if (boardHost) {
-    return boardHost
-}
-return window.location.hostname;
+  const urlParams = new URLSearchParams(window.location.search);
+  const boardHost = urlParams.get("host");
+  if (boardHost) {
+    return boardHost;
+  }
+  return window.location.hostname;
 };
 
 // TODO: make the block to support the brightness `0-7' of the leds
