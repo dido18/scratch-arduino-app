@@ -45,6 +45,8 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
     const arduinoBoardHost = getArduinoBoardHost();
     var serverURL = `wss://${arduinoBoardHost}:7000`;
 
+    console.log("Connecting to Uno Q", serverURL);
+
     this.socket = io(serverURL, {
       path: "/socket.io",
       transports: ["polling", "websocket"],
