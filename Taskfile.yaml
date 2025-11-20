@@ -1,6 +1,5 @@
 version: "3"
 vars:
-  SCRATCH_EDITOR_VERSION: v12.0.1
   DPRINT_VERSION: 0.48.0
 
 tasks:
@@ -21,6 +20,7 @@ tasks:
       - ${PWD}/.bin/dprint check
 
   scratch:init:
+    - git config --global url."https://github.com/".insteadOf git@github.com
     - git clone --recurse-submodules  https://github.com/mitmedialab/prg-raise-playground.git
     - cd prg-raise-playground
     - git checkout dev
