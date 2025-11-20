@@ -35,6 +35,11 @@ jobs:
         run: |
           task install
 
+      - name: use pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Fmt check
         run: |
           task fmt:check
