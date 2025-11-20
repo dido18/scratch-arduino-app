@@ -29,7 +29,7 @@ NOTE: the `https` is needed by the `getUserMedia()` method for security reason.
 - Open the `http://localhost:8602?host=BOARD_IP`
 - `task watch` watch files changes for both python and sketch, and upload the changes to the board and restart"
 
-
 For testing on the board
+
 - `ŧask app:build`
 - `task board:app:upload`

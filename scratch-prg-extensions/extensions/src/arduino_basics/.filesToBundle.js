@@ -1,0 +1,2 @@
+export { default as MatrixArgument } from '/home/dido/code/dido18/scratch-arduino-app/prg-raise-playground/extensions/src/arduino_basics/MatrixArgument.svelte';
+export { default as Extension } from '/home/dido/code/dido18/scratch-arduino-app/prg-raise-playground/extensions/src/arduino_basics/index.ts';
