@@ -7,7 +7,7 @@ tasks:
     cmds:
       - curl -fsSL https://dprint.dev/install.sh | sh -s {{ .DPRINT_VERSION }}
       - mkdir -p .bin && cp $HOME/.dprint/bin/dprint .bin/dprint # workaround for local install
-      - curl -fsSL https://get.pnpm.io/install.sh | sh -
+      - curl -fsSL https://get.pnpm.io/install.sh | sh - &&   source ~/.bashrc
 
   fmt:
     desc: Run format

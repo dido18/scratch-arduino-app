@@ -31,7 +31,7 @@ jobs:
       - name: Install Task
         uses: arduino/setup-task@v2
 
-      - name: Install dprint
+      - name: Install
         run: |
           task install
 
