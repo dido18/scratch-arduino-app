@@ -24,6 +24,7 @@ tasks:
     - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-vm.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-vm.git"
     - git clone --recurse-submodules  https://github.com/mitmedialab/prg-raise-playground.git
     - cd prg-raise-playground
+    - git remote -v
     - git fetch origin
     - git switch dev
     - pnpm install
@@ -65,6 +66,9 @@ tasks:
           ZIP_BASENAME=$(basename "$ZIP_FILE")
           adb shell "cd /tmp && unzip -o $ZIP_BASENAME && mkdir -p /home/arduino/ArduinoApps && rm -rf /home/arduino/ArduinoApps/scratch-arduino-app && mv scratch-arduino-app /home/arduino/ArduinoApps/ && rm $ZIP_BASENAME"
           echo "App deployed to /home/arduino/ArduinoApps/scratch-arduino-app"
+
+  app:start:
+    - adb shell "arduino-app-cli app start user:scratch-arduino-app"
 
   app:zip:
     desc: "Create a zip file with version (defaults to git commit hash)"
