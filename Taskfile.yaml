@@ -20,7 +20,8 @@ tasks:
       - ${PWD}/.bin/dprint check
 
   scratch:init:
-    - git config --global url."https://github.com/".insteadOf git@github.com
+    - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-gui.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-gui.git"
+    - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-vm.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-vm.git"
     - git clone --recurse-submodules  https://github.com/mitmedialab/prg-raise-playground.git
     - cd prg-raise-playground
     - git checkout dev
