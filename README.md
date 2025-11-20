@@ -25,7 +25,11 @@ NOTE: the `https` is needed by the `getUserMedia()` method for security reason.
 ## Local development
 
 - `task scratch:init`
-- `task scratch:local:start`
-- `ŧask board:upload`
-- change the `const DEFAULT_HOST =`<YOUR_IP|BOARD_NAME>`;` in the `scratch-arduino-extensions/packages/scratch-vm/src/extensions/ArduinoUnoQ.js`
-- Open local scratch on http://localhost:8601/
+- `task scratch:watch` watch scratch GUI files and reload on save
+- Open the `http://localhost:8602?host=BOARD_IP`
+- `task watch` watch files changes for both python and sketch, and upload the changes to the board and restart"
+
+
+For testing on the board
+- `ŧask app:build`
+- `task board:app:upload`

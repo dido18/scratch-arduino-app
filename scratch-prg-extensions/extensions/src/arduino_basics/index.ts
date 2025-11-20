@@ -1,9 +1,7 @@
 import {
-  type BlockUtilityWithID,
   type Environment,
   extension,
   type ExtensionMenuDisplayDetails,
-  Language,
   scratch,
 } from "$common";
 import { io, Socket } from "socket.io-client";
@@ -20,9 +18,20 @@ const details: ExtensionMenuDisplayDetails = {
   menuSelectColor: "#62AEB2",
 };
 
-const DEFAULT_HOST = "192.168.1.39";
+// Get Arduino board IP or hostname from URL parameter - required
+const getArduinoBoardHost = () => {
+  if (typeof window !== 'undefined' && window.location) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const boardHost = urlParams.get('host');
+    if (boardHost) {
+      console.log(`Connecting to Arduino board: ${boardHost}`);
+      return boardHost;
+    }
+  }
+  throw new Error('Arduino board host required. Add ?host=arduino_board_ip_or_name to the URL');
+};
 
-// TODO: support the brightness `0-7' of the leds
+// TODO: make the block to support the brightness `0-7' of the leds
 const PATTERNS = {
   heart: [
     [0, 0, 0, 7, 7, 0, 0, 0, 7, 7, 0, 0, 0],
@@ -41,7 +50,8 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
   private socket: Socket | null = null;
 
   init(env: Environment) {
-    var serverURL = `wss://${DEFAULT_HOST}:7000`; // Changed from wss to ws
+    const arduinoBoardHost = getArduinoBoardHost();
+    var serverURL = `wss://${arduinoBoardHost}:7000`;
 
     this.socket = io(serverURL, {
       path: "/socket.io",
@@ -77,9 +87,12 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
     }
   }
 
-  @scratch.command`Clear matrix`
+
+  @(scratch.command`Clear matrix`)
   clearMatrix(matrix: number[][]) {
     var matrixString = PATTERNS.empty.flat().join("");
-    this.socket.emit("matrix_draw", { frame: matrixString });
+    if (this.socket) {
+      this.socket.emit("matrix_draw", { frame: matrixString });
+    }
   }
 }

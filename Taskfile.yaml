@@ -29,7 +29,8 @@ tasks:
     - cd scratch-prg-extensions/extensions/src/arduino_basics && pnpm install
 
   scratch:watch:
-    - cd prg-raise-playground && pnpm dev -i arduino_basics
+    cmds:
+      - cd prg-raise-playground && pnpm dev -i arduino_basics &
 
   app:build:
     desc: "Copy app files (python, assets, app.yaml) to a build directory"
@@ -81,7 +82,7 @@ tasks:
       - cd build && zip -r scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
 
   watch:
-    desc: "wathc files changes for both python and sketch, and upload the changes to the board and restart"
+    desc: "watch files changes for both python and sketch, and upload the changes to the board and restart"
     deps:
       - python:watch
       - sketch:watch
