@@ -13,17 +13,14 @@ const details: ExtensionMenuDisplayDetails = {
   menuSelectColor: "#62AEB2",
 };
 
-// Get Arduino board IP or hostname from URL parameter - required
+// Get Arduino board IP or hostname from URL parameter
 const getArduinoBoardHost = () => {
-  if (typeof window !== "undefined" && window.location) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const boardHost = urlParams.get("host");
-    if (boardHost) {
-      console.log(`Connecting to Arduino board: ${boardHost}`);
-      return boardHost;
-    }
-  }
-  throw new Error("Arduino board host required. Add ?host=arduino_board_ip_or_name to the URL");
+const urlParams = new URLSearchParams(window.location.search);
+const boardHost = urlParams.get("host");
+if (boardHost) {
+    return boardHost
+}
+return window.location.hostname;
 };
 
 // TODO: make the block to support the brightness `0-7' of the leds
