@@ -24,15 +24,14 @@ tasks:
     - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-vm.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-vm.git"
     - git clone --recurse-submodules  https://github.com/mitmedialab/prg-raise-playground.git
     - cd prg-raise-playground
+    - git fetch origin
     - git switch dev
     - pnpm install
-    - task scratch:patch
+    # copy the extension to the rigth place
+    - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_basics $PWD/prg-raise-playground/extensions/src/arduino_basics
     - cd scratch-prg-extensions/extensions/src/arduino_basics && pnpm install
 
-  scratch:patch:
-    - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_basics $PWD/prg-raise-playground/extensions/src/arduino_basics
-
-  scratch:local:start:
+  scratch:watch:
     - cd prg-raise-playground && pnpm dev -i arduino_basics
 
   app:build:
@@ -82,7 +81,7 @@ tasks:
       - cd build && zip -r scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
 
   watch:
-    desc: "wath cfile changes for both python and sketch, and upload the changes to the board and restart"
+    desc: "wathc files changes for both python and sketch, and upload the changes to the board and restart"
     deps:
       - python:watch
       - sketch:watch
