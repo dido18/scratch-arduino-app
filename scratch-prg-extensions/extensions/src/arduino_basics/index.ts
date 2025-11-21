@@ -43,7 +43,7 @@ const PATTERNS = {
     [7, 0, 7, 7, 7, 0, 7, 0, 7, 7, 7, 0, 7],
     [7, 0, 0, 0, 0, 0, 7, 0, 0, 7, 0, 0, 7],
     [0, 7, 0, 0, 0, 7, 0, 7, 0, 0, 0, 7, 0],
-    [0, 0, 7, 7, 7, 0, 0, 0, 7, 7, 7, 0, 0]
+    [0, 0, 7, 7, 7, 0, 0, 0, 7, 7, 7, 0, 0],
   ] as number[][],
   empty: Array(8).fill(null).map(() => Array(13).fill(0)) as number[][],
 } as const;
@@ -83,7 +83,6 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
     return tag`draw ${arg} matrix`;
   })
   drawMatrix(matrix: number[][]) {
-    console.log("atic sendnd", matrix);
     var matrixString = matrix.flat().join("");
     console.log("received matrix update", matrixString);
     if (this.socket) {
