@@ -1,91 +1,16 @@
 from arduino.app_utils import App, Bridge
 from arduino.app_bricks.web_ui import WebUI
-from arduino.app_bricks.object_detection import ObjectDetection
-import time
-import base64
-
-object_detection = ObjectDetection()
-
-
-def on_matrix_draw(_, data):
-    print(f"Received frame to draw on matrix: {data}")
-    # from 5x5 to 8x13 matrix
-    frame_5x5 = data.get("frame")
-    row0 = "0" * 13
-    row1 = "0" * 4 + frame_5x5[0:5] + "0" * 4
-    row2 = "0" * 4 + frame_5x5[5:10] + "0" * 4
-    row3 = "0" * 4 + frame_5x5[10:15] + "0" * 4
-    row4 = "0" * 4 + frame_5x5[15:20] + "0" * 4
-    row5 = "0" * 4 + frame_5x5[20:25] + "0" * 4
-    row6 = "0" * 13
-    row7 = "0" * 13
-    frame_8x13 = row0 + row1 + row2 + row3 + row4 + row5 + row6 + row7
-    print(f"Transformed frame to draw on 8x13 matrix: {frame_8x13}")
-    Bridge.call("matrix_draw", frame_8x13)
-
-
-def rgb_to_digital(value, threshold=128) -> bool:
-    """Convert RGB value (0-255) to digital HIGH(1) or LOW(0)"""
-    return value >= threshold
-
-
-def on_set_led_rgb(_, data):
-    led = data.get("led")
-    r = data.get("r")
-    g = data.get("g")
-    b = data.get("b")
-
-    # Convert RGB values (0-255) to digital HIGH/LOW
-    r_digital = rgb_to_digital(r)
-    g_digital = rgb_to_digital(g)
-    b_digital = rgb_to_digital(b)
-
-    print(
-        f"Setting LED {led} to color: RGB({r},{g},{b}) -> Digital({r_digital},{g_digital},{b_digital})"
-    )
-    Bridge.call("set_led_rgb", led, r_digital, g_digital, b_digital)
-
-
-def on_detect_objects(client_id, data):
-    """Callback function to handle object detection requests."""
-    try:
-        image_data = data.get("image")
-        confidence = data.get("confidence", 0.5)
-        if not image_data:
-            # TODO: implement the 'detection_error` in the extension
-            ui.send_message("detection_error", {"error": "No image data"})
-            return
-
-        start_time = time.time() * 1000
-        results = object_detection.detect(base64.b64decode(image_data), confidence=confidence)
-        diff = time.time() * 1000 - start_time
-
-        if results is None:
-            ui.send_message("detection_error", {"error": "No results returned"})
-            return
-
-        response = {
-            "detection": results.get("detection", []),
-            "detection_count": len(results.get("detection", [])) if results else 0,
-            "processing_time": f"{diff:.2f} ms",
-        }
-        ui.send_message("detection_result", response)
-
-    except Exception as e:
-        ui.send_message("detection_error", {"error": str(e)})
-
 
 ui = WebUI(use_ssl=True)
 ui.on_connect(lambda sid: (print(f"Client connected: {sid} "),))
+
+
+def on_matrix_draw(_, data):
+    frame = data.get("frame")
+    print(f"Frame to draw on 8x13 matrix: {frame}")
+    Bridge.call("matrix_draw", frame)
+
+
 ui.on_message("matrix_draw", on_matrix_draw)
-ui.on_message("set_led_rgb", on_set_led_rgb)
-ui.on_message("detect_objects", on_detect_objects)
-
-
-def on_modulino_button_pressed(btn):
-    ui.send_message("modulino_buttons_pressed", {"btn": btn})
-
-
-Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
 
 App.run()

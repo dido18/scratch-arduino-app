@@ -4,5 +4,4 @@ ports:
   - 7000
 bricks:
   - arduino:web_ui
-  - arduino:object_detection
 icon: 🐱
