@@ -1,5 +1,5 @@
 import { scratch, extension, type ExtensionMenuDisplayDetails, type BlockUtilityWithID, type Environment } from "$common";
-import { io, Socket } from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
 
 const details: ExtensionMenuDisplayDetails = {
   name: "Arduino Modulino",
@@ -9,12 +9,22 @@ const details: ExtensionMenuDisplayDetails = {
   tags :["Arduino UNO Q"]
 };
 
+// Get Arduino board IP or hostname from URL parameter
+const getArduinoBoardHost = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const boardHost = urlParams.get("host");
+  if (boardHost) {
+    return boardHost;
+  }
+  return window.location.hostname;
+};
+
 export default class ExtensionNameGoesHere extends extension(details) {
 
- button_pressed:string  = "";
+ private socket: Socket | null = null;
+ private button_pressed:string  = "";
 
  init(env: Environment) {
-
     const arduinoBoardHost = getArduinoBoardHost();
     var serverURL = `wss://${arduinoBoardHost}:7000`;
 
@@ -26,24 +36,14 @@ export default class ExtensionNameGoesHere extends extension(details) {
       autoConnect: true,
     });
 
-
   }
 
   /** @see {ExplanationOfExampleHatAndBlockUtility} */
-  @(scratch.hat(function (_, tag) {
+  @scratch.hat(function (_: any, tag: any) {
       return tag`When modulino button ${{ type: "string", options: ["A", "B", "C"]}} pressed`;
-    }))
+    })
   async whenModulinoButtonsPressed(button: string, util: BlockUtilityWithID) {
     // return util.stackFrame.isLoop === condition;
     return true;
   }
 }
-
-const getArduinoBoardHost = () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const boardHost = urlParams.get("host");
-  if (boardHost) {
-    return boardHost;
-  }
-  return window.location.hostname;
-};
