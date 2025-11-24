@@ -27,10 +27,12 @@ tasks:
     # copy the extension to the rigth place
     - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_basics $PWD/prg-raise-playground/extensions/src/arduino_basics
     - cd scratch-prg-extensions/extensions/src/arduino_basics && pnpm install
+    - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_modulino $PWD/prg-raise-playground/extensions/src/arduino_modulino
+    - cd scratch-prg-extensions/extensions/src/arduino_modulino && pnpm install
 
   scratch:watch:
     cmds:
-      - cd prg-raise-playground && pnpm dev -i arduino_basics
+      - cd prg-raise-playground && pnpm dev -i arduino_basics arduino_modulino
 
   app:build:
     desc: "Copy app files (python, assets, app.yaml) to a build directory"
