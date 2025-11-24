@@ -30,7 +30,7 @@ tasks:
 
   scratch:watch:
     cmds:
-      - cd prg-raise-playground && pnpm dev -i arduino_basics &
+      - cd prg-raise-playground && pnpm dev -i arduino_basics
 
   app:build:
     desc: "Copy app files (python, assets, app.yaml) to a build directory"
