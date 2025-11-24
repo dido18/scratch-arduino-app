@@ -1,6 +1,5 @@
 version: "3"
 vars:
-  SCRATCH_EDITOR_VERSION: v12.0.1
   DPRINT_VERSION: 0.48.0
 
 tasks:
@@ -8,6 +7,7 @@ tasks:
     cmds:
       - curl -fsSL https://dprint.dev/install.sh | sh -s {{ .DPRINT_VERSION }}
       - mkdir -p .bin && cp $HOME/.dprint/bin/dprint .bin/dprint # workaround for local install
+      - curl -fsSL https://get.pnpm.io/install.sh | sh - &&   source ~/.bashrc
 
   fmt:
     desc: Run format
@@ -20,21 +20,17 @@ tasks:
       - ${PWD}/.bin/dprint check
 
   scratch:init:
-    cmds:
-      - rm -rf scratch-editor
-      - git clone --depth 1 --branch {{ .SCRATCH_EDITOR_VERSION }}  https://github.com/scratchfoundation/scratch-editor.git
-      - cd scratch-editor && npm install
-      - cd scratch-editor && npm run build
-      - task scratch:patch
+    - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-gui.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-gui.git"
+    - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-vm.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-vm.git"
+    - git clone --recurse-submodules  https://github.com/mitmedialab/prg-raise-playground.git
+    - cd prg-raise-playground && git switch dev &&  pnpm install
+    # copy the extension to the rigth place
+    - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_basics $PWD/prg-raise-playground/extensions/src/arduino_basics
+    - cd scratch-prg-extensions/extensions/src/arduino_basics && pnpm install
 
-  scratch:patch:
+  scratch:watch:
     cmds:
-      - cd scratch-editor/packages/scratch-gui && node ../../../scratch-arduino-extensions/scripts/patch-gui.js
-
-  scratch:local:start:
-    dir: scratch-editor
-    cmds:
-      - npm start --workspace @scratch/scratch-gui
+      - cd prg-raise-playground && pnpm dev -i arduino_basics
 
   app:build:
     desc: "Copy app files (python, assets, app.yaml) to a build directory"
@@ -46,17 +42,12 @@ tasks:
       - cp -r ./python build/scratch-arduino-app/python
       - cp -r ./certs build/scratch-arduino-app/certs
       - task scratch:build
-      - mkdir -p build/scratch-arduino-app/assets
-      - cp scratch-editor/packages/scratch-gui/build/index.html build/scratch-arduino-app/assets/index.html
-      - cp scratch-editor/packages/scratch-gui/build/gui.js build/scratch-arduino-app/assets/gui.js
-      - mkdir -p build/scratch-arduino-app/assets/static
-      - cp -r scratch-editor/packages/scratch-gui/build/static/blocks-media  build/scratch-arduino-app/assets/static/blocks-media
+      - cp -r prg-raise-playground/build/. build/scratch-arduino-app/assets
 
   scratch:build:
-    desc: "Build Scratch GUI files"
-    dir: scratch-editor/packages/scratch-gui
+    dir: prg-raise-playground
     cmds:
-      - npm run build:dev --workspace @scratch/scratch-gui
+      - CI=true pnpm build
 
   board:app:upload:
     desc: "Upload zip file to Arduino board, unzip and deploy to /home/arduino/ArduinoApps"
@@ -73,6 +64,9 @@ tasks:
           adb shell "cd /tmp && unzip -o $ZIP_BASENAME && mkdir -p /home/arduino/ArduinoApps && rm -rf /home/arduino/ArduinoApps/scratch-arduino-app && mv scratch-arduino-app /home/arduino/ArduinoApps/ && rm $ZIP_BASENAME"
           echo "App deployed to /home/arduino/ArduinoApps/scratch-arduino-app"
 
+  app:start:
+    - adb shell "arduino-app-cli app start user:scratch-arduino-app"
+
   app:zip:
     desc: "Create a zip file with version (defaults to git commit hash)"
     vars:
@@ -88,7 +82,7 @@ tasks:
       - cd build && zip -r scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
 
   watch:
-    desc: "wath cfile changes for both python and sketch, and upload the changes to the board and restart"
+    desc: "watch files changes for both python and sketch, and upload the changes to the board and restart"
     deps:
       - python:watch
       - sketch:watch
