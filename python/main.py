@@ -13,4 +13,11 @@ def on_matrix_draw(_, data):
 
 ui.on_message("matrix_draw", on_matrix_draw)
 
+
+def on_modulino_button_pressed(btn):
+    ui.send_message("modulino_buttons_pressed", {"btn": btn})
+
+Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
+
 App.run()
+

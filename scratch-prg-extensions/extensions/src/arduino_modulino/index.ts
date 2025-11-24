@@ -36,6 +36,11 @@ export default class ExtensionNameGoesHere extends extension(details) {
       autoConnect: true,
     });
 
+     this.socket.on("modulino_buttons_pressed", (data) => {
+      console.log(`Modulino button pressed event received: ${data.btn}`);
+      this.button_pressed = data.btn.toUpperCase();
+    });
+
   }
 
   /** @see {ExplanationOfExampleHatAndBlockUtility} */
@@ -43,7 +48,10 @@ export default class ExtensionNameGoesHere extends extension(details) {
       return tag`When modulino button ${{ type: "string", options: ["A", "B", "C"]}} pressed`;
     })
   async whenModulinoButtonsPressed(button: string, util: BlockUtilityWithID) {
-    // return util.stackFrame.isLoop === condition;
-    return true;
+    if (button === this.button_pressed) {
+        this.button_pressed = "";
+        return true;
+    }
+    return false;
   }
 }
