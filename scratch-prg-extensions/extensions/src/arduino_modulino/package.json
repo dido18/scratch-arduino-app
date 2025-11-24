@@ -11,5 +11,8 @@
     "add:arg": "pnpm --filter prg-extension-root add:arg arduino_modulino"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "socket.io-client": "^4.8.1"
+  }
 }

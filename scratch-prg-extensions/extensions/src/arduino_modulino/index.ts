@@ -1,4 +1,5 @@
 import { scratch, extension, type ExtensionMenuDisplayDetails, type BlockUtilityWithID, type Environment } from "$common";
+import { io, Socket } from "socket.io-client";
 
 const details: ExtensionMenuDisplayDetails = {
   name: "Arduino Modulino",
@@ -10,8 +11,22 @@ const details: ExtensionMenuDisplayDetails = {
 
 export default class ExtensionNameGoesHere extends extension(details) {
 
-  /** @see {ExplanationOfInitMethod} */
-  init(env: Environment) {
+ button_pressed:string  = "";
+
+ init(env: Environment) {
+
+    const arduinoBoardHost = getArduinoBoardHost();
+    var serverURL = `wss://${arduinoBoardHost}:7000`;
+
+    console.log("Connecting to Uno Q", serverURL);
+
+    this.socket = io(serverURL, {
+      path: "/socket.io",
+      transports: ["polling", "websocket"],
+      autoConnect: true,
+    });
+
+
   }
 
   /** @see {ExplanationOfExampleHatAndBlockUtility} */
@@ -23,3 +38,12 @@ export default class ExtensionNameGoesHere extends extension(details) {
     return true;
   }
 }
+
+const getArduinoBoardHost = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const boardHost = urlParams.get("host");
+  if (boardHost) {
+    return boardHost;
+  }
+  return window.location.hostname;
+};
