@@ -1,5 +1,6 @@
 import { scratch, extension, type ExtensionMenuDisplayDetails, type BlockUtilityWithID, type Environment } from "$common";
 import { io, type Socket } from "socket.io-client";
+import ButtonArgument from "./ButtonArgument.svelte";
 
 const details: ExtensionMenuDisplayDetails = {
   name: "Arduino Modulino",
@@ -19,7 +20,7 @@ const getArduinoBoardHost = () => {
   return window.location.hostname;
 };
 
-export default class ExtensionNameGoesHere extends extension(details) {
+export default class ModulinoButtons extends extension(details, "customArguments") {
 
  private socket: Socket | null = null;
  private button_pressed:string  = "";
@@ -51,8 +52,15 @@ export default class ExtensionNameGoesHere extends extension(details) {
   }
 
 
- @(scratch.hat(function (_: any, tag: any) {
-      return tag`When modulino button ${{ type: "string", options: ["A", "B", "C"]}} pressed`;
+ @(scratch.hat(function (instance, tag) {
+    const arg = instance.makeCustomArgument({
+      component: ButtonArgument,
+      initial: {
+        value: "A",
+        text: "Button A",
+      },
+    });
+    return tag`When modulino ${arg} pressed`;
   }))
   whenModulinoButtonsPressed(button: string, util: BlockUtilityWithID) {
     if ( button.toUpperCase() === this.button_pressed) {
