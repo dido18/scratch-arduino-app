@@ -57,10 +57,10 @@ export default class ModulinoButtons extends extension(details, "customArguments
       component: ButtonArgument,
       initial: {
         value: "A",
-        text: "Button A",
+        text: "A",
       },
     });
-    return tag`When modulino ${arg} pressed`;
+    return tag`When modulino button ${arg} pressed`;
   }))
   whenModulinoButtonsPressed(button: string, util: BlockUtilityWithID) {
     if ( button.toUpperCase() === this.button_pressed) {
