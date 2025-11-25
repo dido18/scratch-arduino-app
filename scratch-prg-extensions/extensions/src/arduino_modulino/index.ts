@@ -16,7 +16,7 @@ export default class ModulinoButtons extends extension({
   name: "Modulino",
   description: "Control Arduino Modulinos via scratch",
   iconURL: "modulino-buttons.png",
-//   insetIconURL: "modulino-buttons.jpg",
+//   insetIconURL: "sdfsafsaf ",
   tags :["Arduino UNO Q"],
   blockColor: "#00878F",
   menuColor: "#62AEB2",
