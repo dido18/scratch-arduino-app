@@ -28,27 +28,34 @@ export default class ExtensionNameGoesHere extends extension(details) {
     const arduinoBoardHost = getArduinoBoardHost();
     var serverURL = `wss://${arduinoBoardHost}:7000`;
 
-    console.log("Connecting to Uno Q", serverURL);
-
     this.socket = io(serverURL, {
       path: "/socket.io",
       transports: ["polling", "websocket"],
       autoConnect: true,
     });
 
+     this.socket.on("connect", () => {
+      console.log(`Connected to Arduino UNO Q`, serverURL);
+    });
+
+    this.socket.on("disconnect", (reason) => {
+      console.log(`Disconnected from Arduino UNO Q: ${reason}`);
+    });
+
      this.socket.on("modulino_buttons_pressed", (data) => {
       console.log(`Modulino button pressed event received: ${data.btn}`);
       this.button_pressed = data.btn.toUpperCase();
+      console.log(`Set button_pressed to: "${this.button_pressed}"`);
     });
 
   }
 
-  /** @see {ExplanationOfExampleHatAndBlockUtility} */
-  @scratch.hat(function (_: any, tag: any) {
+
+ @(scratch.hat(function (_: any, tag: any) {
       return tag`When modulino button ${{ type: "string", options: ["A", "B", "C"]}} pressed`;
-    })
-  async whenModulinoButtonsPressed(button: string, util: BlockUtilityWithID) {
-    if (button === this.button_pressed) {
+  }))
+  whenModulinoButtonsPressed(button: string, util: BlockUtilityWithID) {
+    if ( button.toUpperCase() === this.button_pressed) {
         this.button_pressed = "";
         return true;
     }
