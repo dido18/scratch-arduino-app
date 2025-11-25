@@ -2,14 +2,6 @@ import { scratch, extension, type ExtensionMenuDisplayDetails, type BlockUtility
 import { io, type Socket } from "socket.io-client";
 import ButtonArgument from "./ButtonArgument.svelte";
 
-const details: ExtensionMenuDisplayDetails = {
-  name: "Arduino Modulino",
-  description: "Control Arduino Modulino via scratch",
-  iconURL: "Replace with the name of your icon image file (which should be placed in the same directory as this file)",
-  insetIconURL: "Replace with the name of your inset icon image file (which should be placed in the same directory as this file)",
-  tags :["Arduino UNO Q"]
-};
-
 // Get Arduino board IP or hostname from URL parameter
 const getArduinoBoardHost = () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -20,7 +12,16 @@ const getArduinoBoardHost = () => {
   return window.location.hostname;
 };
 
-export default class ModulinoButtons extends extension(details, "customArguments") {
+export default class ModulinoButtons extends extension({
+  name: "Modulino",
+  description: "Control Arduino Modulinos via scratch",
+  iconURL: "modulino-buttons.png",
+//   insetIconURL: "modulino-buttons.jpg",
+  tags :["Arduino UNO Q"],
+  blockColor: "#00878F",
+  menuColor: "#62AEB2",
+  menuSelectColor: "#62AEB2",
+}, "customArguments") {
 
  private socket: Socket | null = null;
  private button_pressed:string  = "";
@@ -46,7 +47,6 @@ export default class ModulinoButtons extends extension(details, "customArguments
      this.socket.on("modulino_buttons_pressed", (data) => {
       console.log(`Modulino button pressed event received: ${data.btn}`);
       this.button_pressed = data.btn.toUpperCase();
-      console.log(`Set button_pressed to: "${this.button_pressed}"`);
     });
 
   }
