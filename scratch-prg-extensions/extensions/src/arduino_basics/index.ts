@@ -3,13 +3,13 @@ import { io, Socket } from "socket.io-client";
 import MatrixArgument from "./MatrixArgument.svelte";
 
 const details: ExtensionMenuDisplayDetails = {
-  name: "Arduino Basics",
-  description: "Arduino Basics for Uno Q",
-  iconURL: "ArduinoLogo_Blue.png",
-  insetIconURL: "ArduinoLogo_Blue.jpg",
-  tags: ["Arduino"],
+  name: "Basic",
+  description: "Play with UNO Q matrix, leds and pins",
+  iconURL: "matrix.png",
+  insetIconURL: "unoq.svg",
+  tags: ["Arduino UNO Q"],
   blockColor: "#00878F",
-  menuColor: "#62AEB2",
+  menuColor: "#8C7965",
   menuSelectColor: "#62AEB2",
 };
 
