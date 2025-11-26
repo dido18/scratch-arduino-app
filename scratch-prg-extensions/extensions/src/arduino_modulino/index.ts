@@ -1,4 +1,10 @@
-import { scratch, extension, type ExtensionMenuDisplayDetails, type BlockUtilityWithID, type Environment } from "$common";
+import {
+  type BlockUtilityWithID,
+  type Environment,
+  extension,
+  type ExtensionMenuDisplayDetails,
+  scratch,
+} from "$common";
 import { io, type Socket } from "socket.io-client";
 import ButtonArgument from "./ButtonArgument.svelte";
 
@@ -17,16 +23,15 @@ export default class ModulinoButtons extends extension({
   description: "Control your Arduino Modulinos",
   iconURL: "modulinos.png", // png
   insetIconURL: "modulino-buttons.svg", // svg
-  tags :["Arduino UNO Q"],
+  tags: ["Arduino UNO Q"],
   blockColor: "#00878F",
   menuColor: "#8C7965",
   menuSelectColor: "#62AEB2",
 }, "customArguments") {
+  private socket: Socket | null = null;
+  private button_pressed: string = "";
 
- private socket: Socket | null = null;
- private button_pressed:string  = "";
-
- init(env: Environment) {
+  init(env: Environment) {
     const arduinoBoardHost = getArduinoBoardHost();
     var serverURL = `wss://${arduinoBoardHost}:7000`;
 
@@ -36,7 +41,7 @@ export default class ModulinoButtons extends extension({
       autoConnect: true,
     });
 
-     this.socket.on("connect", () => {
+    this.socket.on("connect", () => {
       console.log(`Connected to Arduino UNO Q`, serverURL);
     });
 
@@ -44,15 +49,13 @@ export default class ModulinoButtons extends extension({
       console.log(`Disconnected from Arduino UNO Q: ${reason}`);
     });
 
-     this.socket.on("modulino_buttons_pressed", (data) => {
+    this.socket.on("modulino_buttons_pressed", (data) => {
       console.log(`Modulino button pressed event received: ${data.btn}`);
       this.button_pressed = data.btn.toUpperCase();
     });
-
   }
 
-
- @(scratch.hat(function (instance, tag) {
+  @scratch.hat(function(instance, tag) {
     const arg = instance.makeCustomArgument({
       component: ButtonArgument,
       initial: {
@@ -61,11 +64,11 @@ export default class ModulinoButtons extends extension({
       },
     });
     return tag`When modulino button ${arg} pressed`;
-  }))
+  })
   whenModulinoButtonsPressed(button: string, util: BlockUtilityWithID) {
-    if ( button.toUpperCase() === this.button_pressed) {
-        this.button_pressed = "";
-        return true;
+    if (button.toUpperCase() === this.button_pressed) {
+      this.button_pressed = "";
+      return true;
     }
     return false;
   }
