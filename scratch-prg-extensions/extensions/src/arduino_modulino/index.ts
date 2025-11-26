@@ -14,12 +14,12 @@ const getArduinoBoardHost = () => {
 
 export default class ModulinoButtons extends extension({
   name: "Modulino",
-  description: "Control Arduino Modulinos via scratch",
-  iconURL: "modulino-buttons.png",
-//   insetIconURL: "sdfsafsaf ",
+  description: "Control your Arduino Modulinos",
+  iconURL: "modulinos.png", // png
+  insetIconURL: "modulino-buttons.svg", // svg
   tags :["Arduino UNO Q"],
   blockColor: "#00878F",
-  menuColor: "#62AEB2",
+  menuColor: "#8C7965",
   menuSelectColor: "#62AEB2",
 }, "customArguments") {
 

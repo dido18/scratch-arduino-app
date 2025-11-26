@@ -71,8 +71,7 @@
 <style>
   .matrix {
     display: inline-block;
-    border: 1px solid #333;
-    background-color: #000;
+    background-color: #00878F;
     border-radius: 4px;
     padding: 2px;
   }
@@ -88,19 +87,17 @@
   }
 
   .led {
-    width: 15px;
-    height: 15px;
-    border: 1px solid #444;
-    border-radius: 2px;
+    width: 20px;
+    height: 20px;
+    margin: 1px;
+    border-radius: 30%;
     cursor: pointer;
     transition: all 0.1s ease;
     user-select: none;
-    background-color: #222;
   }
 
   .led:hover {
-    border-color: #666;
-    transform: scale(1.1);
+    border-color: #E5AD24;
   }
 
   .controls {
@@ -111,30 +108,54 @@
   }
 
   .btn {
-    padding: 4px 8px;
+    padding: 6px;
     border: none;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 12px;
     transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .btn-clear {
-    background-color: #dc3545;
+    background-color: #62AEB2;
     color: white;
   }
 
   .btn-clear:hover {
-    background-color: #c82333;
+    background-color: #5a9ea2;
   }
 
   .btn-fill {
-    background-color: #28a745;
+    background-color: #62AEB2;
     color: white;
   }
 
   .btn-fill:hover {
-    background-color: #218838;
+    background-color: #5a9ea2;
+  }
+
+  .btn-icon {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .mini-led {
+    width: 6px;
+    height: 6px;
+    border-radius: 30%;
+  }
+
+  .mini-led.clear {
+    background-color: #00878F;
+  }
+
+  .mini-led.fill {
+    background-color: #FFFFFF;
   }
 </style>
 
@@ -147,8 +168,8 @@
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
             class="led"
-            style:background-color={ledValue > 0 ? `rgba(0, 123, 255)` : '#222'}
-            style:box-shadow={ledValue > 0 ? `0 0 ${ledValue * 2}px rgba(0, 123, 255, 0.8)` : 'none'}
+            style:background-color={ledValue > 0 ? `#FFFFFF` : '#62AEB2'}
+            style:box-shadow={ledValue > 0 ? `0 0 ${ledValue}px rgba(255, 255, 255, 0.7)` : 'none'}
             on:mousedown={(e) => handleMouseDown(e, rowIndex, colIndex)}
             on:mouseenter={() => handleMouseEnter(rowIndex, colIndex)}
             on:contextmenu={handleContextMenu}
@@ -162,7 +183,31 @@
   </div>
 
   <div class="controls">
-    <button class="btn btn-clear" on:click={clearMatrix}>Clear</button>
-    <button class="btn btn-fill" on:click={fillMatrix}>Fill</button>
+    <button class="btn btn-clear" on:click={clearMatrix} title="Clear all LEDs">
+      <div class="btn-icon">
+        <div class="mini-led clear"></div>
+        <div class="mini-led clear"></div>
+        <div class="mini-led clear"></div>
+        <div class="mini-led clear"></div>
+        <div class="mini-led clear"></div>
+        <div class="mini-led clear"></div>
+        <div class="mini-led clear"></div>
+        <div class="mini-led clear"></div>
+        <div class="mini-led clear"></div>
+      </div>
+    </button>
+    <button class="btn btn-fill" on:click={fillMatrix} title="Fill all LEDs">
+      <div class="btn-icon">
+        <div class="mini-led fill"></div>
+        <div class="mini-led fill"></div>
+        <div class="mini-led fill"></div>
+        <div class="mini-led fill"></div>
+        <div class="mini-led fill"></div>
+        <div class="mini-led fill"></div>
+        <div class="mini-led fill"></div>
+        <div class="mini-led fill"></div>
+        <div class="mini-led fill"></div>
+      </div>
+    </button>
   </div>
 </div>

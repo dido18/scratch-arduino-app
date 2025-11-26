@@ -21,6 +21,7 @@
 <style>
 .modulino-container {
   display: flex;
+  padding: 10px;
   justify-content: center;
   align-items: center;
 }
@@ -59,7 +60,6 @@
 .bottom-left { bottom: 15px; left: 15px; }
 .bottom-right { bottom: 15px; right: 15px; }
 
-/* --- Pin Headers (Connection Points) --- */
 .pin-header {
   position: absolute;
   height: 8px; /* Height of the header area */
@@ -68,7 +68,6 @@
   justify-content: space-around;
 }
 
-/* Small Pin Holes at the Top */
 .top-pins {
   top: 5px;
   left: 50%;
@@ -169,7 +168,6 @@
   text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
 }
 
-/* Button Cap (The grey circle) */
 .tactile-button::before {
   content: '';
   position: absolute;
@@ -182,34 +180,6 @@
   background-color: #c0c0c0; /* Button cap color */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) inset;
 }
-
-/* Solder Pads for the Button (The silver rectangles) */
-.tactile-button::after {
-  content: '';
-  position: absolute;
-  /* Using a combination of box-shadow to fake the 4 pads */
-  width: 0;
-  height: 0;
-  box-shadow:
-    -15px -15px 0 2px #c0c0c0,  /* Top Left Pad */
-    15px -15px 0 2px #c0c0c0,   /* Top Right Pad */
-    -15px 15px 0 2px #c0c0c0,   /* Bottom Left Pad */
-    15px 15px 0 2px #c0c0c0;    /* Bottom Right Pad */
-  border-radius: 2px;
-}
-
-/* --- IC Chip (The small black square) --- */
-.ic-chip {
-  position: absolute;
-  top: 20px;
-  right: 60px;
-  width: 12px;
-  height: 12px;
-  background-color: #1a1a1a; /* Black chip body */
-  border-radius: 2px;
-  box-shadow: 0 0 0 1px #c0c0c0; /* Silver pin outline */
-}
-
 </style>
 
 <div class="modulino-container">
@@ -257,6 +227,5 @@
         <div class="button-label">C</div>
       </div>
     </div>
-    <div class="ic-chip"></div>
   </div>
 </div>
