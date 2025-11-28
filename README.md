@@ -11,7 +11,8 @@ Accessible from any device via a browser, it makes coding, electronics, and AI h
 
 ## Installation
 
-- Open a terminal inside the UNO Q board (you can also use the [adb](https://docs.arduino.cc/software/app-lab/tutorials/cli/) tool)
+- Open the Arduino App lab and connect to your UNO Q board.
+- Clik on the button "open terminal" (button left)
 - Copy and paste the following command into the terminal to install the latest `scratch-arduino-app`:
 
 ```
@@ -25,11 +26,9 @@ NOTE: the `https` is needed by the `getUserMedia()` method for security reason.
 ## Local development
 
 - `task scratch:init`
-- `task scratch:watch` watch scratch GUI files and reload on save
+- `task watch` watch python, sketch and scratch GUI files and reload on save
 - Open the `http://localhost:8602?host=BOARD_IP`
-- `task watch` watch files changes for both python and sketch, and upload the changes to the board and restart"
 
-For testing on the board
+For upload the current version into the board
 
-- `ŧask app:build`
-- `task board:app:upload`
+- `ŧask app:upload`
