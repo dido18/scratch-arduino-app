@@ -56,15 +56,15 @@ tasks:
     cmds:
       - task app:zip
       - |
-          ZIP_FILE=$(ls -t build/scratch-arduino-app-*.zip 2>/dev/null | head -n1)
-          if [ -z "$ZIP_FILE" ]; then
-            echo "No zip file found. Run 'task app:zip' first."
-            exit 1
-          fi
-          adb push "$ZIP_FILE" /tmp/
-          ZIP_BASENAME=$(basename "$ZIP_FILE")
-          adb shell "cd /tmp && unzip -o $ZIP_BASENAME && mkdir -p /home/arduino/ArduinoApps && rm -rf /home/arduino/ArduinoApps/scratch-arduino-app && mv scratch-arduino-app /home/arduino/ArduinoApps/ && rm $ZIP_BASENAME"
-          echo "App deployed to /home/arduino/ArduinoApps/scratch-arduino-app"
+        ZIP_FILE=$(ls -t build/scratch-arduino-app-*.zip 2>/dev/null | head -n1)
+        if [ -z "$ZIP_FILE" ]; then
+          echo "No zip file found. Run 'task app:zip' first."
+          exit 1
+        fi
+        adb push "$ZIP_FILE" /tmp/
+        ZIP_BASENAME=$(basename "$ZIP_FILE")
+        adb shell "cd /tmp && unzip -o $ZIP_BASENAME && mkdir -p /home/arduino/ArduinoApps && rm -rf /home/arduino/ArduinoApps/scratch-arduino-app && mv scratch-arduino-app /home/arduino/ArduinoApps/ && rm $ZIP_BASENAME"
+        echo "App deployed to /home/arduino/ArduinoApps/scratch-arduino-app"
 
   app:start:
     - adb shell "arduino-app-cli app start user:scratch-arduino-app"
@@ -76,10 +76,10 @@ tasks:
         sh: echo "${APP_VERSION:-$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')}"
     cmds:
       - |
-          if [ ! -d "build/scratch-arduino-app" ]; then
-            echo "Build folder does not exist. Run 'task app:build' first."
-            exit 1
-          fi
+        if [ ! -d "build/scratch-arduino-app" ]; then
+          echo "Build folder does not exist. Run 'task app:build' first."
+          exit 1
+        fi
       - echo "Creating zip with version {{.APP_VERSION}}"
       - cd build && zip -r scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
 
@@ -94,69 +94,69 @@ tasks:
     silent: true
     cmds:
       - |
-          while true; do
-            echo "🐍 Waiting for changes in python folder..."
-            inotifywait -r -e modify,create,delete,move python/ 2>/dev/null || {
-              echo "inotifywait failed, retrying..."
-              sleep 2
-              continue
-            }
+        while true; do
+          echo "🐍 Waiting for changes in python folder..."
+          inotifywait -r -e modify,create,delete,move python/ 2>/dev/null || {
+            echo "inotifywait failed, retrying..."
+            sleep 2
+            continue
+          }
 
-            sleep 1 # Waiting 1 second for file writes to complete..."
-            echo "🐍  Change detected: uploading and restarting service..."
-            task python:upload-and-restart || {
-              echo "Upload/restart failed, continuing to watch..."
-              continue
-            }
+          sleep 1 # Waiting 1 second for file writes to complete..."
+          echo "🐍  Change detected: uploading and restarting service..."
+          task python:upload-and-restart || {
+            echo "Upload/restart failed, continuing to watch..."
+            continue
+          }
 
-          done
+        done
 
   python:upload-and-restart:
     desc: "Upload Python files and restart container"
     silent: true
     cmds:
       - |
-          adb push ./python/ /home/arduino/ArduinoApps/scratch-arduino-app/
+        adb push ./python/ /home/arduino/ArduinoApps/scratch-arduino-app/
 
-          CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
-          if [ -n "$CONTAINER_ID" ]; then
-            /usr/bin/time -f "🐍 Restarted in %es" adb shell "docker restart $CONTAINER_ID"
-          else
-            echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
-          fi
+        CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
+        if [ -n "$CONTAINER_ID" ]; then
+          /usr/bin/time -f "🐍 Restarted in %es" adb shell "docker restart $CONTAINER_ID"
+        else
+          echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
+        fi
 
   sketch:watch:
     desc: "Watch sketch folder for changes and auto-compile/upload"
     silent: true
     cmds:
       - |
-          while true; do
-            echo "♾️  Waiting for changes in sketch folder..."
-            inotifywait -r -e modify,create,delete sketch/ --include '\.(ino|cpp|h|c)$' 2>/dev/null || {
-              echo "inotifywait failed, retrying..."
-              sleep 2
-              continue
-            }
+        while true; do
+          echo "♾️  Waiting for changes in sketch folder..."
+          inotifywait -r -e modify,create,delete sketch/ --include '\.(ino|cpp|h|c|yaml)$' 2>/dev/null || {
+            echo "inotifywait failed, retrying..."
+            sleep 2
+            continue
+          }
 
-            sleep 1   # Waiting 1 second for file writes to complete
-            echo "♾️  Change detected: compiling and uploading..."
-            task sketch:compile-and-upload|| {
-              echo "Compile/upload failed, continuing to watch..."
-              continue
-            }
-            echo
-          done
+          sleep 1   # Waiting 1 second for file writes to complete
+          echo "♾️  Change detected: compiling and uploading..."
+          task sketch:compile-and-upload|| {
+            echo "Compile/upload failed, continuing to watch..."
+            continue
+          }
+          echo
+        done
 
   sketch:compile-and-upload:
     desc: "Compile and upload Arduino sketch"
     silent: true
     cmds:
       - |
-          TOTAL_START=$(date +%s)
-          /usr/bin/time -f "♾️  Compiled in %es" arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/
-          /usr/bin/time -f "♾️  Uploaded in %es" arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  sketch/
-          TOTAL_END=$(date +%s)
-          echo "♾️  Total time: $((TOTAL_END - TOTAL_START))s"
+        TOTAL_START=$(date +%s)
+        /usr/bin/time -f "♾️  Compiled in %es" arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/
+        /usr/bin/time -f "♾️  Uploaded in %es" arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  sketch/
+        TOTAL_END=$(date +%s)
+        echo "♾️  Total time: $((TOTAL_END - TOTAL_START))s"
       # even if not necessary: the sketch folder is sync into the board to have the updated version
       - adb push ./sketch/ /home/arduino/ArduinoApps/scratch-arduino-app/
 
@@ -171,12 +171,12 @@ tasks:
     desc: "Watch sketch folder for changes and auto-compile/upload"
     cmds:
       - |
-          echo "🐍 Python container logs"
-          while true; do
-           CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
-           if [ -n "$CONTAINER_ID" ]; then
-             adb shell "docker logs -f $CONTAINER_ID"
-           else
-             echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
-           fi
-           done
+        echo "🐍 Python container logs"
+        while true; do
+         CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
+         if [ -n "$CONTAINER_ID" ]; then
+           adb shell "docker logs -f $CONTAINER_ID"
+         else
+           echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
+         fi
+         done

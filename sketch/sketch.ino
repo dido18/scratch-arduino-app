@@ -1,4 +1,5 @@
 #include <Arduino_RouterBridge.h>
+#include "ArduinoGraphics.h"
 #include "Arduino_LED_Matrix.h"
 #include <Arduino_Modulino.h>
 
@@ -7,6 +8,9 @@ ModulinoButtons buttons;
 
 void setup() {
   matrix.begin();
+  matrix.textFont(Font_5x7);
+  matrix.textScrollSpeed(100);
+
   Bridge.begin();
   Modulino.begin(Wire1);
   // show led indication if buttons cannot be initilized
@@ -48,6 +52,10 @@ void loop() {
 uint8_t shades[104];
 
 void matrix_draw(String frame){
+    matrix.beginText(0, 0, 127, 0, 0); // X, Y, then R, G, B
+     matrix.print("      arduino.cc/uno-q      ");
+     matrix.endText(SCROLL_LEFT);
+
   if (frame.length() != 104) {
     Serial.println("Error: Frame length must be 104 characters.");
     return;
