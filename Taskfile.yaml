@@ -30,30 +30,10 @@ tasks:
     - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_modulino $PWD/prg-raise-playground/extensions/src/arduino_modulino
     - cd scratch-prg-extensions/extensions/src/arduino_modulino && pnpm install
 
-  scratch:watch:
+  app:upload:
+    desc: "Build,and Upload zip file to Arduino board, unzip and deploy to /home/arduino/ArduinoApps"
     cmds:
-      - cd prg-raise-playground && pnpm dev -i arduino_basics arduino_modulino
-
-  app:build:
-    desc: "Copy app files (python, assets, app.yaml) to a build directory"
-    cmds:
-      - rm -rf build/scratch-arduino-app/
-      - mkdir -p build/scratch-arduino-app
-      - cp ./app.yaml build/scratch-arduino-app/app.yaml
-      - cp -r ./sketch build/scratch-arduino-app/sketch
-      - cp -r ./python build/scratch-arduino-app/python
-      - cp -r ./certs build/scratch-arduino-app/certs
-      - task scratch:build
-      - cp -r prg-raise-playground/build/. build/scratch-arduino-app/assets
-
-  scratch:build:
-    dir: prg-raise-playground
-    cmds:
-      - CI=true pnpm build
-
-  board:app:upload:
-    desc: "Upload zip file to Arduino board, unzip and deploy to /home/arduino/ArduinoApps"
-    cmds:
+      - task app:build
       - task app:zip
       - |
           ZIP_FILE=$(ls -t build/scratch-arduino-app-*.zip 2>/dev/null | head -n1)
@@ -65,9 +45,18 @@ tasks:
           ZIP_BASENAME=$(basename "$ZIP_FILE")
           adb shell "cd /tmp && unzip -o $ZIP_BASENAME && mkdir -p /home/arduino/ArduinoApps && rm -rf /home/arduino/ArduinoApps/scratch-arduino-app && mv scratch-arduino-app /home/arduino/ArduinoApps/ && rm $ZIP_BASENAME"
           echo "App deployed to /home/arduino/ArduinoApps/scratch-arduino-app"
+      - task app:start
 
-  app:start:
-    - adb shell "arduino-app-cli app start user:scratch-arduino-app"
+  app:build:
+    desc: "Copy app files (python, assets, app.yaml) to a build directory"
+    cmds:
+      - rm -rf build/scratch-arduino-app/
+      - mkdir -p build/scratch-arduino-app
+      - cp ./app.yaml build/scratch-arduino-app/app.yaml
+      - cp -r ./sketch build/scratch-arduino-app/sketch
+      - cp -r ./python build/scratch-arduino-app/python
+      - cp -r ./certs build/scratch-arduino-app/certs
+      - cd prg-raise-playground && CI=true pnpm build  && cp -r build/. ../build/scratch-arduino-app/assets
 
   app:zip:
     desc: "Create a zip file with version (defaults to git commit hash)"
@@ -83,11 +72,19 @@ tasks:
       - echo "Creating zip with version {{.APP_VERSION}}"
       - cd build && zip -r scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
 
+  app:start:
+    - adb shell "arduino-app-cli app start user:scratch-arduino-app"
+
   watch:
     desc: "watch files changes for both python and sketch, and upload the changes to the board and restart"
     deps:
       - python:watch
       - sketch:watch
+      - scratch:watch
+
+  scratch:watch:
+    cmds:
+      - cd prg-raise-playground && pnpm dev -i arduino_basics arduino_modulino
 
   python:watch:
     desc: "Watch Python folder for changes and auto-upload/restart"
