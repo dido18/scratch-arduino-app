@@ -12,6 +12,7 @@ def on_matrix_draw(_, data):
 
 
 ui.on_message("matrix_draw", on_matrix_draw)
+ui.on_message("robot_forward_for_steps", lambda _, data: Bridge.call("robot_forward_for_steps", data.get("steps")))
 
 
 def on_modulino_button_pressed(btn):
