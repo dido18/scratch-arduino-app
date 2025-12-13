@@ -86,7 +86,7 @@ tasks:
 
   app:start:
     # FIXME: workaround to force /tmp as temporary directory in not interactive command
-    - adb shell env TMPDIR=/tmp arduino-app-cli app restart user:scratch-arduino-app
+    - adb shell env TMPDIR=/tmp arduino-app-cli app start user:scratch-arduino-app
 
   watch:
     desc: "watch files changes for both python and sketch, and upload the changes to the board and restart"
