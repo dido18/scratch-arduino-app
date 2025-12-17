@@ -23,7 +23,7 @@ curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/inst
 
 NOTE: the `https` is needed by the `getUserMedia()` method for security reason.
 
-##  Screenshots 
+## Screenshots
 
 Add the extensions for Arduino UNO Q.
 ![Scratch UNO Q extensions](./doc/extensions.png)
