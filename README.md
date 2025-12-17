@@ -8,8 +8,8 @@ Scratch for Arduino UNO Q is an Arduino App that runs Scratch directly on the bo
 Accessible from any device via a browser, it makes coding, electronics, and AI hands-on and easy to explore.
 
 ![Scratch for Arduion UNO Q](./doc/blink.png)
-![Scratch for Arduion UNO Q](./doc/blink.gif)
 
+<img src="./doc/blink.gif" alt="Blink matrix" width="300"/>
 ## Installation
 
 - Open the Arduino App lab and connect to your UNO Q board.
