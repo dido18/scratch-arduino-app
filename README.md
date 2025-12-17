@@ -23,16 +23,16 @@ curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/inst
 
 NOTE: the `https` is needed by the `getUserMedia()` method for security reason.
 
-## Scrennshots
+##  Screenshots 
 
-Add the extensions for Arduino UNO Q, Modulino and Matrix
+Add the extensions for Arduino UNO Q.
 ![Scratch UNO Q extensions](./doc/extensions.png)
 
 Use the matrix block to control the LED matrix.
 ![Scratch Matrix](./doc/matrix.png)
 
-USe the Modulino blocks to control the Modulino inputs and outputs.
-![Scratch Modulino](./doc/moduilino.png)
+Uue the Modulino blocks to control the Modulino.
+![Scratch Modulino](./doc/modulino.png)
 
 ## Local development
 
