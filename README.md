@@ -7,7 +7,7 @@
 Scratch for Arduino UNO Q is an Arduino App that runs Scratch directly on the board to control physical world (e.g., LEDs, buttons, and Arduino Modulino) with optional AI model integration.
 Accessible from any device via a browser, it makes coding, electronics, and AI hands-on and easy to explore.
 
-![Scratch for Arduion UNO Q](./doc/scratch-unoq.png)
+![Scratch for Arduion UNO Q](./doc/blink.png)
 
 ## Installation
 
@@ -22,6 +22,17 @@ curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/inst
 - Open the Scratch interface at the `https://<IP_OR_BOARD_NAME>:7000` address.
 
 NOTE: the `https` is needed by the `getUserMedia()` method for security reason.
+
+## Scrennshots
+
+Add the extensions for Arduino UNO Q, Modulino and Matrix
+![Scratch UNO Q extensions](./doc/extensions.png)
+
+Use the matrix block to control the LED matrix.
+![Scratch Matrix](./doc/matrix.png)
+
+USe the Modulino blocks to control the Modulino inputs and outputs.
+![Scratch Modulino](./doc/moduilino.png)
 
 ## Local development
 
