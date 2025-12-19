@@ -9,6 +9,18 @@ tasks:
       - mkdir -p .bin && cp $HOME/.dprint/bin/dprint .bin/dprint # workaround for local install
       - curl -fsSL https://get.pnpm.io/install.sh | sh - &&   source ~/.bashrc
 
+  check-deps:
+    cmds:
+      - command -v pnpm || (echo "pnpm not found" && exit 1)
+      - command -v python3 || (echo "python3 not found" && exit 1)
+      - command -v adb || (echo "adb not found" && exit 1)
+      - command -v zip || (echo "zip not found" && exit 1)
+      - command -v fswatch || (echo "fswatch not found" && exit 1)
+      - command -v arduino-cli || (echo "arduino-cli not found" && exit 1)
+      - command -v jq || (echo "jq not found" && exit 1)
+      - cmd: command -v gtime || (echo "gtime not found" && exit 1)
+        platforms: [darwin]
+
   fmt:
     desc: Run format
     cmds:
@@ -73,11 +85,13 @@ tasks:
       - cd build && zip -r scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
 
   app:start:
-    - adb shell "arduino-app-cli app start user:scratch-arduino-app"
+    # FIXME: workaround to force /tmp as temporary directory in not interactive command
+    - adb shell env TMPDIR=/tmp arduino-app-cli app start user:scratch-arduino-app
 
   watch:
     desc: "watch files changes for both python and sketch, and upload the changes to the board and restart"
     deps:
+      - check-deps
       - python:watch
       - sketch:watch
       - scratch:watch
@@ -93,7 +107,7 @@ tasks:
       - |
           while true; do
             echo "🐍 Waiting for changes in python folder..."
-            inotifywait -r -e modify,create,delete,move python/ 2>/dev/null || {
+            fswatch -0 -o -r python/ 2>/dev/null || {
               echo "inotifywait failed, retrying..."
               sleep 2
               continue
@@ -129,7 +143,7 @@ tasks:
       - |
           while true; do
             echo "♾️  Waiting for changes in sketch folder..."
-            inotifywait -r -e modify,create,delete sketch/ --include '\.(ino|cpp|h|c)$' 2>/dev/null || {
+            fswatch -0  -o -r sketch/ --include '\.(ino|cpp|h|c)$' 2>/dev/null || {
               echo "inotifywait failed, retrying..."
               sleep 2
               continue
@@ -148,10 +162,15 @@ tasks:
     desc: "Compile and upload Arduino sketch"
     silent: true
     cmds:
+      - cmd: export gtime="/usr/bin/time"
+        platforms: [linux]
+      - cmd: export gtime="gtime"
+        platforms: [darwin]
       - |
           TOTAL_START=$(date +%s)
-          /usr/bin/time -f "♾️  Compiled in %es" arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/
-          /usr/bin/time -f "♾️  Uploaded in %es" arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  sketch/
+          gtime -f "♾️  Compiled in %es" arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/
+          port=$(arduino-cli board list --format json | jq -r '.detected_ports[] | select(.matching_boards[]?.fqbn == "arduino:zephyr:unoq") | .port.address')
+          gtime -f "♾️  Uploaded in %es" arduino-cli upload -p $port -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  sketch/
           TOTAL_END=$(date +%s)
           echo "♾️  Total time: $((TOTAL_END - TOTAL_START))s"
       # even if not necessary: the sketch folder is sync into the board to have the updated version
