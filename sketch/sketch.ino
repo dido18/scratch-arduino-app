@@ -1,9 +1,14 @@
 #include <Arduino_RouterBridge.h>
 #include "Arduino_LED_Matrix.h"
 #include <Arduino_Modulino.h>
+#include "robot.h"
 
 Arduino_LED_Matrix matrix;
 ModulinoButtons buttons;
+
+uint8_t rservo = 9;
+uint8_t lservo = 8;
+Robot myra = Robot(rservo, lservo);
 
 void setup() {
   matrix.begin();
@@ -28,6 +33,11 @@ void setup() {
   buttons.setLeds(true, true, true);
   Bridge.provide("matrix_draw", matrix_draw);
   Bridge.provide("set_led_rgb", set_led_rgb);
+  Bridge.provide("robot_forward_for_steps", robot_forward_for_steps);
+}
+
+void robot_forward_for_steps(uint8_t steps){
+    myra.moveForward(steps, 1000);
 }
 
 void loop() {
