@@ -14,4 +14,5 @@ profiles:
       - STM32duino VL53L4ED (1.0.1)
       - Arduino_LSM6DSOX (1.1.2)
       - Arduino_LPS22HB (1.0.2)
+      - ArduinoGraphics (1.1.4)
 default_profile: default
