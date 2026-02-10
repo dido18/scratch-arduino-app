@@ -44,4 +44,4 @@ Use the Modulino blocks to control the Modulino.
 
 For upload the current version into the board
 
-- `ŧask app:upload`
+- `task app:upload`

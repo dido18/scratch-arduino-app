@@ -137,7 +137,7 @@ This repository hosts a small app that runs Scratch on Arduino UNO Q with custom
 
 ### Arduino Sketch Conventions
 - Target: UNO Q, 8x13 LED matrix `Arduino_LED_Matrix`
-- Brightness levels are 0–7; map string digits to `uint8_t` in `shades`
+ - Brightness levels are 0-7; map string digits to `uint8_t` in `shades`
 - Expose callable functions via `Bridge.provide`; keep them fast and side-effect constrained
 - Use `digitalWrite` with clear polarity (`LOW` to turn on in current wiring); encapsulate repeated patterns
 
