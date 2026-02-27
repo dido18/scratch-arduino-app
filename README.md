@@ -19,12 +19,15 @@ Accessible from any device via a browser, it makes coding, electronics, and AI h
 - Open the [Arduino App Lab](https://docs.arduino.cc/software/app-lab/) and connect to your Arduino UNO Q board.
 - Go to `Create new app` > `Import App`
 - Select the local `.zip` file
+- Click on the App, and `Run`
 
 ### From command-line
 
 - Open the [Arduino App Lab](https://docs.arduino.cc/software/app-lab/) and connect to your Arduino UNO Q board.
 - Clik on the button "open terminal" (button left)
-- Copy and paste the following command into the terminal to install the latest `scratch-arduino-app`:
+- Copy and paste the following command into the terminal to install the latest `scratch-arduino-app`
+
+NOTE: the  script automatically set the scratch app to start by default.
 
 ```
 curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/install.sh | bash
