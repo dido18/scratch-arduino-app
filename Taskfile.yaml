@@ -30,50 +30,35 @@ tasks:
     - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_modulino $PWD/prg-raise-playground/extensions/src/arduino_modulino
     - cd scratch-prg-extensions/extensions/src/arduino_modulino && pnpm install
 
-  app:upload:
-    desc: "Build,and Upload zip file to Arduino board, unzip and deploy to /home/arduino/ArduinoApps"
+  board:upload:
+    desc: "Build, Upload, and start the app into the board"
     cmds:
-      - task app:build
-      - task app:zip
+      # - task app:build
+      - adb shell "arduino-app-cli app stop user:scratch-arduino-app"
       - |
-          ZIP_FILE=$(ls -t build/scratch-arduino-app-*.zip 2>/dev/null | head -n1)
-          if [ -z "$ZIP_FILE" ]; then
-            echo "No zip file found. Run 'task app:zip' first."
-            exit 1
-          fi
-          adb push "$ZIP_FILE" /tmp/
-          ZIP_BASENAME=$(basename "$ZIP_FILE")
-          adb shell "cd /tmp && unzip -o $ZIP_BASENAME && mkdir -p /home/arduino/ArduinoApps && rm -rf /home/arduino/ArduinoApps/scratch-arduino-app && mv scratch-arduino-app /home/arduino/ArduinoApps/ && rm $ZIP_BASENAME"
-          echo "App deployed to /home/arduino/ArduinoApps/scratch-arduino-app"
-      - task app:start
+         ZIP_FILE=$(ls -t app/.build/scratch-arduino-app-*.zip 2>/dev/null | head -n1)
+         if [ -z "$ZIP_FILE" ]; then
+          echo "No zip file found in app/.build. Run 'task app:build' first."
+          exit 1
+         fi
+         adb push "$ZIP_FILE" /tmp
+         ZIP_BASENAME=$(basename "$ZIP_FILE")
+         adb shell "arduino-app-cli app import /tmp/$ZIP_BASENAME"
+      - adb shell "arduino-app-cli app start user:scratch-arduino-app"
 
   app:build:
-    desc: "Copy app files (python, assets, app.yaml) to a build directory"
-    cmds:
-      - rm -rf build/scratch-arduino-app/
-      - mkdir -p build/scratch-arduino-app
-      - cp ./app.yaml build/scratch-arduino-app/app.yaml
-      - cp -r ./sketch build/scratch-arduino-app/sketch
-      - cp -r ./python build/scratch-arduino-app/python
-      - cp -r ./certs build/scratch-arduino-app/certs
-      - cd prg-raise-playground && CI=true pnpm build  && cp -r build/. ../build/scratch-arduino-app/assets
-
-  app:zip:
-    desc: "Create a zip file with version (defaults to git commit hash)"
+    desc: "build the assets of prg-raise-playground and build the zip of the app"
     vars:
       APP_VERSION:
         sh: echo "${APP_VERSION:-$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')}"
     cmds:
-      - |
-          if [ ! -d "build/scratch-arduino-app" ]; then
-            echo "Build folder does not exist. Run 'task app:build' first."
-            exit 1
-          fi
+      - cd prg-raise-playground && CI=true pnpm build && cp -r build/. ../app/assets
       - echo "Creating zip with version {{.APP_VERSION}}"
-      - cd build && zip -r scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
-
-  app:start:
-    - adb shell "arduino-app-cli app start user:scratch-arduino-app"
+      - mkdir -p app/.build && rm -f app/.build/*.zip
+      - mkdir -p tmp_zip/scratch-arduino-app
+      - cp -r app/* tmp_zip/scratch-arduino-app/
+      - cd tmp_zip && zip -r ../app/.build/scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
+      - rm -rf tmp_zip
 
   watch:
     desc: "watch files changes for both python and sketch, and upload the changes to the board and restart"
@@ -93,7 +78,7 @@ tasks:
       - |
           while true; do
             echo "🐍 Waiting for changes in python folder..."
-            inotifywait -r -e modify,create,delete,move python/ 2>/dev/null || {
+            inotifywait -r -e modify,create,delete,move app/python/ 2>/dev/null || {
               echo "inotifywait failed, retrying..."
               sleep 2
               continue
@@ -105,7 +90,6 @@ tasks:
               echo "Upload/restart failed, continuing to watch..."
               continue
             }
-
           done
 
   python:upload-and-restart:
@@ -129,7 +113,7 @@ tasks:
       - |
           while true; do
             echo "♾️  Waiting for changes in sketch folder..."
-            inotifywait -r -e modify,create,delete sketch/ --include '\.(ino|cpp|h|c)$' 2>/dev/null || {
+            inotifywait -r -e modify,create,delete app/sketch/ --include '\.(ino|cpp|h|c)$' 2>/dev/null || {
               echo "inotifywait failed, retrying..."
               sleep 2
               continue
@@ -151,11 +135,11 @@ tasks:
       - |
           TOTAL_START=$(date +%s)
           /usr/bin/time -f "♾️  Compiled in %es" arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/
-          /usr/bin/time -f "♾️  Uploaded in %es" arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  sketch/
+          /usr/bin/time -f "♾️  Uploaded in %es" arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  app/sketch/
           TOTAL_END=$(date +%s)
           echo "♾️  Total time: $((TOTAL_END - TOTAL_START))s"
       # even if not necessary: the sketch folder is sync into the board to have the updated version
-      - adb push ./sketch/ /home/arduino/ArduinoApps/scratch-arduino-app/
+      - adb push app/sketch/ /home/arduino/ArduinoApps/scratch-arduino-app/
 
   sketch:monitor:
     desc: "Open serial monitor for Arduino debugging"
@@ -165,7 +149,7 @@ tasks:
       - arduino-cli monitor -p /dev/ttyACM0
 
   python:monitor:
-    desc: "Watch sketch folder for changes and auto-compile/upload"
+    desc: "Watch Python folder for changes and auto-upload/restart"
     cmds:
       - |
           echo "🐍 Python container logs"

@@ -51,14 +51,11 @@ jobs:
       - name: Create build
         run: |
           task app:build
-
-      - name: Create zip
-        run: task app:zip
         env:
           APP_VERSION: ${{ github.ref_name }}
 
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/scratch-arduino-app*.zip"
+          artifacts: "app/.build/scratch-arduino-app*.zip"
           allowUpdates: true
           token: ${{ github.token }}
