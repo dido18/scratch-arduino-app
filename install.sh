@@ -26,12 +26,7 @@ if [ -d "$HOME/ArduinoApps/scratch-arduino-app" ]; then
     rm -rf $HOME/ArduinoApps/scratch-arduino-app
 fi
 
-unzip -q app.zip
-mv -f scratch-arduino-app $HOME/ArduinoApps/
-rm -f app.zip
-
-echo "Installed $ZIP_NAME  at $HOME/ArduinoApps/scratch-arduino-app"
-
+arduino-app-cli app import app.zip
 arduino-app-cli app start user:scratch-arduino-app
 arduino-app-cli properties set default user:scratch-arduino-app
 echo "Application restarted and set as default."

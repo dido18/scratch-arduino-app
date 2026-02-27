@@ -11,15 +11,29 @@ Accessible from any device via a browser, it makes coding, electronics, and AI h
 
 <img src="./doc/blink.gif" alt="Blink matrix" width="300"/>
 
-## Installation
+## Installation and Usage
 
-- Open the Arduino App lab and connect to your UNO Q board.
+### From AppLab
+
+- Download the `scratch-arduino-app-vX.Y.Z.zip' form the https://github.com/dido18/scratch-arduino-app/releases
+- Open the [Arduino App Lab](https://docs.arduino.cc/software/app-lab/) and connect to your Arduino UNO Q board.
+- Go to `Create new app` > `Import App`
+- Select the local `.zip` file
+- Click on the App, and `Run`
+
+### From command-line
+
+- Open the [Arduino App Lab](https://docs.arduino.cc/software/app-lab/) and connect to your Arduino UNO Q board.
 - Clik on the button "open terminal" (button left)
-- Copy and paste the following command into the terminal to install the latest `scratch-arduino-app`:
+- Copy and paste the following command into the terminal to install the latest `scratch-arduino-app`
+
+NOTE: the script automatically set the scratch app to start by default.
 
 ```
 curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/install.sh | bash
 ```
+
+### Usage
 
 - Open the Scratch interface at the `https://<IP_OR_BOARD_NAME>:7000` address.
 
