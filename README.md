@@ -27,7 +27,7 @@ Accessible from any device via a browser, it makes coding, electronics, and AI h
 - Clik on the button "open terminal" (button left)
 - Copy and paste the following command into the terminal to install the latest `scratch-arduino-app`
 
-NOTE: the  script automatically set the scratch app to start by default.
+NOTE: the script automatically set the scratch app to start by default.
 
 ```
 curl -sSL https://raw.githubusercontent.com/dido18/scratch-arduino-app/main/install.sh | bash
