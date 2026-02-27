@@ -109,7 +109,7 @@ tasks:
     silent: true
     cmds:
       - |
-          adb push ./python/ /home/arduino/ArduinoApps/scratch-arduino-app/
+          adb push app/python/ /home/arduino/ArduinoApps/scratch-arduino-app/
 
           CONTAINER_ID=$(adb shell "docker ps -q --filter 'label=cc.arduino.app.main=true'")
           if [ -n "$CONTAINER_ID" ]; then
@@ -146,7 +146,7 @@ tasks:
     cmds:
       - |
           TOTAL_START=$(date +%s)
-          /usr/bin/time -f "♾️  Compiled in %es" arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq sketch/
+          /usr/bin/time -f "♾️  Compiled in %es" arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq app/sketch/
           /usr/bin/time -f "♾️  Uploaded in %es" arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  app/sketch/
           TOTAL_END=$(date +%s)
           echo "♾️  Total time: $((TOTAL_END - TOTAL_START))s"
