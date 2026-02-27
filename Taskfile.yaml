@@ -33,17 +33,18 @@ tasks:
   board:upload:
     desc: "Build, Upload, and start the app into the board"
     cmds:
-      # - task app:build
-      - adb shell "arduino-app-cli app stop user:scratch-arduino-app"
+      - task app:build
       - |
-         ZIP_FILE=$(ls -t app/.build/scratch-arduino-app-*.zip 2>/dev/null | head -n1)
-         if [ -z "$ZIP_FILE" ]; then
-          echo "No zip file found in app/.build. Run 'task app:build' first."
-          exit 1
-         fi
-         adb push "$ZIP_FILE" /tmp
-         ZIP_BASENAME=$(basename "$ZIP_FILE")
-         adb shell "arduino-app-cli app import /tmp/$ZIP_BASENAME"
+          ZIP_FILE=$(ls -t app/.build/scratch-arduino-app-*.zip 2>/dev/null | head -n1)
+          if [ -z "$ZIP_FILE" ]; then
+            echo "No zip file found in app/.build. Run 'task app:build' first."
+            exit 1
+          fi
+          adb shell "rm -rf /home/arduino/ArduinoApps/scratch-arduino-app*"
+          adb push "$ZIP_FILE" /tmp
+          ZIP_BASENAME=$(basename "$ZIP_FILE")
+          adb shell "arduino-app-cli app import /tmp/$ZIP_BASENAME"
+      - adb shell "arduino-app-cli app stop user:scratch-arduino-app"
       - adb shell "arduino-app-cli app start user:scratch-arduino-app"
 
   app:build:
@@ -99,11 +100,11 @@ tasks:
       - |
           adb push ./python/ /home/arduino/ArduinoApps/scratch-arduino-app/
 
-          CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
+          CONTAINER_ID=$(adb shell "docker ps -q --filter 'label=cc.arduino.app.main=true'")
           if [ -n "$CONTAINER_ID" ]; then
             /usr/bin/time -f "🐍 Restarted in %es" adb shell "docker restart $CONTAINER_ID"
           else
-            echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
+            echo "[warning] No running container found with label cc.arduino.app.main=true to restart"
           fi
 
   sketch:watch:
@@ -154,10 +155,10 @@ tasks:
       - |
           echo "🐍 Python container logs"
           while true; do
-           CONTAINER_ID=$(adb shell "docker ps -q --filter 'ancestor=ghcr.io/arduino/app-bricks/python-apps-base:0.5.0'")
+           CONTAINER_ID=$(adb shell "docker ps -q --filter 'label=cc.arduino.app.main=true'")
            if [ -n "$CONTAINER_ID" ]; then
              adb shell "docker logs -f $CONTAINER_ID"
            else
-             echo "[warning] No running container found with image ghcr.io/arduino/app-bricks/python-apps-base"
+             echo "[warning] No running container found with label cc.arduino.app.main=true"
            fi
            done
