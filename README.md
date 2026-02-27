@@ -15,11 +15,13 @@ Accessible from any device via a browser, it makes coding, electronics, and AI h
 
 ### From AppLab
 
-- Download the `scratch-arduino-app-vX.Y.Z.zip' form the https://github.com/dido18/scratch-arduino-app/releases
+- Download the `scratch-arduino-app-vX.Y.Z.zip` from the https://github.com/dido18/scratch-arduino-app/releases
 - Open the [Arduino App Lab](https://docs.arduino.cc/software/app-lab/) and connect to your Arduino UNO Q board.
 - Go to `Create new app` > `Import App`
 - Select the local `.zip` file
 - Click on the App, and `Run`
+
+NOTE: the AppLab is slow to load the app :)
 
 ### From command-line
 
