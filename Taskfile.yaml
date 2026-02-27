@@ -61,6 +61,17 @@ tasks:
       - cd tmp_zip && zip -r ../app/.build/scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
       - rm -rf tmp_zip
 
+  release:
+    desc: Create a tag on the current commit and push it to the remote to create the release
+    cmds:
+      - |
+          if [ -z "{{.CLI_ARGS}}" ]; then
+            echo "Error: Version argument is required. Usage: task orchestrator:trigger:release -- <version>"
+            exit 1
+          fi
+      - git tag -a "{{.CLI_ARGS}}" -m "Release {{.CLI_ARGS}}"
+      - git push origin "{{.CLI_ARGS}}"
+
   watch:
     desc: "watch files changes for both python and sketch, and upload the changes to the board and restart"
     deps:
