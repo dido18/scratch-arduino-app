@@ -4,11 +4,14 @@
 
 Arduino_LED_Matrix matrix;
 ModulinoButtons buttons;
+ModulinoPixels pixels;
 
 void setup() {
   matrix.begin();
   Bridge.begin();
   Modulino.begin(Wire1);
+  pixels.begin();
+
   // show led indication if buttons cannot be initilized
   buttons.begin();
   pinMode(LED_BUILTIN, OUTPUT);
@@ -28,16 +31,23 @@ void setup() {
   buttons.setLeds(true, true, true);
   Bridge.provide("matrix_draw", matrix_draw);
   Bridge.provide("set_led_rgb", set_led_rgb);
+
+  Bridge.provide("pixels_set_all_rgb", pixels_set_all_rgb);
+  Bridge.provide("pixels_set_rgb", pixels_set_rgb);
+  Bridge.provide("pixels_clear_all", pixels_clear_all);
+  Bridge.provide("pixels_clear", pixels_clear);
 }
 
 void loop() {
   if (buttons.update()) {
       if (buttons.isPressed("A")) {
+        pixels_set_all_rgb(255, 0, 0); // Set all pixels to red
         Bridge.notify("modulino_button_pressed", "A");
         buttons.setLeds(true, false, false);
       } else if (buttons.isPressed("B")) {
         Bridge.notify("modulino_button_pressed", "B");
         buttons.setLeds(false, true, false);
+        pixels_set_all_rgb(0, 255, 0); // Set all pixels to green
       } else if (buttons.isPressed("C")) {
         Bridge.notify("modulino_button_pressed", "C");
         buttons.setLeds(false, false, true);
@@ -97,4 +107,28 @@ void set_led_rgb(String pin, bool r, bool g, bool b) {
     digitalWrite(LED_BUILTIN + 4, g ? LOW : HIGH );
     digitalWrite(LED_BUILTIN + 5, b ? LOW : HIGH );
   }
+}
+
+void pixels_set_all_rgb(uint8_t r, uint8_t g, uint8_t b) {
+  for (int i = 0; i < 8; i++) {
+    pixels.set(i, r, g, b);
+  }
+  pixels.show();
+}
+
+void pixels_set_rgb(int idx, uint8_t r, uint8_t g, uint8_t b) {
+  pixels.set(idx, r, g, b);
+  pixels.show();
+}
+
+void pixels_clear_all() {
+  for (int i = 0; i < 8; i++) {
+    pixels.set(i, 0, 0, 0);
+  }
+  pixels.show();
+}
+
+void pixels_clear(int idx) {
+  pixels.set(idx, 0, 0, 0);
+  pixels.show();
 }
