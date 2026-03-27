@@ -1,11 +1,11 @@
 import {
-  type BlockUtilityWithID,
   type Environment,
   extension,
-  type ExtensionMenuDisplayDetails,
   scratch,
+  type RGBObject,
 } from "$common";
 import { io, type Socket } from "socket.io-client";
+import PixelsArgument from "./PixelsArgument.svelte";
 
 // Get Arduino board IP or hostname from URL parameter
 const getArduinoBoardHost = () => {
@@ -17,17 +17,19 @@ const getArduinoBoardHost = () => {
   return window.location.hostname;
 };
 
+const NUM_LEDS = 8;
+
 export default class ModulinoPixels extends extension({
   name: "Pixels",
-  description: "Control Arduino Modulino RGB pixel LEDs",
+  description: "Control Arduino Modulino pixels",
   iconURL: "modulinos.png",
   insetIconURL: "modulino-buttons.svg",
   tags: ["Arduino", "Modulino"],
   blockColor: "#00878F",
   menuColor: "#8C7965",
   menuSelectColor: "#62AEB2",
-}, "ui") {
-//   private socket: Socket | null = null;
+}, "ui", "customArguments") {
+  private socket: Socket | null = null;
 
   init(env: Environment) {
     const arduinoBoardHost = getArduinoBoardHost();
@@ -49,75 +51,40 @@ export default class ModulinoPixels extends extension({
   }
 
   @scratch.command(function(_, tag) {
-    return tag`Set all pixels to R: ${"RED"} G: ${"GREEN"} B: ${"BLUE"}"`;
+    const arg = this.makeCustomArgument({
+      component: PixelsArgument,
+      initial: {
+        value: Array.from({ length: NUM_LEDS }, () => ({ r: 0, g: 0, b: 0 })) as RGBObject[],
+        text: "pixels",
+      },
+    });
+    return tag`Set pixels pattern ${arg}`;
   })
-  setAllPixelsRGB(
-    red: number,
-    green: number,
-    blue: number,
-  ): Promise<void> {
-    return new Promise((resolve) => {
-      if (this.socket) {
-        this.socket.emit("pixels_set_all_rgb", {
-          r: Math.min(255, Math.max(0, red)),
-          g: Math.min(255, Math.max(0, green)),
-          b: Math.min(255, Math.max(0, blue)),
-        }, () => resolve());
-      } else {
-        resolve();
-      }
+  setPixelsPattern(leds: RGBObject[]): void {
+    if (!this.socket) return;
+    leds.forEach((color, index) => {
+      this.socket!.emit("pixels_set_rgb", {
+        pixel: index,
+        r: color.r,
+        g: color.g,
+        b: color.b,
+      });
     });
   }
 
-//   @scratch.command(function(instance, tag) {
-//     return tag`Set pixel ${"PIXEL"} to R: ${"RED"} G: ${"GREEN"} B: ${"BLUE"}"`;
-//   })
-//   setPixelRGB(
-//     pixel: number,
-//     red: number,
-//     green: number,
-//     blue: number,
-//     util: BlockUtilityWithID
-//   ): Promise<void> {
-//     return new Promise((resolve) => {
-//       if (this.socket) {
-//         this.socket.emit("pixels_set_rgb", {
-//           pixel: Math.max(0, pixel),
-//           r: Math.min(255, Math.max(0, red)),
-//           g: Math.min(255, Math.max(0, green)),
-//           b: Math.min(255, Math.max(0, blue)),
-//         }, () => resolve());
-//       } else {
-//         resolve();
-//       }
-//     });
-//   }
+  @(scratch.command`Set all pixels to ${{ type: "color" }}`)
+  setAllPixelsRGB(color: RGBObject): void {
+    if (!this.socket) return;
+    this.socket.emit("pixels_set_all_rgb", {
+      r: color.r,
+      g: color.g,
+      b: color.b,
+    });
+  }
 
-//   @scratch.command(function(instance, tag) {
-//     return tag`Clear all pixels`;
-//   })
-//   clearAllPixels(util: BlockUtilityWithID): Promise<void> {
-//     return new Promise((resolve) => {
-//       if (this.socket) {
-//         this.socket.emit("pixels_clear_all", {}, () => resolve());
-//       } else {
-//         resolve();
-//       }
-//     });
-//   }
-
-//   @scratch.command(function(instance, tag) {
-//     return tag`Clear pixel ${"PIXEL"}`;
-//   })
-//   clearPixel(pixel: number, util: BlockUtilityWithID): Promise<void> {
-//     return new Promise((resolve) => {
-//       if (this.socket) {
-//         this.socket.emit("pixels_clear", {
-//           pixel: Math.max(0, pixel),
-//         }, () => resolve());
-//       } else {
-//         resolve();
-//       }
-//     });
-//   }
+  @(scratch.command`Clear all pixels`)
+  clearAllPixels(): void {
+    if (!this.socket) return;
+    this.socket.emit("pixels_clear_all", {});
+  }
 }
