@@ -5,7 +5,8 @@ import {
   type RGBObject,
 } from "$common";
 
-import { createArduinoSocket } from "../arduino-socket";
+import { type Socket } from "socket.io-client";
+import { getArduinoSocket } from "../arduino-socket";
 import PixelsArgument from "./PixelsArgument.svelte";
 
 const NUM_LEDS = 8;
@@ -20,10 +21,10 @@ export default class ModulinoPixels extends extension({
   menuColor: "#8C7965",
   menuSelectColor: "#62AEB2",
 }, "ui", "customArguments") {
-  private socket: Socket | null = null;
+  private socket!: Socket;
 
   init(env: Environment) {
-    this.socket = createArduinoSocket();
+    this.socket = getArduinoSocket();
   }
 
   @scratch.command(function(_, tag) {
@@ -37,9 +38,8 @@ export default class ModulinoPixels extends extension({
     return tag`Set pixels pattern ${arg}`;
   })
   setPixelsPattern(leds: RGBObject[]): void {
-    if (!this.socket) return;
     leds.forEach((color, index) => {
-      this.socket!.emit("pixels_set_rgb", {
+      this.socket.emit("pixels_set_rgb", {
         pixel: index,
         r: color.r,
         g: color.g,
@@ -50,7 +50,6 @@ export default class ModulinoPixels extends extension({
 
   @(scratch.command`Set all pixels to ${{ type: "color" }}`)
   setAllPixelsRGB(color: RGBObject): void {
-    if (!this.socket) return;
     this.socket.emit("pixels_set_all_rgb", {
       r: color.r,
       g: color.g,
@@ -60,7 +59,6 @@ export default class ModulinoPixels extends extension({
 
   @(scratch.command`Clear all pixels`)
   clearAllPixels(): void {
-    if (!this.socket) return;
     this.socket.emit("pixels_clear_all", {});
   }
 }

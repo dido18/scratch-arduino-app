@@ -6,7 +6,7 @@ import {
   scratch,
 } from "$common";
 import { type Socket } from "socket.io-client";
-import { createArduinoSocket } from "../arduino-socket";
+import { getArduinoSocket } from "../arduino-socket";
 import ButtonArgument from "./ButtonArgument.svelte";
 
 export default class ModulinoButtons extends extension({
@@ -19,11 +19,11 @@ export default class ModulinoButtons extends extension({
   menuColor: "#8C7965",
   menuSelectColor: "#62AEB2",
 }, "customArguments") {
-  private socket:;
+  private socket!: Socket;
   private button_pressed: string = "";
 
   init(env: Environment) {
-    this.socket = createArduinoSocket();
+    this.socket = getArduinoSocket();
 
     this.socket.on("modulino_buttons_pressed", (data) => {
       console.log(`Modulino button pressed event received: ${data.btn}`);

@@ -1,6 +1,6 @@
 import { type Environment, extension, type ExtensionMenuDisplayDetails, scratch } from "$common";
 import { type Socket } from "socket.io-client";
-import { createArduinoSocket } from "../arduino-socket";
+import { getArduinoSocket } from "../arduino-socket";
 import MatrixArgument from "./MatrixArgument.svelte";
 
 const details: ExtensionMenuDisplayDetails = {
@@ -40,10 +40,10 @@ const PATTERNS = {
 } as const;
 
 export default class ArduinoBasics extends extension(details, "ui", "customArguments") {
-  private socket;
+  private socket!: Socket;
 
   init(env: Environment) {
-    this.socket = createArduinoSocket();
+    this.socket = getArduinoSocket();
   }
 
   @scratch.command(function(_, tag) {
@@ -59,16 +59,12 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
   drawMatrix(matrix: number[][]) {
     var matrixString = matrix.flat().join("");
     console.log("received matrix update", matrixString);
-    if (this.socket) {
-      this.socket.emit("matrix_draw", { frame: matrixString });
-    }
+    this.socket.emit("matrix_draw", { frame: matrixString });
   }
 
   @scratch.command`Clear matrix`
   clearMatrix(matrix: number[][]) {
     var matrixString = PATTERNS.empty.flat().join("");
-    if (this.socket) {
-      this.socket.emit("matrix_draw", { frame: matrixString });
-    }
+    this.socket.emit("matrix_draw", { frame: matrixString });
   }
 }
