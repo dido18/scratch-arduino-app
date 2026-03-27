@@ -1,5 +1,6 @@
 import { type Environment, extension, type ExtensionMenuDisplayDetails, scratch } from "$common";
-import { io, Socket } from "socket.io-client";
+import { type Socket } from "socket.io-client";
+import { createArduinoSocket } from "../arduino-socket";
 import MatrixArgument from "./MatrixArgument.svelte";
 
 const details: ExtensionMenuDisplayDetails = {
@@ -11,16 +12,6 @@ const details: ExtensionMenuDisplayDetails = {
   blockColor: "#00878F",
   menuColor: "#8C7965",
   menuSelectColor: "#62AEB2",
-};
-
-// Get Arduino board IP or hostname from URL parameter
-const getArduinoBoardHost = () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const boardHost = urlParams.get("host");
-  if (boardHost) {
-    return boardHost;
-  }
-  return window.location.hostname;
 };
 
 // TODO: make the block to support the brightness `0-7' of the leds
@@ -49,27 +40,10 @@ const PATTERNS = {
 } as const;
 
 export default class ArduinoBasics extends extension(details, "ui", "customArguments") {
-  private socket: Socket | null = null;
+  private socket;
 
   init(env: Environment) {
-    const arduinoBoardHost = getArduinoBoardHost();
-    var serverURL = `wss://${arduinoBoardHost}:7000`;
-
-    console.log("Connecting to Uno Q", serverURL);
-
-    this.socket = io(serverURL, {
-      path: "/socket.io",
-      transports: ["polling", "websocket"],
-      autoConnect: true,
-    });
-
-    this.socket.on("connect", () => {
-      console.log(`Connected to Arduino UNO Q`);
-    });
-
-    this.socket.on("disconnect", (reason) => {
-      console.log(`Disconnected from Arduino UNO Q: ${reason}`);
-    });
+    this.socket = createArduinoSocket();
   }
 
   @scratch.command(function(_, tag) {
