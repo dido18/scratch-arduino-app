@@ -1,7 +1,7 @@
 {
-  "name": "arduino-socket-client",
+  "name": "arduino-board-client",
   "version": "1.0.0",
-  "description": "Shared Arduino WebSocket client for extensions",
+  "description": "Shared Arduino Board WebSocket client for extensions",
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
