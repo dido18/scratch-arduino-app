@@ -41,4 +41,5 @@ export function ConnectArduinoBoard(): ArduinoBoard {
   return new ArduinoBoard(socket);
 };
 
+
 export type MatrixFrame = number[][];

@@ -24,6 +24,7 @@ export default class ModulinoButtons extends extension({
   init(env: Environment) {
     this.board = ConnectArduinoBoard();
 
+    // TODO make into board class?
     this.board.socket.on("modulino_buttons_pressed", (data) => {
       console.log(`Modulino button pressed event received: ${data.btn}`);
       this.button_pressed = data.btn.toUpperCase();
