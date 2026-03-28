@@ -5,7 +5,7 @@ import {
   type ExtensionMenuDisplayDetails,
   scratch,
 } from "$common";
-import { ConnectArduinoBoard, type ArduinoBoard } from "../arduinoBoard";
+import { type ArduinoBoard, ConnectArduinoBoard } from "../arduinoBoard";
 import ButtonArgument from "./ButtonArgument.svelte";
 
 export default class ModulinoButtons extends extension({

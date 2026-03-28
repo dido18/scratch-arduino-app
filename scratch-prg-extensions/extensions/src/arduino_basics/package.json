@@ -10,7 +10,7 @@
     "add:ui": "pnpm --filter prg-extension-root add:ui arduino_basics",
     "add:arg": "pnpm --filter prg-extension-root add:arg arduino_basics"
   },
-  "dependencies": { },
+  "dependencies": {},
   "author": "",
   "license": "ISC"
 }

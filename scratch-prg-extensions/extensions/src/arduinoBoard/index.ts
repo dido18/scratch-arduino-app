@@ -8,8 +8,8 @@ export class ArduinoBoard {
   }
 
   drawMatrix(matrix: MatrixFrame): void {
-      const matrixString = matrix.flat().join("");
-      this.socket.emit("matrix_draw", { frame: matrixString });
+    const matrixString = matrix.flat().join("");
+    this.socket.emit("matrix_draw", { frame: matrixString });
   }
 }
 
@@ -17,7 +17,7 @@ export function ConnectArduinoBoard(): ArduinoBoard {
   var arduinoBoardHost = window.location.hostname;
   const hostParam = new URLSearchParams(window.location.search).get("host");
   if (hostParam) {
-     arduinoBoardHost = hostParam;
+    arduinoBoardHost = hostParam;
   }
 
   const serverURL = `wss://${arduinoBoardHost}:7000`;
@@ -39,7 +39,6 @@ export function ConnectArduinoBoard(): ArduinoBoard {
   });
 
   return new ArduinoBoard(socket);
-};
-
+}
 
 export type MatrixFrame = number[][];
