@@ -1,5 +1,5 @@
 import { type Environment, extension, type ExtensionMenuDisplayDetails, scratch } from "$common";
-import { type ArduinoBoard, ConnectArduinoBoard } from "../arduinoBoard";
+import { type ArduinoBoard, ConnectArduinoBoard } from "../commonArduinoBoard";
 import MatrixArgument from "./MatrixArgument.svelte";
 
 const details: ExtensionMenuDisplayDetails = {
