@@ -5,8 +5,7 @@ import {
   type ExtensionMenuDisplayDetails,
   scratch,
 } from "$common";
-import { type Socket } from "socket.io-client";
-import { getArduinoSocket } from "../arduino-socket";
+import { ConnectArduinoBoard, type ArduinoBoard } from "../arduinoBoard";
 import ButtonArgument from "./ButtonArgument.svelte";
 
 export default class ModulinoButtons extends extension({
@@ -19,13 +18,13 @@ export default class ModulinoButtons extends extension({
   menuColor: "#8C7965",
   menuSelectColor: "#62AEB2",
 }, "customArguments") {
-  private socket!: Socket;
+  private board!: ArduinoBoard;
   private button_pressed: string = "";
 
   init(env: Environment) {
-    this.socket = getArduinoSocket();
+    this.board = ConnectArduinoBoard();
 
-    this.socket.on("modulino_buttons_pressed", (data) => {
+    this.board.socket.on("modulino_buttons_pressed", (data) => {
       console.log(`Modulino button pressed event received: ${data.btn}`);
       this.button_pressed = data.btn.toUpperCase();
     });

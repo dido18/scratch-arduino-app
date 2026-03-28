@@ -1,12 +1,14 @@
 import { io, type Socket } from "socket.io-client";
 
-let _socket: Socket | null = null;
+export class ArduinoBoard {
+  socket: Socket;
 
-export const getArduinoSocket = (): Socket => {
-  if (_socket !== null) {
-    return _socket;
+  constructor(socket: Socket) {
+    this.socket = socket;
   }
+}
 
+export function ConnectArduinoBoard(): ArduinoBoard {
   var arduinoBoardHost = window.location.hostname;
   const hostParam = new URLSearchParams(window.location.search).get("host");
   if (hostParam) {
@@ -17,19 +19,19 @@ export const getArduinoSocket = (): Socket => {
 
   console.log("Connecting to Uno Q", serverURL);
 
-  _socket = io(serverURL, {
+  const socket = io(serverURL, {
     path: "/socket.io",
     transports: ["polling", "websocket"],
     autoConnect: true,
   });
 
-  _socket.on("connect", () => {
+  socket.on("connect", () => {
     console.log(`Connected to Arduino UNO Q at ${serverURL}`);
   });
 
-  _socket.on("disconnect", (reason: string) => {
+  socket.on("disconnect", (reason: string) => {
     console.log(`Disconnected from Arduino UNO Q: ${reason}`);
   });
 
-  return _socket;
+  return new ArduinoBoard(socket);
 };
