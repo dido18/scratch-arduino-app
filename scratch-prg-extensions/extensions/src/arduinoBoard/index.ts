@@ -6,6 +6,11 @@ export class ArduinoBoard {
   constructor(socket: Socket) {
     this.socket = socket;
   }
+
+  drawMatrix(matrix: MatrixFrame): void {
+      const matrixString = matrix.flat().join("");
+      this.socket.emit("matrix_draw", { frame: matrixString });
+  }
 }
 
 export function ConnectArduinoBoard(): ArduinoBoard {
@@ -35,3 +40,5 @@ export function ConnectArduinoBoard(): ArduinoBoard {
 
   return new ArduinoBoard(socket);
 };
+
+export type MatrixFrame = number[][];

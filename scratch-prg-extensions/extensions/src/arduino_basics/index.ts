@@ -56,14 +56,11 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
     return tag`draw ${arg} matrix`;
   })
   drawMatrix(matrix: number[][]) {
-    var matrixString = matrix.flat().join("");
-    console.log("received matrix update", matrixString);
-    this.board.socket.emit("matrix_draw", { frame: matrixString });
+    this.board.drawMatrix(matrix);
   }
 
-  @scratch.command(`Clear matrix`)
-  clearMatrix(matrix: number[][]) {
-    var matrixString = PATTERNS.empty.flat().join("");
-    this.board.socket.emit("matrix_draw", { frame: matrixString });
+  @scratch.command`Clear matrix`
+  clearMatrix() {
+    this.board.drawMatrix(PATTERNS.empty);
   }
 }
