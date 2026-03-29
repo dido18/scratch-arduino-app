@@ -55,7 +55,7 @@ tasks:
     desc: "build the assets of prg-raise-playground and build the zip of the app"
     vars:
       APP_VERSION:
-        sh: echo "${APP_VERSION:-$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')}"
+        sh: echo "${APP_VERSION:-$(git rev-parse --short HEAD 2>/dev/null || echo 'unknoscrwn')}"
     cmds:
       - cd prg-raise-playground && CI=true pnpm build && cp -r build/. ../app/assets
       - echo "Creating zip with version {{.APP_VERSION}}"
@@ -85,7 +85,7 @@ tasks:
 
   scratch:watch:
     cmds:
-      - cd prg-raise-playground && pnpm dev -i arduino_basics arduino_modulino arduino_modulino_pixels
+      - cd prg-raise-playground && pnpm install && pnpm dev -i arduino_basics arduino_modulino_buttons arduino_modulino_pixels
 
   python:watch:
     desc: "Watch Python folder for changes and auto-upload/restart"
