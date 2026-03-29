@@ -1,6 +1,5 @@
 import { type Environment, extension, type RGBObject, scratch } from "$common";
 import { ArduinoBoard, ConnectArduinoBoard } from "../commonArduinoBoard";
-import PixelsArgument from "./PixelsArgument.svelte";
 
 export default class ModulinoPixels extends extension(
   {
