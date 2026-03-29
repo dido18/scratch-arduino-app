@@ -1,0 +1,18 @@
+{
+  "name": "arduino_modulino_pixels-extension",
+  "version": "1.0.0",
+  "description": "An extension for controlling Arduino Modulino pixel LEDs",
+  "main": "index.ts",
+  "scripts": {
+    "directory": "echo arduino_modulino_pixels",
+    "test": "pnpm --filter prg-extension-root test arduino_modulino_pixels/index.test.ts",
+    "dev": "pnpm --filter prg-extension-root dev --include arduino_modulino_pixels",
+    "add:ui": "pnpm --filter prg-extension-root add:ui arduino_modulino_pixels",
+    "add:arg": "pnpm --filter prg-extension-root add:arg arduino_modulino_pixels"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "socket.io-client": "^4.8.1"
+  }
+}

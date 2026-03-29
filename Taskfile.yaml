@@ -31,6 +31,8 @@ tasks:
     - cd scratch-prg-extensions/extensions/src/arduino_basics && pnpm install
     - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_modulino $PWD/prg-raise-playground/extensions/src/arduino_modulino
     - cd scratch-prg-extensions/extensions/src/arduino_modulino && pnpm install
+    - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_modulino_pixels $PWD/prg-raise-playground/extensions/src/arduino_modulino_pixels
+    - cd scratch-prg-extensions/extensions/src/arduino_modulino_pixels && pnpm install
 
   board:upload:
     desc: "Build, Upload, and start the app into the board"
@@ -83,7 +85,7 @@ tasks:
 
   scratch:watch:
     cmds:
-      - cd prg-raise-playground && pnpm dev -i arduino_basics arduino_modulino
+      - cd prg-raise-playground && pnpm dev -i arduino_basics arduino_modulino arduino_modulino_pixels
 
   python:watch:
     desc: "Watch Python folder for changes and auto-upload/restart"

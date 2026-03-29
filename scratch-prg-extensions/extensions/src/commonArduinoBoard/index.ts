@@ -11,6 +11,23 @@ export class ArduinoBoard {
     const matrixString = matrix.flat().join("");
     this.socket.emit("matrix_draw", { frame: matrixString });
   }
+
+  modulinoPixelsSetAllRGB(r: number, g: number, b: number): void {
+    this.socket.emit("pixels_set_all_rgb", {
+      r: r,
+      g: g,
+      b: b,
+    });
+  }
+
+  modulinoPixelsSetRGB(idx: number, r: number, g: number, b: number): void {
+    this.socket.emit("pixels_set_rgb", {
+      idx: idx,
+      r: r,
+      g: g,
+      b: b,
+    });
+  }
 }
 
 export function ConnectArduinoBoard(): ArduinoBoard {
