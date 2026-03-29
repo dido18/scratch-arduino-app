@@ -1,5 +1,5 @@
 {
-  "name": "arduino_basics-extension",
+  "name": "arduino_basics",
   "version": "1.0.0",
   "description": "An extension created using the PRG AI Blocks framework",
   "main": "index.ts",

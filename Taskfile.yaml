@@ -29,8 +29,8 @@ tasks:
     - cd scratch-prg-extensions/extensions/src/commonArduinoBoard &&  pnpm install
     - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_basics $PWD/prg-raise-playground/extensions/src/arduino_basics
     - cd scratch-prg-extensions/extensions/src/arduino_basics && pnpm install
-    - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_modulino $PWD/prg-raise-playground/extensions/src/arduino_modulino
-    - cd scratch-prg-extensions/extensions/src/arduino_modulino && pnpm install
+    - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_modulino_buttons $PWD/prg-raise-playground/extensions/src/arduino_modulino_buttons
+    - cd scratch-prg-extensions/extensions/src/arduino_modulino_buttons && pnpm install
     - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_modulino_pixels $PWD/prg-raise-playground/extensions/src/arduino_modulino_pixels
     - cd scratch-prg-extensions/extensions/src/arduino_modulino_pixels && pnpm install
 
