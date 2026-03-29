@@ -27,7 +27,7 @@ export class ArduinoBoard {
       g: g,
       b: b,
     });
- }
+  }
 }
 
 export function ConnectArduinoBoard(): ArduinoBoard {
