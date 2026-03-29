@@ -4,18 +4,8 @@ import {
   scratch,
   type RGBObject,
 } from "$common";
-import { io, type Socket } from "socket.io-client";
+import { ArduinoBoard, ConnectArduinoBoard } from "../commonArduinoBoard";
 import PixelsArgument from "./PixelsArgument.svelte";
-
-// Get Arduino board IP or hostname from URL parameter
-const getArduinoBoardHost = () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const boardHost = urlParams.get("host");
-  if (boardHost) {
-    return boardHost;
-  }
-  return window.location.hostname;
-};
 
 const NUM_LEDS = 8;
 
@@ -29,25 +19,10 @@ export default class ModulinoPixels extends extension({
   menuColor: "#8C7965",
   menuSelectColor: "#62AEB2",
 }, "ui", "customArguments") {
-  private socket: Socket | null = null;
+  private board!: ArduinoBoard;
 
   init(env: Environment) {
-    const arduinoBoardHost = getArduinoBoardHost();
-    var serverURL = `wss://${arduinoBoardHost}:7000`;
-
-    this.socket = io(serverURL, {
-      path: "/socket.io",
-      transports: ["polling", "websocket"],
-      autoConnect: true,
-    });
-
-    this.socket.on("connect", () => {
-      console.log(`Connected to Arduino UNO Q`, serverURL);
-    });
-
-    this.socket.on("disconnect", (reason) => {
-      console.log(`Disconnected from Arduino UNO Q: ${reason}`);
-    });
+    this.board = ConnectArduinoBoard();
   }
 
   @scratch.command(function(_, tag) {
@@ -61,7 +36,6 @@ export default class ModulinoPixels extends extension({
     return tag`Set pixels pattern ${arg}`;
   })
   setPixelsPattern(leds: RGBObject[]): void {
-    if (!this.socket) return;
     leds.forEach((color, index) => {
       this.socket!.emit("pixels_set_rgb", {
         pixel: index,
