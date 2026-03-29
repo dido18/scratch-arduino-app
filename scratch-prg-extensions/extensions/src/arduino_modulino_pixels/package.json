@@ -1,5 +1,5 @@
 {
-  "name": "arduino_modulino_pixels-extension",
+  "name": "arduino_modulino_pixels",
   "version": "1.0.0",
   "description": "An extension for controlling Arduino Modulino pixel LEDs",
   "main": "index.ts",

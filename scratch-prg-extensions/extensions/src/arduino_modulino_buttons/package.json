@@ -1,0 +1,16 @@
+{
+  "name": "arduino_modulino_buttons",
+  "version": "1.0.0",
+  "description": "An extension created using the PRG AI Blocks framework",
+  "main": "index.ts",
+  "scripts": {
+    "directory": "echo arduino_modulino_buttons",
+    "test": "pnpm --filter prg-extension-root test arduino_modulino_buttons/index.test.ts",
+    "dev": "pnpm --filter prg-extension-root dev --include arduino_modulino_buttons",
+    "add:ui": "pnpm --filter prg-extension-root add:ui arduino_modulino_buttons",
+    "add:arg": "pnpm --filter prg-extension-root add:arg arduino_modulino_buttons"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

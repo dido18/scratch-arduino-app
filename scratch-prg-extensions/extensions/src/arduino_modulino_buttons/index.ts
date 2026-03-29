@@ -9,11 +9,11 @@ import { type ArduinoBoard, ConnectArduinoBoard } from "../commonArduinoBoard";
 import ButtonArgument from "./ButtonArgument.svelte";
 
 export default class ModulinoButtons extends extension({
-  name: "Modulino",
-  description: "Control your Arduino Modulinos",
-  iconURL: "modulinos.png", // png
-  insetIconURL: "modulino-buttons.svg", // svg
-  tags: ["Arduino UNO Q"],
+  name: "Buttons",
+  description: "Control Arduino Modulino Buttons",
+  iconURL: "modulino-buttons.png",
+  insetIconURL: "modulino-buttons.svg",
+  tags: ["Arduino Modulino"],
   blockColor: "#00878F",
   menuColor: "#8C7965",
   menuSelectColor: "#62AEB2",
