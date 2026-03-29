@@ -22,28 +22,18 @@ Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
 
 
 def on_pixels_set_all_rgb(_, data):
+    print(f"Setting all pixels to RGB: {data}")
     r, g, b = data.get("r", 0), data.get("g", 0), data.get("b", 0)
     Bridge.call("pixels_set_all_rgb", r, g, b)
 
 
 def on_pixels_set_rgb(_, data):
-    pixel = data.get("pixel", 0)
+    idx = data.get("idx", 0)
     r, g, b = data.get("r", 0), data.get("g", 0), data.get("b", 0)
-    Bridge.call("pixels_set_rgb", pixel, r, g, b)
-
-
-def on_pixels_clear_all(_, data):
-    Bridge.call("pixels_clear_all")
-
-
-def on_pixels_clear(_, data):
-    pixel = data.get("pixel", 0)
-    Bridge.call("pixels_clear", pixel)
+    Bridge.call("pixels_set_rgb", idx, r, g, b)
 
 
 ui.on_message("pixels_set_all_rgb", on_pixels_set_all_rgb)
 ui.on_message("pixels_set_rgb", on_pixels_set_rgb)
-ui.on_message("pixels_clear_all", on_pixels_clear_all)
-ui.on_message("pixels_clear", on_pixels_clear)
 
 App.run()

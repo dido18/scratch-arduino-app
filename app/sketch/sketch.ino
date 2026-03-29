@@ -32,10 +32,9 @@ void setup() {
   Bridge.provide("matrix_draw", matrix_draw);
   Bridge.provide("set_led_rgb", set_led_rgb);
 
+
   Bridge.provide("pixels_set_all_rgb", pixels_set_all_rgb);
   Bridge.provide("pixels_set_rgb", pixels_set_rgb);
-  Bridge.provide("pixels_clear_all", pixels_clear_all);
-  Bridge.provide("pixels_clear", pixels_clear);
 }
 
 void loop() {
@@ -109,26 +108,14 @@ void set_led_rgb(String pin, bool r, bool g, bool b) {
   }
 }
 
-void pixels_set_all_rgb(uint8_t r, uint8_t g, uint8_t b) {
+void pixels_set_all_rgb(int r, int g, int b) {
   for (int i = 0; i < 8; i++) {
     pixels.set(i, r, g, b);
   }
   pixels.show();
 }
 
-void pixels_set_rgb(int idx, uint8_t r, uint8_t g, uint8_t b) {
+void pixels_set_rgb(int idx, int r, int g, int b) {
   pixels.set(idx, r, g, b);
-  pixels.show();
-}
-
-void pixels_clear_all() {
-  for (int i = 0; i < 8; i++) {
-    pixels.set(i, 0, 0, 0);
-  }
-  pixels.show();
-}
-
-void pixels_clear(int idx) {
-  pixels.set(idx, 0, 0, 0);
   pixels.show();
 }
