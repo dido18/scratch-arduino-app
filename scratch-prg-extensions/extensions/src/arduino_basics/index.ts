@@ -77,6 +77,5 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
       pin: pin,
       angle: angle,
     });
-   }
-
+  }
 }
