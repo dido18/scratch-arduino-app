@@ -1,28 +1,22 @@
 
 #include "Wire.h"
 #include "Arduino_RouterBridge.h"
-#include "Arduino_Modulino.h"
 
 struct DetectedModulino {
   uint8_t addr;
   String modulinoType;
-  String pinstrap;
-  String defaultAddr;
 };
 
 #define MAX_DEVICES 16
 DetectedModulino rows[MAX_DEVICES];
 int numRows = 0;
 
-ModulinoPixels pixels;
 
 void setup() {
   Wire1.begin();
   Monitor.begin();
-  Modulino.begin(Wire1);
-  pixels.begin();
-  Bridge.begin();
 
+  Bridge.begin();
 }
 
 void loop() {
@@ -50,7 +44,7 @@ void discoverDevices() {
     // Some addresses represent non configurable devices (no MCU on it). Handle them as a special case.
     if (isFixedAddrDevice(addr)) {
       snprintf(buffer, 64, "0x%02X (cannot change)", addr);
-      addRow(addr, fixedAddrToName(addr), "-", String(buffer));
+      addRow(addr, fixedAddrToName(addr));
 
       continue;  // Stop here, do not try to communicate with this device.
     }
@@ -72,49 +66,33 @@ void discoverDevices() {
         Monitor.println("Failed to read device type at address 0x" + String(addr, HEX));
       }
 
-      snprintf(buffer, 64, "0x%02X", pinstrap);
-      auto hexPinstrap = String(buffer);
-
-      snprintf(buffer, 64, "0x%02X", pinstrap / 2);  // Default address is half pinstrap.
-      auto defaultAddr = String(buffer);
-      if (addr != pinstrap / 2) defaultAddr += " *";  // Mark devices with modified address.
-
-      addRow(addr, pinstrapToName(pinstrap), hexPinstrap, defaultAddr);
+      addRow(addr, pinstrapToName(pinstrap));
     }
   }
 
-  // Print the results.
-  pixels.clear();
-  for (int i = 0; i < numRows; i++) {
-    pixels.set(i, 0, 255, 0);
-    pixels.show();
 
+  MsgPack::map_t<MsgPack::str_t, uint8_t> m;
+
+  for (int i = 0; i < numRows; i++) {
     char buffer[16];
     snprintf(buffer, 16, "0x%02X", rows[i].addr);
 
     Monitor.print(fixedWidth(buffer, 8));
     Monitor.print(fixedWidth(rows[i].modulinoType, 16));
-    Monitor.print(fixedWidth(rows[i].pinstrap, 16));
-    Monitor.println(fixedWidth(rows[i].defaultAddr, 12));
+    m[rows[i].modulinoType.c_str()] = rows[i].addr;
   }
+
+  Bridge.notify("modulinos_detected", m);
 }
 
-void addRow(uint8_t address, String modulinoType, String pinstrap, String defaultAddr) {
+void addRow(uint8_t address, String modulinoType) {
   if (numRows >= MAX_DEVICES) return;
 
   rows[numRows].addr = address;
   rows[numRows].modulinoType = modulinoType;
-  rows[numRows].pinstrap = pinstrap;
-  rows[numRows].defaultAddr = defaultAddr;
   numRows++;  // Increment the row counter
 }
 
-bool findRow(uint8_t address) {
-  for (int i = 0; i < numRows; i++) {
-    if (rows[i].addr == address) return true;
-  }
-  return false;
-}
 
 
 // Function to add padding to the right to ensure each field has a fixed width
