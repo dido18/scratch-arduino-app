@@ -35,5 +35,6 @@ def on_pixels_set_rgb(_, data):
 
 ui.on_message("pixels_set_all_rgb", on_pixels_set_all_rgb)
 ui.on_message("pixels_set_rgb", on_pixels_set_rgb)
-
+ui.on_message("attach_servo", lambda _, data: Bridge.call("attach_servo", data.get("pin")))
+ui.on_message("write_servo", lambda _, data: Bridge.call("write_servo", data.get("pin"), data.get("value")))
 App.run()

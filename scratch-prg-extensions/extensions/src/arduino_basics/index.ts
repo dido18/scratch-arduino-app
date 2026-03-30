@@ -63,4 +63,21 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
   clearMatrix() {
     this.board.drawMatrix(PATTERNS.empty);
   }
+
+
+  @scratch.command`Servo attach to ${{ type:"number", defaultValue:0, options:[0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] }} pin`
+   servoAttach(pin: number) {
+    this.board.socket.emit("attach_servo", {
+      pin: pin,
+    });
+   }
+
+  @scratch.command`Servo write to ${{ type:"number", defaultValue:0, options:[0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] }} pin value ${{ type:"number", defaultValue: 90}}`
+   servoWrite(pin: number, value :number) {
+    this.board.socket.emit("write_servo", {
+      pin: pin,
+      value: value,
+    });
+   }
+
 }
