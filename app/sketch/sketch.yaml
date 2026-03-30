@@ -4,6 +4,7 @@ profiles:
     platforms:
       - platform: arduino:zephyr
     libraries:
+      - Servo (1.3.0)
       - MsgPack (0.4.2)
       - DebugLog (0.8.4)
       - ArxContainer (0.7.0)

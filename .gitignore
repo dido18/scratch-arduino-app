@@ -3,3 +3,4 @@ prg-raise-playground
 build/
 .bin/
 .cache/
+.DS_Store
