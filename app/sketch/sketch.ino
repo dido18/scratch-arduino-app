@@ -1,10 +1,20 @@
 #include <Arduino_RouterBridge.h>
 #include "Arduino_LED_Matrix.h"
 #include <Arduino_Modulino.h>
+#include "Servo.h"
+
+#define SKETCH_MAX_SERVOS 16
 
 Arduino_LED_Matrix matrix;
 ModulinoButtons buttons;
 ModulinoPixels pixels;
+
+typedef struct custom_servo{
+  Servo servo;
+  int pin; 
+} custom_servo;
+uint8_t number_of_servos = 0;
+custom_servo servos[SKETCH_MAX_SERVOS];
 
 void setup() {
   matrix.begin();
@@ -35,6 +45,9 @@ void setup() {
 
   Bridge.provide("pixels_set_all_rgb", pixels_set_all_rgb);
   Bridge.provide("pixels_set_rgb", pixels_set_rgb);
+
+  Bridge.provide("attach_servo", attach_servo);
+  Bridge.provide("write_servo", write_servo);
 }
 
 void loop() {
@@ -118,4 +131,32 @@ void pixels_set_all_rgb(int r, int g, int b) {
 void pixels_set_rgb(int idx, int r, int g, int b) {
   pixels.set(idx, r, g, b);
   pixels.show();
+}
+
+int attach_servo(int pin){
+  for (int i=0; i<number_of_servos; i++){
+    if (servos[i].pin==pin){
+      return -1;
+    }
+  }
+  if (number_of_servos>=SKETCH_MAX_SERVOS){
+    return -2;
+  }
+  servos[number_of_servos].pin = pin;
+  servos[number_of_servos].servo.attach(pin);
+  number_of_servos++;
+  return 0;
+}
+
+int write_servo(int pin, int angle){
+  if (number_of_servos==0){
+    return -2;
+  }
+  for (int i=0; i<SKETCH_MAX_SERVOS; i++){
+    if (servos[i].pin==pin){
+      servos[i].servo.write(angle);
+      return 0;
+    }
+  }
+  return -1;
 }
