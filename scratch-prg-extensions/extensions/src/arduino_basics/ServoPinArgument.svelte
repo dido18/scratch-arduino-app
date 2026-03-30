@@ -90,7 +90,6 @@
     gap: 40px;
   }
 
-  /* ── Shared header column ── */
   .header {
     display: flex;
     flex-direction: column;
@@ -99,15 +98,6 @@
     padding: 2px 0;
   }
 
-  .header-left {
-    border-right: none;
-  }
-
-  .header-right {
-    border-left: none;
-  }
-
-  /* ── Individual pin wrapper ── */
   .pin-wrapper {
     display: flex;
     align-items: center;
@@ -128,7 +118,6 @@
     justify-content: flex-start;
   }
 
-  /* Black housing rectangle containing the hole */
   .pin-housing {
     width: 14px;
     height: 14px;
@@ -154,7 +143,6 @@
     box-shadow: 0 0 4px #E5AD24bb;
   }
 
-  /* Square hole inside the housing */
   .pin-hole {
     width: 7px;
     height: 7px;
@@ -169,7 +157,6 @@
     background: #fff3cc;
   }
 
-  /* Labels with orange badge background — fixed equal width */
   .pin-label {
     background: #ff7a3d;
     color: #fff;
@@ -182,14 +169,6 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     width: 30px;
     text-align: center;
-  }
-
-  .left-label {
-    order: 1;
-  }
-
-  .right-label {
-    order: 1;
   }
 
   .pin-wrapper.left:hover .pin-label,
