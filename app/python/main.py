@@ -32,9 +32,14 @@ def on_pixels_set_rgb(_, data):
     r, g, b = data.get("r", 0), data.get("g", 0), data.get("b", 0)
     Bridge.call("pixels_set_rgb", idx, r, g, b)
 
+def on_write_servo(_, data):
+    print(f"Writing servo: {data}")
+    pin = data.get("pin")
+    angle = data.get("angle")
+    Bridge.call("servo_write", pin, angle)
+
 
 ui.on_message("pixels_set_all_rgb", on_pixels_set_all_rgb)
 ui.on_message("pixels_set_rgb", on_pixels_set_rgb)
-ui.on_message("attach_servo", lambda _, data: Bridge.call("attach_servo", data.get("pin")))
-ui.on_message("write_servo", lambda _, data: Bridge.call("write_servo", data.get("pin"), data.get("value")))
+ui.on_message("servo_write", on_write_servo)
 App.run()

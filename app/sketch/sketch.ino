@@ -11,7 +11,7 @@ ModulinoPixels pixels;
 
 typedef struct custom_servo{
   Servo servo;
-  int pin; 
+  int pin;
 } custom_servo;
 uint8_t number_of_servos = 0;
 custom_servo servos[SKETCH_MAX_SERVOS];
@@ -42,12 +42,10 @@ void setup() {
   Bridge.provide("matrix_draw", matrix_draw);
   Bridge.provide("set_led_rgb", set_led_rgb);
 
-
   Bridge.provide("pixels_set_all_rgb", pixels_set_all_rgb);
   Bridge.provide("pixels_set_rgb", pixels_set_rgb);
 
-  Bridge.provide("attach_servo", attach_servo);
-  Bridge.provide("write_servo", write_servo);
+  Bridge.provide("servo_write", servo_write);
 }
 
 void loop() {
@@ -133,30 +131,20 @@ void pixels_set_rgb(int idx, int r, int g, int b) {
   pixels.show();
 }
 
-int attach_servo(int pin){
+int servo_write(int pin, int angle){
   for (int i=0; i<number_of_servos; i++){
-    if (servos[i].pin==pin){
-      return -1;
-    }
-  }
-  if (number_of_servos>=SKETCH_MAX_SERVOS){
-    return -2;
-  }
-  servos[number_of_servos].pin = pin;
-  servos[number_of_servos].servo.attach(pin);
-  number_of_servos++;
-  return 0;
-}
-
-int write_servo(int pin, int angle){
-  if (number_of_servos==0){
-    return -2;
-  }
-  for (int i=0; i<SKETCH_MAX_SERVOS; i++){
     if (servos[i].pin==pin){
       servos[i].servo.write(angle);
       return 0;
     }
   }
-  return -1;
+
+  if (number_of_servos>=SKETCH_MAX_SERVOS){
+    return -2;
+  }
+  servos[number_of_servos].pin = pin;
+  servos[number_of_servos].servo.attach(pin);
+  servos[number_of_servos].servo.write(angle);
+  number_of_servos++;
+  return 0;
 }
