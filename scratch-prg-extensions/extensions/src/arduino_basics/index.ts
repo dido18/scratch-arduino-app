@@ -1,6 +1,7 @@
 import { type Environment, extension, type ExtensionMenuDisplayDetails, scratch } from "$common";
 import { type ArduinoBoard, ConnectArduinoBoard } from "../commonArduinoBoard";
 import MatrixArgument from "./MatrixArgument.svelte";
+import ServoPinArgument from "./ServoPinArgument.svelte";
 
 const details: ExtensionMenuDisplayDetails = {
   name: "Basic",
@@ -64,8 +65,14 @@ export default class ArduinoBasics extends extension(details, "ui", "customArgum
     this.board.drawMatrix(PATTERNS.empty);
   }
 
-  @scratch.command`Set servo pin ${{ type:"number", defaultValue:0, options:[0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] }} angle to ${{ type:"number", defaultValue: 90}}`
-   servoWrite(pin: number, angle :number) {
+  @scratch.command(function(_, tag) {
+    const pinArg = this.makeCustomArgument({
+      component: ServoPinArgument,
+      initial: { value: 3, text: "~D3" },
+    });
+    return tag`Set servo pin ${pinArg} angle to ${{ type: "number", defaultValue: 90 }}`;
+  })
+  servoWrite(pin: number, angle: number) {
     this.board.socket.emit("servo_write", {
       pin: pin,
       angle: angle,
