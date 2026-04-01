@@ -24,8 +24,7 @@ tasks:
     - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-vm.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-vm.git"
     - git clone --recurse-submodules --depth 1 --shallow-submodules https://github.com/mitmedialab/prg-raise-playground.git
     - cd prg-raise-playground && git switch dev &&  pnpm install
-    # apply patch to remove prg extensions
-    - cd scratch-packages/scratch-gui/ && git apply ../../../remove-extensions.patch
+    - git apply --directory=prg-raise-playground/scratch-packages/scratch-gui $PWD/remove-extensions.patch
     # copy the extension to the right place
     - ln -s $PWD/scratch-prg-extensions/extensions/src/commonArduinoBoard $PWD/prg-raise-playground/extensions/src/commonArduinoBoard
     - cd scratch-prg-extensions/extensions/src/commonArduinoBoard &&  pnpm install
