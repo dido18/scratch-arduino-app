@@ -1,9 +1,56 @@
---- a/prg-raise-playground/scratch-packages/scratch-gui/src/lib/libraries/extensions/index.jsx
-+++ b/prg-raise-playground/scratch-packages/scratch-gui/src/lib/libraries/extensions/index.jsx
-@@ -85,72 +85,6 @@ export default [
+diff --git a/src/lib/libraries/extensions/index.jsx b/src/lib/libraries/extensions/index.jsx
+index 43c8c2b..58a042b 100644
+--- a/src/lib/libraries/extensions/index.jsx
++++ b/src/lib/libraries/extensions/index.jsx
+@@ -5,13 +5,6 @@ import generatedDetails from '../../../generated/prg/details.generated';
+ import React from 'react';
+ import { FormattedMessage } from 'react-intl';
+ 
+-import arduinoRobotIconURL from './arduino_extension/arduino_extension.png';
+-import arduinoRobotInsetIconURL from './arduino_extension/arduino_small.svg';
+-
+-import microbitRobotIconURL from './arduino_extension/microbot_extension.png';
+-
+-import gizmoRobotIconURL from './arduino_extension/gizmo_extension.png';
+-import gizmoRobotInsetIconURL from './arduino_extension/gizmo_small.png';
+ 
+ import musicIconURL from './music/music.png';
+ import musicInsetIconURL from './music/music-small.svg';
+@@ -31,28 +24,6 @@ import translateInsetIconURL from './translate/translate-small.png';
+ import makeymakeyIconURL from './makeymakey/makeymakey.png';
+ import makeymakeyInsetIconURL from './makeymakey/makeymakey-small.svg';
+ 
+-import microbitIconURL from './microbit/microbit.png';
+-import microbitInsetIconURL from './microbit/microbit-small.svg';
+-import microbitConnectionIconURL from './microbit/microbit-illustration.svg';
+-import microbitConnectionSmallIconURL from './microbit/microbit-small.svg';
+-
+-import ev3IconURL from './ev3/ev3.png';
+-import ev3InsetIconURL from './ev3/ev3-small.svg';
+-import ev3ConnectionIconURL from './ev3/ev3-hub-illustration.svg';
+-import ev3ConnectionSmallIconURL from './ev3/ev3-small.svg';
+-
+-import wedo2IconURL from './wedo2/wedo.png'; // TODO: Rename file names to match variable/prop names?
+-import wedo2InsetIconURL from './wedo2/wedo-small.svg';
+-import wedo2ConnectionIconURL from './wedo2/wedo-illustration.svg';
+-import wedo2ConnectionSmallIconURL from './wedo2/wedo-small.svg';
+-import wedo2ConnectionTipIconURL from './wedo2/wedo-button-illustration.svg';
+-
+-import boostIconURL from './boost/boost.png';
+-import boostInsetIconURL from './boost/boost-small.svg';
+-import boostConnectionIconURL from './boost/boost-illustration.svg';
+-import boostConnectionSmallIconURL from './boost/boost-small.svg';
+-import boostConnectionTipIconURL from './boost/boost-button-illustration.svg';
+-
+ import gdxforIconURL from './gdxfor/gdxfor.png';
+ import gdxforInsetIconURL from './gdxfor/gdxfor-small.svg';
+ import gdxforConnectionIconURL from './gdxfor/gdxfor-illustration.svg';
+@@ -84,68 +55,6 @@ export default [
+         helpLink: 'https://scratch.mit.edu/wedo'
+ 
      },
-     {
-         name: (
+-    {
+-        name: (
 -            <FormattedMessage
 -                defaultMessage="PRG Microbit Robot"
 -                description="Name for the 'Microbit Robot' Extension"
@@ -64,12 +111,10 @@
 -        featured: true,
 -        tags: ["Made by PRG"]
 -    }, //*/ // RANDI Removing extensions I don't want students to play with
--    {
--        name: (
+     {
+         name: (
              <FormattedMessage
-                 defaultMessage="Music"
-                 description="Name for the 'Music' extension"
-@@ -198,59 +132,6 @@ export default [
+@@ -271,132 +180,6 @@ export default [
          featured: true,
          tags: ["Made by Scratch"]
      },
@@ -129,12 +174,8 @@
 -            <FormattedMessage
 -                defaultMessage="Connecting. Make sure the pin on your EV3 is set to 1234."
 -                description="Message to help people connect to their EV3. Must note the PIN should be 1234."
-+        description: (
-+            <FormattedMessage
-+                defaultMessage="Connecting. Make sure the pin on your EV3 is set to 1234."
-+                description="Message to help people connect to their EV3. Must note the PIN should be 1234."
-                 id="gui.extension.ev3.connectingMessage"
-             />
+-                id="gui.extension.ev3.connectingMessage"
+-            />
 -        ),
 -        helpLink: 'https://scratch.mit.edu/ev3',
 -        tags: ["Made by Scratch"]
