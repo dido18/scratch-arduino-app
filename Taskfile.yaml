@@ -19,11 +19,17 @@ tasks:
     cmds:
       - ${PWD}/.bin/dprint check
 
+  patch:apply-extensions:
+    desc: Apply patch to remove PRG extensions
+    cmds:
+      - cd ${PWD} && patch -p1 < remove-prg-extensions.patch
+
   scratch:init:
     - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-gui.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-gui.git"
     - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-vm.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-vm.git"
     - git clone --recurse-submodules --depth 1 --shallow-submodules https://github.com/mitmedialab/prg-raise-playground.git
     - cd prg-raise-playground && git switch dev &&  pnpm install
+    - patch:apply-extensions
     # copy the extension to the rigth place
     - ln -s $PWD/scratch-prg-extensions/extensions/src/commonArduinoBoard $PWD/prg-raise-playground/extensions/src/commonArduinoBoard
     - cd scratch-prg-extensions/extensions/src/commonArduinoBoard &&  pnpm install
