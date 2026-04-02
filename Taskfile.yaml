@@ -24,7 +24,8 @@ tasks:
     - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-vm.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-vm.git"
     - git clone --recurse-submodules --depth 1 --shallow-submodules https://github.com/mitmedialab/prg-raise-playground.git
     - cd prg-raise-playground && git switch dev &&  pnpm install
-    # copy the extension to the rigth place
+    - git apply --directory=prg-raise-playground/scratch-packages/scratch-gui $PWD/remove-extensions.patch
+    # copy the extension to the right place
     - ln -s $PWD/scratch-prg-extensions/extensions/src/commonArduinoBoard $PWD/prg-raise-playground/extensions/src/commonArduinoBoard
     - cd scratch-prg-extensions/extensions/src/commonArduinoBoard &&  pnpm install
     - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_basics $PWD/prg-raise-playground/extensions/src/arduino_basics
@@ -57,7 +58,7 @@ tasks:
       APP_VERSION:
         sh: echo "${APP_VERSION:-$(git rev-parse --short HEAD 2>/dev/null || echo 'unknoscrwn')}"
     cmds:
-      - cd prg-raise-playground && CI=true pnpm build && cp -r build/. ../app/assets
+      - cd prg-raise-playground && CI=true NODE_ENV=production pnpm install && pnpm transpile:vm && pnpm build:extensions:and:gui --include -i arduino_basics arduino_modulino_buttons arduino_modulino_pixels teachableMachine poseBody poseFace poseHand --watch false --parrallel false && cp -r build/. ../app/assets
       - echo "Creating zip with version {{.APP_VERSION}}"
       - mkdir -p app/.build && rm -f app/.build/*.zip
       - mkdir -p tmp_zip/scratch-arduino-app
