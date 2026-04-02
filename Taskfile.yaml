@@ -58,7 +58,9 @@ tasks:
       APP_VERSION:
         sh: echo "${APP_VERSION:-$(git rev-parse --short HEAD 2>/dev/null || echo 'unknoscrwn')}"
     cmds:
-      - cd prg-raise-playground && CI=true NODE_ENV=production pnpm install && pnpm transpile:vm && pnpm build:extensions:and:gui --include -i arduino_basics arduino_modulino_buttons arduino_modulino_pixels teachableMachine poseBody poseFace poseHand --watch false --parrallel false && cp -r build/. ../app/assets
+      - cd prg-raise-playground && pnpm install
+      - cd prg-raise-playground && pnpm transpile:vm && CI=true NODE_ENV=production pnpm build:extensions:and:gui --include -i arduino_basics arduino_modulino_buttons arduino_modulino_pixels teachableMachine poseBody poseFace poseHand --watch false --parrallel false
+      - cd prg-raise-playground && rm -rf ../app/assets && cp -r build/. ../app/assets
       - echo "Creating zip with version {{.APP_VERSION}}"
       - mkdir -p app/.build && rm -f app/.build/*.zip
       - mkdir -p tmp_zip/scratch-arduino-app
