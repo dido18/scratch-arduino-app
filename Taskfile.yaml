@@ -58,7 +58,7 @@ tasks:
       APP_VERSION:
         sh: echo "${APP_VERSION:-$(git rev-parse --short HEAD 2>/dev/null || echo 'unknoscrwn')}"
     cmds:
-      - cd prg-raise-playground && CI=true pnpm build && cp -r build/. ../app/assets
+      - cd prg-raise-playground && CI=true NODE_ENV=production pnpm build && cp -r build/. ../app/assets
       - echo "Creating zip with version {{.APP_VERSION}}"
       - mkdir -p app/.build && rm -f app/.build/*.zip
       - mkdir -p tmp_zip/scratch-arduino-app
