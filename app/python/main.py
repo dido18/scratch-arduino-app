@@ -1,7 +1,7 @@
 from arduino.app_utils import App, Bridge
 from arduino.app_bricks.web_ui import WebUI
 
-ui = WebUI(use_ssl=True)
+ui = WebUI(use_tls=True)
 ui.on_connect(lambda sid: (print(f"Client connected: {sid} "),))
 
 
