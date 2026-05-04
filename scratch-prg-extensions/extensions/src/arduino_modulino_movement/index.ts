@@ -1,4 +1,5 @@
-import { Bridge, SaveDataHandler, extension, scratch, Language, type Environment } from "$common";
+import { extension, scratch, Language, type Environment } from "$common";
+import { type ArduinoBoard, ConnectArduinoBoard } from "../commonArduinoBoard";
 
 const details = {
   name: "Arduino Modulino Movement",
@@ -20,9 +21,11 @@ export default class ArduinoModulinoMovement extends extension(details) {
   private yaw: number = 0;
   private sensorReady: boolean = false;
 
-  async init(env: Environment): Promise<void> {
-    // Set up Bridge listener to receive sensor updates from sketch
-    Bridge.provide("movement_data", (data) => {
+  private board!: ArduinoBoard;
+
+  async init(env: Environment){
+    this.board = ConnectArduinoBoard();
+    this.board.socket.on("movement_data", (data) => {
       this.accelX = data.accelX ?? 0;
       this.accelY = data.accelY ?? 0;
       this.accelZ = data.accelZ ?? 0;
@@ -31,14 +34,6 @@ export default class ArduinoModulinoMovement extends extension(details) {
       this.yaw = data.yaw ?? 0;
       this.sensorReady = true;
     });
-
-    // Optionally request initial sensor reading (if using polling pattern)
-    try {
-      Bridge.call("get_movement_data");
-    } catch (e) {
-      console.warn("Bridge not available; using mock sensor data");
-      this.sensorReady = true;
-    }
   }
 
   /**
