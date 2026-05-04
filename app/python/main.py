@@ -6,21 +6,8 @@ ui.on_connect(lambda sid: (print(f"Client connected: {sid} "),))
 
 def on_movement_data(accX, accY, accZ, roll, pitch, yaw):
     """Receive and cache movement sensor data from sketch (msgpack format)"""
+    print("oooo movement data:")
     print(accX, accY, accZ, roll, pitch, yaw)
-    # try:
-    #     # Decode msgpack binary data from sketch
-    #     if isinstance(data, bytes):
-    #         movement_data = msgpack.unpackb(data, raw=False)
-    #     elif isinstance(data, str):
-    #         # If data is a string, encode to bytes first
-    #         movement_data = msgpack.unpackb(data.encode('latin-1'), raw=False)
-    #     else:
-    #         movement_data = data
-    #     # Broadcast to any connected web clients
-    #     ui.send_message("movement_data", movement_data)
-    # except Exception as e:
-    #     print(f"Error parsing movement data: {e}")
-
 
 def on_modulino_button_pressed(btn):
     ui.send_message("modulino_buttons_pressed", {"btn": btn})

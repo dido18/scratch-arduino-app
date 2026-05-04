@@ -24,11 +24,12 @@ custom_servo servos[SKETCH_MAX_SERVOS];
 void setup() {
   matrix.begin();
   Bridge.begin();
+
   Modulino.begin(Wire1);
   pixels.begin();
-
-  // show led indication if buttons cannot be initilized
+  movement.begin();
   buttons.begin();
+
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(LED_BUILTIN + 1, OUTPUT);
   pinMode(LED_BUILTIN + 2, OUTPUT);
@@ -44,9 +45,6 @@ void setup() {
   digitalWrite(LED_BUILTIN + 5, HIGH);
 
   buttons.setLeds(true, true, true);
-
-  // Initialize Modulino Movement sensor
-  movement.begin();
 
   // Register Bridge RPC functions
   Bridge.provide("matrix_draw", matrix_draw);
@@ -162,10 +160,14 @@ int servo_write(int pin, int angle){
   return 0;
 }
 
+
 void send_movement_data() {
+  movement.update();
+
   float accelX = movement.getX();
   float accelY = movement.getY();
   float accelZ = movement.getZ();
+
 
   float roll = movement.getRoll();
   float pitch = movement.getPitch();
@@ -173,4 +175,5 @@ void send_movement_data() {
 
   Bridge.notify("movement_data", accelX, accelY, accelZ, roll, pitch, yaw);
 }
+
 
