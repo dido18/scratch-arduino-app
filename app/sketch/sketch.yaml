@@ -4,12 +4,6 @@ profiles:
     platforms:
       - platform: arduino:zephyr
     libraries:
-      - dependency: Arduino_RPClite (0.2.1)
-      - Arduino_RouterBridge (0.4.1)
-      - dependency: ArxContainer (0.7.0)
-      - dependency: ArxTypeTraits (0.3.2)
-      - dependency: DebugLog (0.8.4)
-      - dependency: MsgPack (0.4.2)
       - dependency: ArduinoGraphics (1.1.5)
       - dependency: Arduino_HS300x (1.0.0)
       - dependency: Arduino_LPS22HB (1.0.2)
@@ -19,4 +13,5 @@ profiles:
       - dependency: STM32duino VL53L4CD (1.0.5)
       - dependency: STM32duino VL53L4ED (1.0.1)
       - Servo (1.3.0)
+
 default_profile: default
