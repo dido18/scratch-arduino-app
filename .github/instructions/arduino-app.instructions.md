@@ -13,10 +13,10 @@ This instruction covers the full architecture of the Arduino App Lab running on 
 
 The Arduino UNO Q has two independent processors:
 
-| Processor | Role | Language | Entry File |
-|-----------|------|----------|------------|
-| **MPU** — Qualcomm QRB2210 | Runs Linux (Debian OS) | Python | `app/python/main.py` |
-| **MCU** — STM32U585 | Runs Arduino firmware | C++ (sketch) | `app/sketch/sketch.ino` |
+| Processor                  | Role                   | Language     | Entry File              |
+| -------------------------- | ---------------------- | ------------ | ----------------------- |
+| **MPU** — Qualcomm QRB2210 | Runs Linux (Debian OS) | Python       | `app/python/main.py`    |
+| **MCU** — STM32U585        | Runs Arduino firmware  | C++ (sketch) | `app/sketch/sketch.ino` |
 
 Both sides **communicate exclusively via the Bridge** — there is no shared memory or direct function calling between them.
 
@@ -61,6 +61,7 @@ Bridge is the **only** communication channel between Python (MPU) and the Arduin
 One side **declares** a named function that the other side can call.
 
 **In sketch (C++)**: Register a C++ function to be callable from Python.
+
 ```cpp
 // sketch.ino — setup()
 Bridge.provide("matrix_draw", matrix_draw);
@@ -69,6 +70,7 @@ Bridge.provide("servo_write", servo_write);
 ```
 
 **In Python**: Register a Python function to be callable from the sketch.
+
 ```python
 # main.py
 def on_modulino_button_pressed(btn):
@@ -82,6 +84,7 @@ Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
 One side **invokes** a function that was `provide`d on the other side.
 
 **Python → MCU**: Call a function registered with `Bridge.provide()` in the sketch.
+
 ```python
 # main.py — call a sketch function
 Bridge.call("matrix_draw", frame)
@@ -97,6 +100,7 @@ Bridge.call("servo_write", pin, angle)
 One side **pushes** data to the other without expecting a return value. Used for events/sensors.
 
 **MCU → Python**: Push an event from sketch to Python.
+
 ```cpp
 // sketch.ino — loop()
 Bridge.notify("modulino_button_pressed", "A");
@@ -115,6 +119,7 @@ Bridge.notify(...)  →  Bridge.provide(cb)  →  ui.send_message(...)
 ```
 
 **Concrete example** — Button pressed:
+
 ```
 1. User presses button A on Modulino
 2. sketch: Bridge.notify("modulino_button_pressed", "A")
@@ -133,6 +138,7 @@ ui.on_message(...)  →  Bridge.call(...)     →  Bridge.provide(fn)
 ```
 
 **Concrete example** — Draw on LED matrix:
+
 ```
 1. Browser sends WebSocket message "matrix_draw" with {frame: "...104 chars..."}
 2. python: on_matrix_draw(sid, data) fires (registered via ui.on_message)
@@ -180,6 +186,7 @@ App.run()   # MUST be the last line; starts all bricks and Bridge
 ```
 
 **Rules**:
+
 - `App.run()` must always be the **last statement** in `main.py`
 - Any code after `App.run()` will not execute
 - Use `print()` for logging — visible in the Arduino App Lab Console → "Main (Python®)" tab
@@ -242,18 +249,18 @@ Monitor.println("Sketch ready");  // visible in App Lab console
 
 ### Sketch provides (callable from Python via `Bridge.call`)
 
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `matrix_draw` | `(String frame)` | Draw 104-char greyscale string on 8×13 LED matrix (chars `0`–`7` = brightness) |
-| `set_led_rgb` | `(String pin, bool r, bool g, bool b)` | Toggle built-in RGB LEDs (`"LED3"` or `"LED4"`) |
-| `pixels_set_all_rgb` | `(int r, int g, int b)` | Set all 8 Modulino pixel LEDs to one RGB color |
-| `pixels_set_rgb` | `(int idx, int r, int g, int b)` | Set a single Modulino pixel LED by index |
-| `servo_write` | `(int pin, int angle)` | Write angle to servo (auto-attaches if not yet registered) |
+| Function             | Signature                              | Description                                                                    |
+| -------------------- | -------------------------------------- | ------------------------------------------------------------------------------ |
+| `matrix_draw`        | `(String frame)`                       | Draw 104-char greyscale string on 8×13 LED matrix (chars `0`–`7` = brightness) |
+| `set_led_rgb`        | `(String pin, bool r, bool g, bool b)` | Toggle built-in RGB LEDs (`"LED3"` or `"LED4"`)                                |
+| `pixels_set_all_rgb` | `(int r, int g, int b)`                | Set all 8 Modulino pixel LEDs to one RGB color                                 |
+| `pixels_set_rgb`     | `(int idx, int r, int g, int b)`       | Set a single Modulino pixel LED by index                                       |
+| `servo_write`        | `(int pin, int angle)`                 | Write angle to servo (auto-attaches if not yet registered)                     |
 
 ### Python provides (callable from sketch via `Bridge.notify`)
 
-| Function | Called when | Python action |
-|----------|-------------|---------------|
+| Function                  | Called when               | Python action                                         |
+| ------------------------- | ------------------------- | ----------------------------------------------------- |
 | `modulino_button_pressed` | Button A, B, or C pressed | Sends `modulino_buttons_pressed` WebSocket to browser |
 
 ---
@@ -285,13 +292,14 @@ ui.on_connect(lambda sid: print(f"Client connected: {sid}"))
 name: Scratch for Arduino UNO Q
 description: Control the UNO Q board using Scratch blocks
 ports:
-  - 7000         # Port exposed by WebUI brick
+  - 7000 # Port exposed by WebUI brick
 bricks:
   - arduino:web_ui
 icon: 🐱
 ```
 
 **Rules**:
+
 - Do **not** manually edit the `bricks:` list — use the Arduino App Lab UI to add/remove bricks
 - `ports` should list any port the app exposes externally
 
@@ -302,7 +310,7 @@ icon: 🐱
 ```yaml
 profiles:
   default:
-    fqbn: arduino:zephyr:unoq      # Board fully-qualified board name
+    fqbn: arduino:zephyr:unoq # Board fully-qualified board name
     platforms:
       - platform: arduino:zephyr
     libraries:
@@ -314,6 +322,7 @@ default_profile: default
 ```
 
 **Rules**:
+
 - Add new Arduino libraries here, not via `#include` alone
 - The platform is always `arduino:zephyr` for UNO Q
 
@@ -367,23 +376,25 @@ Bridge.provide("my_event", on_my_event)
 ## Debugging
 
 ### Python Logs
+
 - View in: Arduino App Lab → App Console → **"Main (Python®)"** tab
 - Add `print()` statements anywhere in `main.py`
 
 ### Sketch Logs
+
 - View in: Arduino App Lab → App Console → **"Sketch (Microcontroller)"** tab
 - Use `Monitor.print()` / `Monitor.println()` — **not** `Serial.println()`
 
 ### Common Issues
 
-| Problem | Likely Cause | Fix |
-|---------|-------------|-----|
-| Bridge.call does nothing | Function not registered in sketch `setup()` | Add `Bridge.provide("name", fn)` |
-| Python function never fires | `Bridge.provide()` called after `App.run()` | Move `Bridge.provide()` before `App.run()` |
-| Browser message not received | `ui.on_message()` after `App.run()` | Move all `ui.on_message()` before `App.run()` |
-| Sketch won't compile | Missing library in `sketch.yaml` | Add library with pinned version |
-| Console shows nothing from sketch | Used `Serial.println` | Use `Monitor.println` instead |
-| App crashes on start | Exception in `main.py` before `App.run()` | Check Python tab logs for traceback |
+| Problem                           | Likely Cause                                | Fix                                           |
+| --------------------------------- | ------------------------------------------- | --------------------------------------------- |
+| Bridge.call does nothing          | Function not registered in sketch `setup()` | Add `Bridge.provide("name", fn)`              |
+| Python function never fires       | `Bridge.provide()` called after `App.run()` | Move `Bridge.provide()` before `App.run()`    |
+| Browser message not received      | `ui.on_message()` after `App.run()`         | Move all `ui.on_message()` before `App.run()` |
+| Sketch won't compile              | Missing library in `sketch.yaml`            | Add library with pinned version               |
+| Console shows nothing from sketch | Used `Serial.println`                       | Use `Monitor.println` instead                 |
+| App crashes on start              | Exception in `main.py` before `App.run()`   | Check Python tab logs for traceback           |
 
 ---
 

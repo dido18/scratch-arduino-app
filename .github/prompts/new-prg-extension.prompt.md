@@ -35,7 +35,7 @@ Generate the following files:
 Use this exact structure:
 
 ```typescript
-import { extension, scratch, Language, type Environment } from "$common";
+import { type Environment, extension, Language, scratch } from "$common";
 
 const details = {
   name: "<Extension Display Name>",
@@ -47,7 +47,7 @@ const details = {
   tags: ["Arduino Modulino"],
 };
 
-export default class <ClassName> extends extension(details<mixins>) {
+export default class<ClassName> extends extension(details<mixins>) {
   // State fields here
 
   async init(env: Environment): Promise<void> {
@@ -59,6 +59,7 @@ export default class <ClassName> extends extension(details<mixins>) {
 ```
 
 Rules for block generation:
+
 - Each block must use the `@scratch.command`, `@scratch.reporter`, or `@scratch.button` decorator
 - Use template literal form for static blocks; function form `(self, tag) => tag\`...\`` when the block needs dynamic options from extension state
 - Each placeholder `${{ type, defaultValue?, options? }}` maps to one method parameter in order

@@ -16,10 +16,10 @@ Svelte files live **alongside** `index.ts` in the same extension folder and are 
 
 PRG extensions use Svelte for two distinct purposes:
 
-| Type | File naming | Opened via | Purpose |
-|---|---|---|---|
-| **Modal UI Panel** | `MyPanel.svelte` | `this.openUI("MyPanel")` | Full control panels, info views |
-| **Custom Argument** | `MyPicker.svelte` | `this.makeCustomArgument(...)` | Inline block argument selector |
+| Type                | File naming       | Opened via                     | Purpose                         |
+| ------------------- | ----------------- | ------------------------------ | ------------------------------- |
+| **Modal UI Panel**  | `MyPanel.svelte`  | `this.openUI("MyPanel")`       | Full control panels, info views |
+| **Custom Argument** | `MyPicker.svelte` | `this.makeCustomArgument(...)` | Inline block argument selector  |
 
 Both types receive an `extension` prop. Argument components additionally receive `setter` and `current`.
 
@@ -34,7 +34,7 @@ Register `"ui"` as a mixin, then call `openUI()` from any button block:
 ```typescript
 // index.ts
 export default class MyExtension extends extension(details, "ui") {
-  @(scratch.button`Open Control Panel`)
+  @scratch.button`Open Control Panel`
   showPanel(): void {
     this.openUI("Counter", "Panel Title (optional)");
   }
@@ -77,6 +77,7 @@ export default class MyExtension extends extension(details, "ui") {
 ```
 
 **Rules**:
+
 - Always `import type ExtensionClass from "."` — never import the default value directly (avoid circular side-effects)
 - The `extension` prop is always provided; do not assign a default
 - Use Svelte's reactive `$:` statements to sync with extension state
@@ -161,6 +162,7 @@ Call `setter({ value, text })` whenever the user makes a selection:
 ```
 
 **Key rules**:
+
 - `setter()` must be called on every change \u2014 use a reactive `$:` statement
 - `current.value` holds the previous/initial value; read it once on component mount
 - Never mutate `current` directly; always go through `setter`
@@ -271,6 +273,7 @@ extensions/src/my_extension/
 ```
 
 **Naming rules**:
+
 - Modal panels: PascalCase noun (`Counter`, `ColorPicker`, `AnimalCollection`)
 - Argument pickers: PascalCase noun + "Picker" or "Argument" suffix
 - Do **not** create a `ui/` subdirectory \u2014 keep Svelte files flat alongside `index.ts`
@@ -288,13 +291,13 @@ extensions/src/my_extension/
 
 ## Common Errors & Solutions
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| `extension` is undefined | Wrong import of extension | Use `import type Extension from "."` |
-| `setter` not a function | Prop name mismatch | Ensure prop is `setter`, not `onChange` or similar |
-| Block arg doesn't update | Forgot to call `setter` | Add `$: setter({ value, text })` reactive statement |
-| Component not found | File name mismatch | `openUI("Foo")` requires `Foo.svelte` (case-sensitive) |
-| Style bleeds into Scratch | Global CSS written | Always write styles inside `<style>` in `.svelte` file |
+| Error                         | Cause                     | Solution                                               |
+| ----------------------------- | ------------------------- | ------------------------------------------------------ |
+| `extension` is undefined      | Wrong import of extension | Use `import type Extension from "."`                   |
+| `setter` not a function       | Prop name mismatch        | Ensure prop is `setter`, not `onChange` or similar     |
+| Block arg doesn't update      | Forgot to call `setter`   | Add `$: setter({ value, text })` reactive statement    |
+| Component not found           | File name mismatch        | `openUI("Foo")` requires `Foo.svelte` (case-sensitive) |
+| Style bleeds into Scratch     | Global CSS written        | Always write styles inside `<style>` in `.svelte` file |
 | TypeScript error on prop type | `ParameterOf` wrong index | Check the method signature and 0-based parameter index |
 
 ---
