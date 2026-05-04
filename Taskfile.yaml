@@ -20,11 +20,11 @@ tasks:
       - ${PWD}/.bin/dprint check
 
   scratch:init:
-    - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-gui.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-gui.git"
-    - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-vm.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-vm.git"
-    - git clone --recurse-submodules --depth 1 --shallow-submodules https://github.com/mitmedialab/prg-raise-playground.git
-    - cd prg-raise-playground && git switch dev &&  pnpm install
-    - git apply --directory=prg-raise-playground/scratch-packages/scratch-gui $PWD/remove-extensions.patch
+    # - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-gui.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-gui.git"
+    # - git config --global url."https://github.com/mitmedialab/prg-raise-playground-scratch-vm.git".insteadOf "git@github.com:mitmedialab/prg-raise-playground-scratch-vm.git"
+    # - git clone --recurse-submodules --depth 1 --shallow-submodules https://github.com/mitmedialab/prg-raise-playground.git
+    # - cd prg-raise-playground && git switch dev &&  pnpm install
+    # - git apply --directory=prg-raise-playground/scratch-packages/scratch-gui $PWD/remove-extensions.patch
     # copy the extension to the right place
     - ln -s $PWD/scratch-prg-extensions/extensions/src/commonArduinoBoard $PWD/prg-raise-playground/extensions/src/commonArduinoBoard
     - cd scratch-prg-extensions/extensions/src/commonArduinoBoard &&  pnpm install
@@ -34,6 +34,8 @@ tasks:
     - cd scratch-prg-extensions/extensions/src/arduino_modulino_buttons && pnpm install
     - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_modulino_pixels $PWD/prg-raise-playground/extensions/src/arduino_modulino_pixels
     - cd scratch-prg-extensions/extensions/src/arduino_modulino_pixels && pnpm install
+    - ln -s $PWD/scratch-prg-extensions/extensions/src/arduino_modulino_movement $PWD/prg-raise-playground/extensions/src/arduino_modulino_movement
+    - cd scratch-prg-extensions/extensions/src/arduino_modulino_movement && pnpm install
 
   board:upload:
     desc: "Build, Upload, and start the app into the board"
@@ -67,6 +69,11 @@ tasks:
       - cp -r app/* tmp_zip/scratch-arduino-app/
       - cd tmp_zip && zip -r ../app/.build/scratch-arduino-app-{{.APP_VERSION}}.zip scratch-arduino-app && cd ..
       - rm -rf tmp_zip
+
+  app:start:
+    desc: "Start the app into the board"
+    cmds:
+      - adb shell "arduino-app-cli app start user:scratch-arduino-app"
 
   release:
     desc: Create a tag on the current commit and push it to the remote to create the release

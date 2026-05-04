@@ -4,11 +4,16 @@ from arduino.app_bricks.web_ui import WebUI
 ui = WebUI(use_tls=True)
 ui.on_connect(lambda sid: (print(f"Client connected: {sid} "),))
 
+def on_movement_data(accX, accY, accZ, roll, pitch, yaw):
+    """Receive and cache movement sensor data from sketch (msgpack format)"""
+    print("oooo movement data:")
+    print(accX, accY, accZ, roll, pitch, yaw)
 
 def on_modulino_button_pressed(btn):
     ui.send_message("modulino_buttons_pressed", {"btn": btn})
 
 
+Bridge.provide("movement_data", on_movement_data)
 Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
 
 
