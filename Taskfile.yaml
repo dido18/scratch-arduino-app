@@ -95,7 +95,7 @@ tasks:
 
   scratch:watch:
     cmds:
-      - cd prg-raise-playground && pnpm install && pnpm dev -i arduino_basics arduino_modulino_buttons arduino_modulino_pixels
+      - cd prg-raise-playground && pnpm install && pnpm dev -i arduino_basics arduino_modulino_buttons arduino_modulino_pixels arduino_modulino_movement
 
   python:watch:
     desc: "Watch Python folder for changes and auto-upload/restart"

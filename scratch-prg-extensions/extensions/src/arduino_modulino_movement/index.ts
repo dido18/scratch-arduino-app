@@ -5,14 +5,13 @@ const details = {
   name: "Arduino Modulino Movement",
   description: "Read 6-axis sensor data (acceleration & rotation) from Modulino Movement module",
   implementationLanguage: Language.English,
-  blockColor: "#4CAF50",       // Green for sensors
+  blockColor: "#4CAF50",
   menuColor: "#66BB6A",
   menuSelectColor: "#2E7D32",
   tags: ["Arduino Modulino"],
 };
 
 export default class ArduinoModulinoMovement extends extension(details) {
-  // Current sensor readings (updated via polling or Bridge notifications)
   private accelX: number = 0;
   private accelY: number = 0;
   private accelZ: number = 0;
