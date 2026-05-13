@@ -24,7 +24,8 @@ export default class ArduinoModulinoMovement extends extension(details) {
 
   async init(env: Environment){
     this.board = ConnectArduinoBoard();
-    this.board.socket.on("movement_data", (data) => {
+    this.board.socket.on("modulino_movement_data", (data) => {
+        console.log("Received movement data:", data); // Debug log to verify data reception
       this.accelX = data.accelX ?? 0;
       this.accelY = data.accelY ?? 0;
       this.accelZ = data.accelZ ?? 0;

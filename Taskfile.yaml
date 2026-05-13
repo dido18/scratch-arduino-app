@@ -61,7 +61,7 @@ tasks:
         sh: echo "${APP_VERSION:-$(git rev-parse --short HEAD 2>/dev/null || echo 'unknoscrwn')}"
     cmds:
       - cd prg-raise-playground && pnpm install
-      - cd prg-raise-playground && pnpm transpile:vm && CI=true NODE_ENV=production pnpm build:extensions:and:gui --include -i arduino_basics arduino_modulino_buttons arduino_modulino_pixels teachableMachine poseBody poseFace poseHand --watch false --parrallel false
+      - cd prg-raise-playground && pnpm transpile:vm && CI=true NODE_ENV=production pnpm build:extensions:and:gui --include -i arduino_basics arduino_modulino_buttons arduino_modulino_pixels arduino_modulino_movement teachableMachine poseBody poseFace poseHand --watch false --parrallel false
       - cd prg-raise-playground && rm -rf ../app/assets && cp -r build/. ../app/assets
       - echo "Creating zip with version {{.APP_VERSION}}"
       - mkdir -p app/.build && rm -f app/.build/*.zip
@@ -161,7 +161,7 @@ tasks:
       - |
           TOTAL_START=$(date +%s)
           /usr/bin/time -f "♾️  Compiled in %es" arduino-cli compile  --build-path .cache -b arduino:zephyr:unoq app/sketch/
-          /usr/bin/time -f "♾️  Uploaded in %es" arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq:flash_mode=ram --input-dir .cache  app/sketch/
+          /usr/bin/time -f "♾️  Uploaded in %es" arduino-cli upload -p /dev/ttyACM0 -b arduino:zephyr:unoq  --input-dir .cache  app/sketch/
           TOTAL_END=$(date +%s)
           echo "♾️  Total time: $((TOTAL_END - TOTAL_START))s"
       # even if not necessary: the sketch folder is sync into the board to have the updated version

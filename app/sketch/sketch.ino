@@ -11,7 +11,8 @@ ModulinoPixels pixels;
 ModulinoMovement movement;
 
 
-const unsigned long MOVEMENT_POLL_INTERVAL = 100;
+
+const unsigned long MOVEMENT_POLL_INTERVAL = 1000;
 unsigned long last_movement_poll = 0;
 
 typedef struct custom_servo{
@@ -150,6 +151,7 @@ int servo_write(int pin, int angle){
     }
   }
 
+
   if (number_of_servos>=SKETCH_MAX_SERVOS){
     return -2;
   }
@@ -168,12 +170,11 @@ void send_movement_data() {
   float accelY = movement.getY();
   float accelZ = movement.getZ();
 
-
   float roll = movement.getRoll();
   float pitch = movement.getPitch();
   float yaw = movement.getYaw();
 
-  Bridge.notify("movement_data", accelX, accelY, accelZ, roll, pitch, yaw);
+  Bridge.notify("modulino_movement_data", accelX, accelY, accelZ, roll, pitch, yaw);
 }
 
 
