@@ -21,8 +21,6 @@ Accessible from any device via a browser, it makes coding, electronics, and AI h
 - Select the local `.zip` file
 - Click on the App, and `Run`
 
-NOTE: the AppLab is slow to load the app :)
-
 ### From command-line
 
 - Open the [Arduino App Lab](https://docs.arduino.cc/software/app-lab/) and connect to your Arduino UNO Q board.
