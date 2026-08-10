@@ -11,6 +11,7 @@ export default class ModulinoPixels extends extension(
     blockColor: "#00878F",
     menuColor: "#8C7965",
     menuSelectColor: "#62AEB2",
+    //launchPeripheralConnectionFlow: true,
   },
   "ui",
   "customArguments",
@@ -18,7 +19,11 @@ export default class ModulinoPixels extends extension(
   private board!: ArduinoBoard;
 
   init(env: Environment) {
+    console.log("Initializing Arduino Modulino Pixels Extension");
+    env.runtime.registerPeripheralExtension(9999, this);
+    env.runtime.connectPeripheral(9999, 0);
     this.board = ConnectArduinoBoard();
+
   }
 
   @scratch.command`Set pixel ${{ type: "number" }} to ${{ type: "color" }}`

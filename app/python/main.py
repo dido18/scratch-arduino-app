@@ -9,6 +9,13 @@ def on_modulino_button_pressed(btn):
     ui.send_message("modulino_buttons_pressed", {"btn": btn})
 
 
+def on_modulinos_detected(data):
+    # {'Smartleds': 54, 'Buttons': 62, 'Buzzer': 30, 'Distance': 41}
+    print("modulino detected", data.keys())
+    # {'Smartleds': 54, 'Buttons': 62, 'Buzzer': 30, 'Distance': 41}
+    ui.send_message("modulino_connected", {"modulinos": list(data.keys())})
+
+Bridge.provide("modulinos_detected", on_modulinos_detected)
 Bridge.provide("modulino_button_pressed", on_modulino_button_pressed)
 
 
